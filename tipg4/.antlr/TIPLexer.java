@@ -17,10 +17,10 @@ public class TIPLexer extends Lexer {
 		new PredictionContextCache();
 	public static final int
 		T__0=1, T__1=2, T__2=3, T__3=4, T__4=5, T__5=6, T__6=7, T__7=8, T__8=9, 
-		T__9=10, T__10=11, INC=12, DEC=13, MUL=14, DIV=15, MOD=16, ADD=17, SUB=18, 
-		GT=19, GE=20, LT=21, LE=22, EQ=23, NE=24, NUMBER=25, KALLOC=26, KINPUT=27, 
-		KWHILE=28, KIF=29, KELSE=30, KVAR=31, KRETURN=32, KNULL=33, KOUTPUT=34, 
-		KERROR=35, IDENTIFIER=36, WS=37, BLOCKCOMMENT=38, COMMENT=39;
+		T__9=10, T__10=11, T__11=12, T__12=13, MUL=14, DIV=15, MOD=16, ADD=17, 
+		SUB=18, GT=19, GE=20, LT=21, LE=22, EQ=23, NE=24, NUMBER=25, KALLOC=26, 
+		KINPUT=27, KWHILE=28, KIF=29, KELSE=30, KVAR=31, KRETURN=32, KNULL=33, 
+		KOUTPUT=34, KERROR=35, IDENTIFIER=36, WS=37, BLOCKCOMMENT=38, COMMENT=39;
 	public static String[] channelNames = {
 		"DEFAULT_TOKEN_CHANNEL", "HIDDEN"
 	};
@@ -32,8 +32,8 @@ public class TIPLexer extends Lexer {
 	private static String[] makeRuleNames() {
 		return new String[] {
 			"T__0", "T__1", "T__2", "T__3", "T__4", "T__5", "T__6", "T__7", "T__8", 
-			"T__9", "T__10", "INC", "DEC", "MUL", "DIV", "MOD", "ADD", "SUB", "GT", 
-			"GE", "LT", "LE", "EQ", "NE", "NUMBER", "KALLOC", "KINPUT", "KWHILE", 
+			"T__9", "T__10", "T__11", "T__12", "MUL", "DIV", "MOD", "ADD", "SUB", 
+			"GT", "GE", "LT", "LE", "EQ", "NE", "NUMBER", "KALLOC", "KINPUT", "KWHILE", 
 			"KIF", "KELSE", "KVAR", "KRETURN", "KNULL", "KOUTPUT", "KERROR", "IDENTIFIER", 
 			"WS", "BLOCKCOMMENT", "COMMENT"
 		};
@@ -42,8 +42,8 @@ public class TIPLexer extends Lexer {
 
 	private static String[] makeLiteralNames() {
 		return new String[] {
-			null, "'('", "','", "')'", "'{'", "'}'", "';'", "'.'", "'&'", "':'", 
-			"'='", "'?'", "'++'", "'--'", "'*'", "'/'", "'%'", "'+'", "'-'", "'>'", 
+			null, "'('", "','", "')'", "'{'", "'}'", "';'", "'.'", "'&'", "'?'", 
+			"':'", "'='", "'++'", "'--'", "'*'", "'/'", "'%'", "'+'", "'-'", "'>'", 
 			"'>='", "'<'", "'<='", "'=='", "'!='", null, "'alloc'", "'input'", "'while'", 
 			"'if'", "'else'", "'var'", "'return'", "'null'", "'output'", "'error'"
 		};
@@ -52,7 +52,7 @@ public class TIPLexer extends Lexer {
 	private static String[] makeSymbolicNames() {
 		return new String[] {
 			null, null, null, null, null, null, null, null, null, null, null, null, 
-			"INC", "DEC", "MUL", "DIV", "MOD", "ADD", "SUB", "GT", "GE", "LT", "LE", 
+			null, null, "MUL", "DIV", "MOD", "ADD", "SUB", "GT", "GE", "LT", "LE", 
 			"EQ", "NE", "NUMBER", "KALLOC", "KINPUT", "KWHILE", "KIF", "KELSE", "KVAR", 
 			"KRETURN", "KNULL", "KOUTPUT", "KERROR", "IDENTIFIER", "WS", "BLOCKCOMMENT", 
 			"COMMENT"
@@ -152,8 +152,8 @@ public class TIPLexer extends Lexer {
 		"\u00b6\3\2\2\2G\u00bd\3\2\2\2I\u00c3\3\2\2\2K\u00cb\3\2\2\2M\u00d1\3\2"+
 		"\2\2O\u00df\3\2\2\2QR\7*\2\2R\4\3\2\2\2ST\7.\2\2T\6\3\2\2\2UV\7+\2\2V"+
 		"\b\3\2\2\2WX\7}\2\2X\n\3\2\2\2YZ\7\177\2\2Z\f\3\2\2\2[\\\7=\2\2\\\16\3"+
-		"\2\2\2]^\7\60\2\2^\20\3\2\2\2_`\7(\2\2`\22\3\2\2\2ab\7<\2\2b\24\3\2\2"+
-		"\2cd\7?\2\2d\26\3\2\2\2ef\7A\2\2f\30\3\2\2\2gh\7-\2\2hi\7-\2\2i\32\3\2"+
+		"\2\2\2]^\7\60\2\2^\20\3\2\2\2_`\7(\2\2`\22\3\2\2\2ab\7A\2\2b\24\3\2\2"+
+		"\2cd\7<\2\2d\26\3\2\2\2ef\7?\2\2f\30\3\2\2\2gh\7-\2\2hi\7-\2\2i\32\3\2"+
 		"\2\2jk\7/\2\2kl\7/\2\2l\34\3\2\2\2mn\7,\2\2n\36\3\2\2\2op\7\61\2\2p \3"+
 		"\2\2\2qr\7\'\2\2r\"\3\2\2\2st\7-\2\2t$\3\2\2\2uv\7/\2\2v&\3\2\2\2wx\7"+
 		"@\2\2x(\3\2\2\2yz\7@\2\2z{\7?\2\2{*\3\2\2\2|}\7>\2\2},\3\2\2\2~\177\7"+

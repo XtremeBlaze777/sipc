@@ -35,8 +35,7 @@ nameDeclaration : IDENTIFIER ;
 // issues elsewhere in the compiler, e.g.,  introducing an assignable expr
 // weeding pass. 
 //
-expr : IDENTIFIER op=(INC | DEC)            #incrementDecrement
-     | expr '(' (expr (',' expr)*)? ')' 	#funAppExpr
+expr : expr '(' (expr (',' expr)*)? ')' 	#funAppExpr
      | expr '.' IDENTIFIER 		#accessExpr
      | '*' expr 				#deRefExpr
      | SUB NUMBER				#negNumber
@@ -46,6 +45,7 @@ expr : IDENTIFIER op=(INC | DEC)            #incrementDecrement
      | SUB expr                 #arithmeticNegation
      | expr op=(GT | GE | LT | LE) expr 				#relationalExpr
      | expr op=(EQ | NE) expr 			#equalityExpr
+     | expr '?' expr ':' expr           #ternaryExpr
      | IDENTIFIER				#varExpr
      | NUMBER					#numExpr
      | KINPUT					#inputExpr
@@ -62,6 +62,8 @@ fieldExpr : IDENTIFIER ':' expr ;
 ////////////////////// TIP Statements ////////////////////////// 
 
 statement : blockStmt
+    | incStmt
+    | decStmt
     | assignStmt
     | whileStmt
     | ifStmt
@@ -75,9 +77,7 @@ blockStmt : '{' (statement*) '}' ;
 
 whileStmt : KWHILE '(' expr ')' statement ;
 
-ifStmt : KIF '(' expr ')' statement (KELSE statement)?      #typicalIf
-       | expr '?' expr ':' expr           #ternaryExpr
-;
+ifStmt : KIF '(' expr ')' statement (KELSE statement)? ;
 
 outputStmt : KOUTPUT expr ';'  ;
 
@@ -85,13 +85,15 @@ errorStmt : KERROR expr ';'  ;
 
 returnStmt : KRETURN expr ';'  ;
 
+incStmt : expr '++';
+
+decStmt : expr '--';
+
 
 ////////////////////// TIP Lexicon ////////////////////////// 
 
 // By convention ANTLR4 lexical elements use all caps
 
-INC : '++' ;
-DEC : '--' ;
 MUL : '*' ;
 DIV : '/' ;
 MOD : '%' ;
