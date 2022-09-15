@@ -40,12 +40,16 @@ expr : expr '(' (expr (',' expr)*)? ')' 	#funAppExpr
      | '*' expr 				#deRefExpr
      | SUB NUMBER				#negNumber
      | '&' expr					#refExpr
+     | NOT expr                 #unaryNegation
      | expr op=(MUL | DIV | MOD) expr 	#multiplicativeExpr
      | expr op=(ADD | SUB) expr 		#additiveExpr
      | SUB expr                 #arithmeticNegation
      | expr op=(GT | GE | LT | LE) expr 				#relationalExpr
      | expr op=(EQ | NE) expr 			#equalityExpr
+     | expr AND expr            #bitwiseAnd
+     | expr OR expr             #bitwiseOr
      | expr '?' expr ':' expr           #ternaryExpr
+     | BOOLEAN                  #boolExpr
      | IDENTIFIER				#varExpr
      | NUMBER					#numExpr
      | KINPUT					#inputExpr
@@ -94,6 +98,7 @@ decStmt : expr '--';
 
 // By convention ANTLR4 lexical elements use all caps
 
+NOT : 'not' ;
 MUL : '*' ;
 DIV : '/' ;
 MOD : '%' ;
@@ -105,6 +110,8 @@ LT  : '<'   ;
 LE  : '<=' ;
 EQ  : '==' ;
 NE  : '!=' ;
+AND : 'and' ;
+OR  : 'or' ;
 
 NUMBER : [0-9]+ ;
 
@@ -120,6 +127,10 @@ KRETURN : 'return' ;
 KNULL   : 'null' ;
 KOUTPUT : 'output' ;
 KERROR  : 'error' ;
+KTRUE   : 'true' ;
+KFALSE  : 'false' ;
+
+BOOLEAN : KTRUE | KFALSE ;
 
 IDENTIFIER : [a-zA-Z_][a-zA-Z0-9_]* ;
 
