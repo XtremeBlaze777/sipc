@@ -35,9 +35,9 @@ nameDeclaration : IDENTIFIER ;
 // issues elsewhere in the compiler, e.g.,  introducing an assignable expr
 // weeding pass. 
 //
-expr : IDENTIFIER op=(INC | DEC)        #incrementDecrement
+expr : IDENTIFIER op=(INC | DEC)            #incrementDecrement
      | expr '(' (expr (',' expr)*)? ')' 	#funAppExpr
-     | expr '.' IDENTIFIER 			#accessExpr
+     | expr '.' IDENTIFIER 		#accessExpr
      | '*' expr 				#deRefExpr
      | SUB NUMBER				#negNumber
      | '&' expr					#refExpr
@@ -74,7 +74,9 @@ blockStmt : '{' (statement*) '}' ;
 
 whileStmt : KWHILE '(' expr ')' statement ;
 
-ifStmt : KIF '(' expr ')' statement (KELSE statement)? ;
+ifStmt : KIF '(' expr ')' statement (KELSE statement)?
+       | expr '?' expr ':' expr           #ternaryExpr
+;
 
 outputStmt : KOUTPUT expr ';'  ;
 
