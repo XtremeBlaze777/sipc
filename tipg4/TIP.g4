@@ -35,7 +35,8 @@ nameDeclaration : IDENTIFIER ;
 // issues elsewhere in the compiler, e.g.,  introducing an assignable expr
 // weeding pass. 
 //
-expr : expr '(' (expr (',' expr)*)? ')' 	#funAppExpr
+expr : IDENTIFIER op=(INC | DEC)        #incrementDecrement
+     | expr '(' (expr (',' expr)*)? ')' 	#funAppExpr
      | expr '.' IDENTIFIER 			#accessExpr
      | '*' expr 				#deRefExpr
      | SUB NUMBER				#negNumber
@@ -86,6 +87,8 @@ returnStmt : KRETURN expr ';'  ;
 
 // By convention ANTLR4 lexical elements use all caps
 
+INC : '++' ;
+DEC : '--' ;
 MUL : '*' ;
 DIV : '/' ;
 ADD : '+' ;
