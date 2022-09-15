@@ -50,6 +50,9 @@ expr : expr '(' (expr (',' expr)*)? ')' 	#funAppExpr
      | expr OR expr             #bitwiseOr
      | expr '?' expr ':' expr           #ternaryExpr
      | BOOLEAN                  #boolExpr
+     | ARRAY                    #arr
+     | LEN ARRAY                #arrLen
+     | IDENTIFIER '[]'          #arrIndex
      | IDENTIFIER				#varExpr
      | NUMBER					#numExpr
      | KINPUT					#inputExpr
@@ -118,6 +121,7 @@ EQ  : '==' ;
 NE  : '!=' ;
 AND : 'and' ;
 OR  : 'or' ;
+LEN : '#' ;
 
 NUMBER : [0-9]+ ;
 
@@ -136,6 +140,9 @@ KOUTPUT : 'output' ;
 KERROR  : 'error' ;
 KTRUE   : 'true' ;
 KFALSE  : 'false' ;
+
+ARRAY : '[' expr ' of ' expr ']'
+      | '[' ( expr ( ',' expr )* )? ']' ;
 
 BOOLEAN : KTRUE | KFALSE ;
 
