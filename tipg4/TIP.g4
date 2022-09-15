@@ -41,8 +41,9 @@ expr : IDENTIFIER op=(INC | DEC)            #incrementDecrement
      | '*' expr 				#deRefExpr
      | SUB NUMBER				#negNumber
      | '&' expr					#refExpr
-     | expr op=(MUL | DIV) expr 		#multiplicativeExpr
+     | expr op=(MUL | DIV | MOD) expr 	#multiplicativeExpr
      | expr op=(ADD | SUB) expr 		#additiveExpr
+     | SUB expr                 #arithmeticNegation
      | expr op=(GT | GE | LT | LE) expr 				#relationalExpr
      | expr op=(EQ | NE) expr 			#equalityExpr
      | IDENTIFIER				#varExpr
@@ -74,7 +75,7 @@ blockStmt : '{' (statement*) '}' ;
 
 whileStmt : KWHILE '(' expr ')' statement ;
 
-ifStmt : KIF '(' expr ')' statement (KELSE statement)?
+ifStmt : KIF '(' expr ')' statement (KELSE statement)?      #typicalIf
        | expr '?' expr ':' expr           #ternaryExpr
 ;
 
@@ -93,6 +94,7 @@ INC : '++' ;
 DEC : '--' ;
 MUL : '*' ;
 DIV : '/' ;
+MOD : '%' ;
 ADD : '+' ;
 SUB : '-' ;
 GT  : '>' ;
