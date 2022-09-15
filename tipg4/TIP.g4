@@ -52,7 +52,7 @@ expr : expr '(' (expr (',' expr)*)? ')' 	#funAppExpr
      | BOOLEAN                  #boolExpr
      | ARRAY                    #arr
      | LEN ARRAY                #arrLen
-     | IDENTIFIER '[]'          #arrIndex
+     | IDENTIFIER '[' expr ']'          #arrIndex
      | IDENTIFIER				#varExpr
      | NUMBER					#numExpr
      | KINPUT					#inputExpr
