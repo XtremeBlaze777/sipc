@@ -70,6 +70,8 @@ statement : blockStmt
     | decStmt
     | assignStmt
     | whileStmt
+    | forStmt
+    | forEachStmt
     | ifStmt
     | outputStmt
     | errorStmt
@@ -81,6 +83,10 @@ blockStmt : '{' (statement*) '}' ;
 
 whileStmt : KWHILE '(' expr ')' statement ;
 
+forStmt : KFOR '(' expr ':' expr '..' expr ('by' expr)? ')' statement;
+
+forEachStmt : KFOR '(' expr ':' expr ')' statement ;
+
 ifStmt : KIF '(' expr ')' statement (KELSE statement)? ;
 
 outputStmt : KOUTPUT expr ';'  ;
@@ -89,9 +95,9 @@ errorStmt : KERROR expr ';'  ;
 
 returnStmt : KRETURN expr ';'  ;
 
-incStmt : expr '++';
+incStmt : expr '++' ';';
 
-decStmt : expr '--';
+decStmt : expr '--' ';';
 
 
 ////////////////////// TIP Lexicon ////////////////////////// 
@@ -120,6 +126,7 @@ NUMBER : [0-9]+ ;
 KALLOC  : 'alloc' ;
 KINPUT  : 'input' ;
 KWHILE  : 'while' ;
+KFOR    : 'for' ;
 KIF     : 'if' ;
 KELSE   : 'else' ;
 KVAR    : 'var' ;
