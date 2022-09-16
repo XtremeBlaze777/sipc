@@ -50,9 +50,10 @@ expr : expr '(' (expr (',' expr)*)? ')' 	#funAppExpr
      | expr OR expr             #bitwiseOr
      | expr '?' expr ':' expr           #ternaryExpr
      | BOOLEAN                  #boolExpr
-     | ARRAY                    #arr
-     | LEN ARRAY                #arrLen
-     | IDENTIFIER '[' expr ']'          #arrIndex
+     | LKET ( expr ( ',' expr )* )? RKET    #mainArr
+     | LKET expr 'of' expr RKET             #altArr
+     | LEN IDENTIFIER                       #arrLen
+     | IDENTIFIER LKET expr RKET            #arrIndex
      | IDENTIFIER				#varExpr
      | NUMBER					#numExpr
      | KINPUT					#inputExpr
@@ -107,6 +108,8 @@ decStmt : expr '--' ';';
 
 // By convention ANTLR4 lexical elements use all caps
 
+LKET : '[' ;
+RKET : ']' ;
 NOT : 'not' ;
 MUL : '*' ;
 DIV : '/' ;
@@ -140,9 +143,6 @@ KOUTPUT : 'output' ;
 KERROR  : 'error' ;
 KTRUE   : 'true' ;
 KFALSE  : 'false' ;
-
-ARRAY : '[' expr ' of ' expr ']'
-      | '[' ( expr ( ',' expr )* )? ']' ;
 
 BOOLEAN : KTRUE | KFALSE ;
 
