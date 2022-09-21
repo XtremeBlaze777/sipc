@@ -38,3 +38,10 @@ coverage.out/
 corretto.key
 llvm.sh
 kitware-archive.sh
+
+# VS Code
+.vscode/
+tipg4/.antlr/
+
+# Testing
+tipg4/hellosip.tip
