@@ -188,6 +188,7 @@ TEST_CASE("TIP Parser: arr len precedence test", "[TIP Parser]") {
     stream << R"(main() {var p; p = [1 of 2]; return #p;})";
     std::string expected = "(expr # [(expr 1) of (expr 2)])";
     std::string tree = ParserHelper::parsetree(stream);
+    std::cout << tree << std::endl;
     REQUIRE(tree.find(expected) != std::string::npos); 
     stream.str("");
     stream << R"(main() {var p; p = [1, 2]; return #p;})";
@@ -202,6 +203,7 @@ TEST_CASE("TIP Parser: modulo precedence test", "[TIP Parser]") {
     stream << R"(main() { return not -5 % 3;})";
     std::string expected = "(expr (not (- (expr 5)) % (expr 3))";
     std::string tree = ParserHelper::parsetree(stream);
+    std::cout << tree << std::endl;
     REQUIRE(tree.find(expected) != std::string::npos); 
     stream.str("");
     stream << R"(main() return 5 - 3 % 3;})";
@@ -215,6 +217,7 @@ TEST_CASE("TIP Parser: unary negation precedence test", "[TIP Parser]") {
     stream << R"(main() { return -1 * 2;})";
     std::string expected = "(expr (not expr 1) * (expr 2))";
     std::string tree = ParserHelper::parsetree(stream);
+    std::cout << tree << std::endl;
     REQUIRE(tree.find(expected) != std::string::npos); 
     stream.str("");
     stream << R"(main() var p; &p = 1; return -&p;})";
@@ -229,6 +232,7 @@ TEST_CASE("TIP Parser: relational operator precedence test", "[TIP Parser]") {
     stream << R"(main() { return 2 * 2 >= 3;})";
     std::string expected = "(expr ((expr 2) * (expr 2)) >= (expr 3))";
     std::string tree = ParserHelper::parsetree(stream);
+    std::cout << tree << std::endl;
     REQUIRE(tree.find(expected) != std::string::npos); 
     stream.str("");
     stream << R"(main() { return 3 + 2 <= 3;})";
