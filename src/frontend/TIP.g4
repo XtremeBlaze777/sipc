@@ -99,9 +99,9 @@ errorStmt : KERROR expr ';'  ;
 
 returnStmt : KRETURN expr ';'  ;
 
-incStmt : expr '++' ';';
+incStmt : expr INC ';';
 
-decStmt : expr '--' ';';
+decStmt : expr DEC ';';
 
 
 ////////////////////// TIP Lexicon ////////////////////////// 
@@ -110,6 +110,8 @@ decStmt : expr '--' ';';
 
 LKET : '[' ;
 RKET : ']' ;
+INC : '++' ;
+DEC : '--' ;
 NOT : 'not' ;
 MUL : '*' ;
 DIV : '/' ;
@@ -141,10 +143,8 @@ KRETURN : 'return' ;
 KNULL   : 'null' ;
 KOUTPUT : 'output' ;
 KERROR  : 'error' ;
-KTRUE   : 'true' ;
-KFALSE  : 'false' ;
 
-BOOLEAN : KTRUE | KFALSE ;
+BOOLEAN : 'true' | 'false' ;
 
 IDENTIFIER : [a-zA-Z_][a-zA-Z0-9_]* ;
 
