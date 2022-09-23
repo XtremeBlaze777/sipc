@@ -37,18 +37,18 @@ nameDeclaration : IDENTIFIER ;
 //
 expr : expr '(' (expr (',' expr)*)? ')' 	#funAppExpr
      | expr '.' IDENTIFIER 		#accessExpr
-     | '*' expr 				#deRefExpr
+     | <assoc=right> '*' expr 				#deRefExpr
      | SUB NUMBER				#negNumber
-     | '&' expr					#refExpr
+     | <assoc=right> '&' expr					#refExpr
      | NOT expr                 #unaryNegation
+     | <assoc=right> SUB expr                 #arithmeticNegation
      | expr op=(MUL | DIV | MOD) expr 	#multiplicativeExpr
      | expr op=(ADD | SUB) expr 		#additiveExpr
-     | SUB expr                 #arithmeticNegation
      | expr op=(GT | GE | LT | LE) expr 				#relationalExpr
      | expr op=(EQ | NE) expr 			#equalityExpr
      | expr AND expr            #bitwiseAnd
      | expr OR expr             #bitwiseOr
-     | expr '?' expr ':' expr           #ternaryExpr
+     | <assoc=right> expr '?' expr ':' expr           #ternaryExpr
      | BOOLEAN                  #boolExpr
      | LKET ( expr ( ',' expr )* )? RKET    #mainArr
      | LKET expr 'of' expr RKET             #altArr

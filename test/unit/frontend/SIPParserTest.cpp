@@ -5,7 +5,7 @@
 
 #include <catch2/catch_test_macros.hpp>
 
-TEST_CASE("TIP Parser: boolean", "[TIP Parser]") {
+TEST_CASE("SIP Parser: boolean", "[SIP Parser]") {
     std::stringstream stream;
     stream << R"(
       boolean() {
@@ -20,7 +20,7 @@ TEST_CASE("TIP Parser: boolean", "[TIP Parser]") {
     REQUIRE(ParserHelper::is_parsable(stream));
 }
 
-TEST_CASE("TIP Parser: modulo", "[TIP Parser]") {
+TEST_CASE("SIP Parser: modulo", "[SIP Parser]") {
     std::stringstream stream;
     stream << R"(
       modulo() {
@@ -42,7 +42,7 @@ TEST_CASE("TIP Parser: modulo", "[TIP Parser]") {
 }
 
 
-TEST_CASE("TIP Parser: negation", "[TIP Parser]") {
+TEST_CASE("SIP Parser: negation", "[SIP Parser]") {
     std::stringstream stream;
     stream << R"(
       negation() {
@@ -61,7 +61,7 @@ TEST_CASE("TIP Parser: negation", "[TIP Parser]") {
 }
 
 
-TEST_CASE("TIP Parser: relational operator extension", "[TIP Parser]") {
+TEST_CASE("SIP Parser: relational operator extension", "[SIP Parser]") {
     std::stringstream stream;
     stream << R"(
       cmp() {
@@ -89,7 +89,7 @@ TEST_CASE("TIP Parser: relational operator extension", "[TIP Parser]") {
 }
 
 
-TEST_CASE("TIP Parser: ternary operator", "[TIP Parser]") {
+TEST_CASE("SIP Parser: ternary operator", "[SIP Parser]") {
     std::stringstream stream;
     stream << R"(
       ternary() {
@@ -111,7 +111,7 @@ TEST_CASE("TIP Parser: ternary operator", "[TIP Parser]") {
 }
 
 
-TEST_CASE("TIP Parser: inc/dec statements", "[TIP Parser]") {
+TEST_CASE("SIP Parser: inc/dec statements", "[SIP Parser]") {
     std::stringstream stream;
     stream << R"(
       incdec() {
@@ -131,7 +131,7 @@ TEST_CASE("TIP Parser: inc/dec statements", "[TIP Parser]") {
 }
 
 
-TEST_CASE("TIP Parser: arrays", "[TIP Parser]") {
+TEST_CASE("SIP Parser: arrays", "[SIP Parser]") {
     std::stringstream stream;
     stream << R"(
       arrtest() {
@@ -152,7 +152,7 @@ TEST_CASE("TIP Parser: arrays", "[TIP Parser]") {
 }
 
 
-TEST_CASE("TIP Parser: for loops", "[TIP Parser]") {
+TEST_CASE("SIP Parser: for loops", "[SIP Parser]") {
     std::stringstream stream;
     stream << R"(
       arrtest() {
@@ -182,67 +182,70 @@ TEST_CASE("TIP Parser: for loops", "[TIP Parser]") {
     REQUIRE(ParserHelper::is_parsable(stream));
 }
 
-
-TEST_CASE("TIP Parser: arr len precedence test", "[TIP Parser]") {
+TEST_CASE("SIP Parser: arr len precedence test", "[SIP Parser]") {
     std::stringstream stream;
     stream << R"(main() {var p; p = [1 of 2]; return #p;})";
-    std::string expected = "(expr # [(expr 1) of (expr 2)])";
+    std::string expected = "(expr # p)";
     std::string tree = ParserHelper::parsetree(stream);
-    std::cout << tree << std::endl;
     REQUIRE(tree.find(expected) != std::string::npos); 
     stream.str("");
     stream << R"(main() {var p; p = [1, 2]; return #p;})";
-    expected = "(expr # [((expr 1), (expr 2))])";
+    expected = "(expr # p)";
     tree = ParserHelper::parsetree(stream);
     REQUIRE(tree.find(expected) != std::string::npos);
 }
 
 
-TEST_CASE("TIP Parser: modulo precedence test", "[TIP Parser]") {
+TEST_CASE("SIP Parser: modulo precedence test", "[SIP Parser]") {
     std::stringstream stream;
     stream << R"(main() { return not -5 % 3;})";
-    std::string expected = "(expr (not (- (expr 5)) % (expr 3))";
+    std::string expected = "(expr (expr not (expr - 5)) % (expr 3))";
     std::string tree = ParserHelper::parsetree(stream);
-    std::cout << tree << std::endl;
     REQUIRE(tree.find(expected) != std::string::npos); 
     stream.str("");
-    stream << R"(main() return 5 - 3 % 3;})";
-    expected = "(expr (expr 5) - ((expr 3) % (expr 3)))";
+    stream << R"(main() { return 5 - 3 % 3;})";
+    expected = "(expr (expr 5) - (expr (expr 3) % (expr 3)))";
     tree = ParserHelper::parsetree(stream);
     REQUIRE(tree.find(expected) != std::string::npos);
 }
 
-TEST_CASE("TIP Parser: unary negation precedence test", "[TIP Parser]") {
+TEST_CASE("SIP Parser: unary negation precedence test", "[SIP Parser]") {
     std::stringstream stream;
     stream << R"(main() { return -1 * 2;})";
-    std::string expected = "(expr (not expr 1) * (expr 2))";
+    std::string expected = "(expr (expr - 1) * (expr 2))";
     std::string tree = ParserHelper::parsetree(stream);
-    std::cout << tree << std::endl;
     REQUIRE(tree.find(expected) != std::string::npos); 
     stream.str("");
-    stream << R"(main() var p; &p = 1; return -&p;})";
-    expected = "(expr not (& (expr 1)))";
+    stream << R"(main() { var p; &p = 1; return -&p;})";
+    expected = "(expr - (expr & (expr p)))";
     tree = ParserHelper::parsetree(stream);
     REQUIRE(tree.find(expected) != std::string::npos);
 }
 
 
-TEST_CASE("TIP Parser: relational operator precedence test", "[TIP Parser]") {
+TEST_CASE("SIP Parser: relational operator precedence test", "[SIP Parser]") {
     std::stringstream stream;
     stream << R"(main() { return 2 * 2 >= 3;})";
-    std::string expected = "(expr ((expr 2) * (expr 2)) >= (expr 3))";
+    std::string expected = "(expr (expr (expr 2) * (expr 2)) >= (expr 3))";
     std::string tree = ParserHelper::parsetree(stream);
-    std::cout << tree << std::endl;
     REQUIRE(tree.find(expected) != std::string::npos); 
     stream.str("");
     stream << R"(main() { return 3 + 2 <= 3;})";
-    expected = "(expr ((expr 3) + (expr 2) <= (expr 3))";
+    expected = "(expr (expr (expr 3) + (expr 2)) <= (expr 3))";
     tree = ParserHelper::parsetree(stream);
     REQUIRE(tree.find(expected) != std::string::npos);
     stream.str("");
     stream << R"(main() { return 3 + 2 < 3;})";
-    expected = "(expr ((expr 3) + (expr 2) < (expr 3))";
+    expected = "(expr (expr (expr 3) + (expr 2)) < (expr 3))";
     tree = ParserHelper::parsetree(stream);
     REQUIRE(tree.find(expected) != std::string::npos);
 }
 
+TEST_CASE("SIP Parser: ternary operator precedence test", "[SIP Parser]") {
+    std::stringstream stream;
+    stream << R"(main() {return a ? b : c ? d : e;})";
+    std::string expected = "(expr (expr a) ? (expr b) : (expr (expr c) ? (expr d) : (expr e)))";
+    std::string tree = ParserHelper::parsetree(stream);
+    REQUIRE(tree.find(expected) != std::string::npos); 
+    stream.str("");
+}
