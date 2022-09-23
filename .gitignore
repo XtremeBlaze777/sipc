@@ -47,3 +47,4 @@ src/frontend/.antlr
 
 # Testing
 tipg4/hellosip.tip
+tipg4/test.sip
