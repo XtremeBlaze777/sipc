@@ -36,14 +36,24 @@ nameDeclaration : IDENTIFIER ;
 // weeding pass. 
 //
 expr : expr '(' (expr (',' expr)*)? ')' 	#funAppExpr
-     | expr '.' IDENTIFIER 			#accessExpr
-     | '*' expr 				#deRefExpr
+     | expr '.' IDENTIFIER 		#accessExpr
+     | <assoc=right> '*' expr 				#deRefExpr
      | SUB NUMBER				#negNumber
-     | '&' expr					#refExpr
-     | expr op=(MUL | DIV) expr 		#multiplicativeExpr
+     | <assoc=right> '&' expr					#refExpr
+     | NOT expr                 #unaryNegation
+     | <assoc=right> SUB expr                 #arithmeticNegation
+     | expr op=(MUL | DIV | MOD) expr 	#multiplicativeExpr
      | expr op=(ADD | SUB) expr 		#additiveExpr
-     | expr op=GT expr 				#relationalExpr
+     | expr op=(GT | GE | LT | LE) expr 				#relationalExpr
      | expr op=(EQ | NE) expr 			#equalityExpr
+     | expr AND expr            #bitwiseAnd
+     | expr OR expr             #bitwiseOr
+     | <assoc=right> expr '?' expr ':' expr           #ternaryExpr
+     | BOOLEAN                  #boolExpr
+     | LKET ( expr ( ',' expr )* )? RKET    #mainArr
+     | LKET expr 'of' expr RKET             #altArr
+     | LEN IDENTIFIER                       #arrLen
+     | IDENTIFIER LKET expr RKET            #arrIndex
      | IDENTIFIER				#varExpr
      | NUMBER					#numExpr
      | KINPUT					#inputExpr
@@ -60,8 +70,12 @@ fieldExpr : IDENTIFIER ':' expr ;
 ////////////////////// TIP Statements ////////////////////////// 
 
 statement : blockStmt
+    | incStmt
+    | decStmt
     | assignStmt
     | whileStmt
+    | forStmt
+    | forEachStmt
     | ifStmt
     | outputStmt
     | errorStmt
@@ -73,6 +87,10 @@ blockStmt : '{' (statement*) '}' ;
 
 whileStmt : KWHILE '(' expr ')' statement ;
 
+forStmt : KFOR '(' expr ':' expr '..' expr ('by' expr)? ')' statement;
+
+forEachStmt : KFOR '(' expr ':' expr ')' statement ;
+
 ifStmt : KIF '(' expr ')' statement (KELSE statement)? ;
 
 outputStmt : KOUTPUT expr ';'  ;
@@ -81,18 +99,34 @@ errorStmt : KERROR expr ';'  ;
 
 returnStmt : KRETURN expr ';'  ;
 
+incStmt : expr INC ';';
+
+decStmt : expr DEC ';';
+
 
 ////////////////////// TIP Lexicon ////////////////////////// 
 
 // By convention ANTLR4 lexical elements use all caps
 
+LKET : '[' ;
+RKET : ']' ;
+INC : '++' ;
+DEC : '--' ;
+NOT : 'not' ;
 MUL : '*' ;
 DIV : '/' ;
+MOD : '%' ;
 ADD : '+' ;
 SUB : '-' ;
 GT  : '>' ;
+GE  : '>=' ;
+LT  : '<'   ;
+LE  : '<=' ;
 EQ  : '==' ;
 NE  : '!=' ;
+AND : 'and' ;
+OR  : 'or' ;
+LEN : '#' ;
 
 NUMBER : [0-9]+ ;
 
@@ -101,6 +135,7 @@ NUMBER : [0-9]+ ;
 KALLOC  : 'alloc' ;
 KINPUT  : 'input' ;
 KWHILE  : 'while' ;
+KFOR    : 'for' ;
 KIF     : 'if' ;
 KELSE   : 'else' ;
 KVAR    : 'var' ;
@@ -108,6 +143,8 @@ KRETURN : 'return' ;
 KNULL   : 'null' ;
 KOUTPUT : 'output' ;
 KERROR  : 'error' ;
+
+BOOLEAN : 'true' | 'false' ;
 
 IDENTIFIER : [a-zA-Z_][a-zA-Z0-9_]* ;
 

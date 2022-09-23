@@ -42,6 +42,8 @@ kitware-archive.sh
 # VS Code
 .vscode/
 tipg4/.antlr/
+src/frontend/.antlr
+
 
 # Testing
 tipg4/hellosip.tip

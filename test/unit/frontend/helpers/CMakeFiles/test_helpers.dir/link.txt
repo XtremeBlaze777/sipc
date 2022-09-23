@@ -1,0 +1,2 @@
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ar qc libtest_helpers.a CMakeFiles/test_helpers.dir/ASTHelper.o CMakeFiles/test_helpers.dir/GeneralHelper.o CMakeFiles/test_helpers.dir/ParserHelper.o
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ranlib libtest_helpers.a
