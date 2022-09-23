@@ -12,7 +12,12 @@ TEST_CASE("SIP Parser: boolean", "[SIP Parser]") {
         var x, y, z;
         x = true;
         y = false;
-        z = true;
+        z = x or y;
+        z = x and y;
+        x = z or x and y;
+        z = not x;
+        z = not not x;
+        z = not x and not y;
         return z;
       }
     )";
