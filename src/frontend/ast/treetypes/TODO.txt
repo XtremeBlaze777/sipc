@@ -1,0 +1,16 @@
+TODO
+------------
+[] Pair Programming to understand how AST subnode types work
+[] Split up and work on ~5 cpp and header files each
+[] Add new visitor methods to support the new Subtypes
+[] Add new methods to build AST nodes from SIP parse trees
+[] Update pretty printer
+
+
+AST Subtypes List
+------------
+[] Boolean
+[] Unary
+
+
+
