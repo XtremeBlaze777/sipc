@@ -10,6 +10,8 @@ using namespace antlrcpp;
 
 ASTBuilder::ASTBuilder(TIPParser *p) : parser{p} {}
 
+
+// SIP Extension for Unary Operators
 std::string ASTBuilder::opString(int op) {
   std::string opStr;
   switch (op) {
@@ -34,6 +36,27 @@ std::string ASTBuilder::opString(int op) {
   case TIPParser::NE:
     opStr = "!=";
     break;
+  // SIP Extensions
+  case TIPParser::MOD:
+    opStr = "%";
+    break;
+  case TIPParser::GE:
+    opStr = ">=";
+    break;
+  case TIPParser::LT:
+    opStr = "<";
+    break;
+  case TIPParser::LE:
+    opStr = "<=";
+    break;
+  case TIPParser::AND:
+    opStr = "and";
+    break;
+  case TIPParser::OR:
+    opStr = "or";
+    break;
+  case TIPParser::NOT:
+    opStr = "not";
   default:
     throw std::runtime_error(
         "unknown operator :" +
