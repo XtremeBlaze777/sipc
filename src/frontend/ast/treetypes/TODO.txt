@@ -1,15 +1,15 @@
 TODO
 ------------
 [x] Pair Programming to understand how AST subnode types work
-[x] Split up and work on ~5 cpp and header files each
-[x] Add new visitor methods to support the new Subtypes
+[neil] Split up and work on ~5 cpp and header files each
+[neil] Add new visitor methods to support the new Subtypes
 [] Add new methods to build AST nodes from SIP parse trees
 [] Update pretty printer
 
 
 AST Subtypes List
 ------------
-[x] Unary (Arithmetic NOT; Logical NOT; Array Length Prefix)
+[x] Unary (arithmetic NOT; logical NOT; array length prefix)
 [x] Increment/Decrement
 [x] Ternary 
 [x] For Loop (Iteration)
@@ -24,6 +24,20 @@ Extend
 [x] Arithmetic Operators (%) -> ASTBinaryExpr
 [x] Logical Operators (AND and OR) -> ASTBinaryExpr
 [x] Boolean values (true and false) -> ASTAssignStmt
+
+
+ASTBuilder
+------------
+[x] Extend opString switch cases 
+[x] Create visitUnaryExpr for (arithmetic NOT, logical NOT, array length prefix)
+
+[] Extend visitEqualityExpr for (>=, <, <=)
+[] Create visitBoolexpr for (and, or)
+[] Extend visitAssignStmt for (true, false)
+
+Pretty printer
+-----------
+[] Update pretty print 
 
 
 
