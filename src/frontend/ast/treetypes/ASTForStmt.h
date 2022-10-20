@@ -3,7 +3,7 @@
 #include "ASTStmt.h"
 #include "ASTExpr.h"
 
-/*! \brief Class for if-then-else.
+/*! \brief Class for for loop.
  */
 class ASTForStmt : public ASTStmt {
   std::shared_ptr<ASTExpr> START, END, BEGIN, STEP;

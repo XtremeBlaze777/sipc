@@ -2,7 +2,7 @@
 
 #include "ASTExpr.h"
 
-/*! \brief Class for a binary operator.
+/*! \brief Class for binary operators: inc & dec.
  */
 class ASTIncDecExpr : public ASTExpr {
   std::string OP;

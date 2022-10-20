@@ -46,8 +46,8 @@ expr : expr '(' (expr (',' expr)*)? ')' 	#funAppExpr
      | expr op=(ADD | SUB) expr 		#additiveExpr
      | expr op=(GT | GE | LT | LE) expr 				#relationalExpr
      | expr op=(EQ | NE) expr 			#equalityExpr
-     | expr AND expr            #bitwiseAnd
-     | expr OR expr             #bitwiseOr
+     | expr AND expr            #logicalAnd
+     | expr OR expr             #logicalOr
      | <assoc=right> expr '?' expr ':' expr           #ternaryExpr
      | BOOLEAN                  #boolExpr
      | LKET ( expr ( ',' expr )* )? RKET    #mainArr

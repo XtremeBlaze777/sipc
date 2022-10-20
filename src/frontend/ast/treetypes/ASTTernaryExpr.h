@@ -2,7 +2,7 @@
 
 #include "ASTExpr.h"
 
-/*! \brief Class for a binary operator.
+/*! \brief Class for a ternary operator.
  */
 class ASTTernaryExpr : public ASTExpr {
   std::shared_ptr<ASTExpr> COND, IF, ELSE;

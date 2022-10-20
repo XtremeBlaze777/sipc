@@ -2,7 +2,7 @@
 
 #include "ASTExpr.h"
 
-/*! \brief Class for a binary operator.
+/*! \brief Class for a unary operator.
  */
 class ASTUnaryExpr : public ASTExpr {
   std::string OP;
