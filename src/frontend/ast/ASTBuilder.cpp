@@ -200,6 +200,19 @@ void ASTBuilder::visitBinaryExpr(T* ctx, const std::string& op) {
                            ctx->getStart()->getCharPositionInLine());
 }
 
+// NEW FUNCTION
+void ASTBuilder::visitUnaryExpr(T* ctx, const std::sring& op) {
+  visit(ctx->expr(1));
+  auto rhs = std::move(visitedExpr);
+
+  visitedExpr = std::make_unqiue<ASTUnaryExpr(op, std::move(rhs));
+
+  LOG_S(1) << "Built AST node " << *visitedExpr;
+
+  visitedExpr->setLocation(ctx->getStart()->getLine(),
+                           ctx->getStart()->getCharPositionInLine());
+}
+
 Any ASTBuilder::visitAdditiveExpr(TIPParser::AdditiveExprContext *ctx) {
   visitBinaryExpr(ctx, opString(ctx->op->getType()));
   return "";
@@ -452,6 +465,33 @@ Any ASTBuilder::visitIfStmt(TIPParser::IfStmtContext *ctx) {
     visit(ctx->statement(1));
     elseBody = std::move(visitedStmt);
   }
+
+Any ASTBuilder::visitForStmt(TIPParser::ForStmtContext *ctx) {
+  visit(ctx->expr(0));
+  auto start = std::move(visitedExpr);
+  visit(ctx->expr(1));
+  auto end = std::move(visitedExpr);
+  visit(ctx->expr(2));
+  auto begin = std::move(visitedExpr);
+
+  std::unique_ptr<ASTExpr> step = nullptr;
+  if (ctx->expr().size() == 4) {
+    visit(ctx->expr(3));
+    step = std::move(visitedExpr);
+  }
+
+  visit(ctx->statement(0));
+  stmtBody = std::move(visitedStmt);
+}
+
+Any ASTBuilder::visitForEachStmt(TIPParser::ForEachStmtContext *ctx) {
+  visit(ctx->expr(0));
+  auto elem = std::move(visitedExpr);
+  visit(ctx->statement(0));
+  auto arrBody = std::move(visitedStmt);
+  visit(ctx->statement(1));
+  auto condBody = std::move(visitedStmt);
+}
 
   visitedStmt = std::make_unique<ASTIfStmt>(std::move(cond), std::move(thenBody),
                                             std::move(elseBody));

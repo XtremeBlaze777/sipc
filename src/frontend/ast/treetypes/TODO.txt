@@ -14,8 +14,8 @@ AST Subtypes List
 [x] Ternary 
 [x] For Loop (Iteration)
 [x] For Loop (Range)
-[] Array (Regular)
-[] Array (x of y)
+[X] Array (Regular)
+[X] Array (x of y)
 [] Array Element Reference Operator
 
 Extend
@@ -30,6 +30,9 @@ ASTBuilder
 ------------
 [x] Extend opString switch cases 
 [x] Create visitUnaryExpr for (arithmetic NOT, logical NOT, array length prefix)
+
+[x] For/ForEach statements
+[x] Ternary expressions
 
 [] Extend visitEqualityExpr for (>=, <, <=)
 [] Create visitBoolexpr for (and, or)
