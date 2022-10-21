@@ -245,16 +245,10 @@ void PrettyPrinter::endVisit(ASTTernaryExpr * element) {
   visitResults.push_back('(' + condString + " ? " + ifString + " : " + elseString + ')');
 }
 
-void PrettyPrinter::endVisit(ASTIncStmt * element) {
+void PrettyPrinter::endVisit(ASTIncDecExpr * element) {
   std::string exprString visitResults.back();
   visitResults.pop_back();
   visitResults.push_back(exprString + element->getOp());
-}
-
-void PrettyPrinter::endVisit(ASTDecStmt * element) {
-  std::string exprString = visitResults.back();
-  visitResults.pop_back();
-  visitResults.push_back(exprString + element->getOp()); 
 }
 
 void PrettyPrinter::endVisit(ASTMainArray * element) {

@@ -61,10 +61,9 @@ public:
 
   virtual void endVisit(ASTUnaryExpr * element) override;
   virtual void endVisit(ASTTernaryExpr * element) override;
-  virtual void endVisit(ASTIncStmt * element) override;
-  virtual void endVisit(ASTDecStmt * element) override;
-  virtual void endVisit(ASTMainArr * element) override;
-  virtual void endVisit(ASTAltArr * element) override;
+  virtual void endVisit(ASTIncDecExpr * element) override;
+  virtual void endVisit(ASTMainArray * element) override;
+  virtual void endVisit(ASTAltArray * element) override;
   virtual void endVisit(ASTForStmt * element) override;
   virtual void endVisit(ASTForEachStmt * element) override;
 
