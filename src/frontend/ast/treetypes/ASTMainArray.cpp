@@ -14,15 +14,14 @@ std::vector<ASTExpr*> ASTMainArray::getElements() const {
 
 void ASTMainArray::accept(ASTVisitor* visitor) {
     if (visitor->visit(this)) {
-        getElements()->accept(visitor);
         for (auto p : getElements()) {
-        p->accept(visitor);
+            p->accept(visitor);
         }
     }
     visitor->endVisit(this);
 }
 
-std::vector<std::shared_ptr<ASTNode>> ASTFunction::getChildren() {
+std::vector<std::shared_ptr<ASTNode>> ASTMainArray::getChildren() {
     std::vector<std::shared_ptr<ASTNode>> children;
     for (auto &element : elements) {
         children.push_back(element);
@@ -30,7 +29,7 @@ std::vector<std::shared_ptr<ASTNode>> ASTFunction::getChildren() {
     return children;
 }
 
-std::ostream& ASTArrayMain::print(std::ostream &out) const {
+std::ostream& ASTMainArray::print(std::ostream &out) const {
     auto gotten = getElements();
     auto &last = gotten.back();
     gotten.pop_back();

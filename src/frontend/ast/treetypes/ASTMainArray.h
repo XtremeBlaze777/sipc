@@ -6,12 +6,12 @@
 /*! \brief Class for an array.
  *
  */
-class ASTArray: public ASTNode {
+class ASTMainArray: public ASTNode {
     std::string name;
     std::vector<std::shared_ptr<ASTExpr>> elements;
     public:
         std::vector<std::shared_ptr<ASTNode>> getChildren() override;
-        ASTArray(std::vector<std::unique_ptr<ASTExpr>> elements);
+        ASTMainArray(std::vector<std::unique_ptr<ASTExpr>> elements);
         std::string getName() const { return name; }
         std::vector<ASTExpr*> getElements() const;
         void accept(ASTVisitor * visitor) override;
