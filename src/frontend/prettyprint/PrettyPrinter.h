@@ -56,14 +56,15 @@ public:
   virtual void endVisit(ASTErrorStmt * element) override;
 
   // SIP Extensions
-  virtual void visit(ASTForStmt * element) override;
-  virtual void visit(ASTForEachStmt * element) override;
-  
+  virtual bool visit(ASTForStmt * element) override;
+  virtual bool visit(ASTForEachStmt * element) override;
+
   virtual void endVisit(ASTUnaryExpr * element) override;
   virtual void endVisit(ASTTernaryExpr * element) override;
-  virtual void endVisit(ASTIncDecExpr * element) override;
-  virtual void endVisit(ASTMainArray * element) override;
-  virtual void endVisit(ASTAlternateArray * element) override;
+  virtual void endVisit(ASTIncStmt * element) override;
+  virtual void endVisit(ASTDecStmt * element) override;
+  virtual void endVisit(ASTMainArr * element) override;
+  virtual void endVisit(ASTAltArr * element) override;
   virtual void endVisit(ASTForStmt * element) override;
   virtual void endVisit(ASTForEachStmt * element) override;
 

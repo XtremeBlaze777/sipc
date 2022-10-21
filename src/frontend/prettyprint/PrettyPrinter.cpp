@@ -245,13 +245,13 @@ void PrettyPrinter::endVisit(ASTTernaryExpr * element) {
   visitResults.push_back('(' + condString + " ? " + ifString + " : " + elseString + ')');
 }
 
-void PrettyPrinter::endVisit(ASTincStmt * element) {
+void PrettyPrinter::endVisit(ASTIncStmt * element) {
   std::string exprString visitResults.back();
   visitResults.pop_back();
   visitResults.push_back(exprString + element->getOp());
 }
 
-void PrettyPrinter::endVisit(ASTdecStmt * element) {
+void PrettyPrinter::endVisit(ASTDecStmt * element) {
   std::string exprString = visitResults.back();
   visitResults.pop_back();
   visitResults.push_back(exprString + element->getOp()); 
@@ -295,6 +295,11 @@ void PrettyPrinter::endVisit(ASTAlternateArray * element) {
   visitResults.push_back(results);
 }
 
+bool PrettyPrinter::visit(ASTForEachStmt * element) {
+  indentLevel++;
+  return true;
+}
+
 void PrettyPrinter::endVisit(ASTForStmt * element) {
   std::string doString = visitResults.back();
   visitResults.pop_back();
@@ -312,6 +317,11 @@ void PrettyPrinter::endVisit(ASTForStmt * element) {
   visitResults.pop_back();
 
   visitResults.push_back("for (" + startString + " : " endString + " .. " + beginString + " by " + stepString + ") " + doString);
+}
+
+bool PrettyPrinter::visit(ASTForEachStmt * element) {
+  indentLevel++;
+  return true;
 }
 
 void PrettyPrinter::endVisit(ASTForEachStmt * element) {

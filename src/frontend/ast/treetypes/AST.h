@@ -34,3 +34,11 @@
 #include "ASTStmt.h"
 #include "ASTVariableExpr.h"
 #include "ASTWhileStmt.h"
+
+// SIP Extensions
+#include "ASTUnaryExpr.h"
+#include "ASTTernaryExpr.h"
+#include "ASTForStmt.h"
+#include "ASTForEachStmt.h"
+#include "ASTMainArray.h"
+#include "ASTAlternateArray.h"
