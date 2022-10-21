@@ -11,7 +11,7 @@ using namespace antlrcpp;
 ASTBuilder::ASTBuilder(TIPParser *p) : parser{p} {}
 
 
-// SIP Extension for Unary Operators
+// SIP Extension for Unary/Binary Operators
 std::string ASTBuilder::opString(int op) {
   std::string opStr;
   switch (op) {
@@ -57,6 +57,8 @@ std::string ASTBuilder::opString(int op) {
     break;
   case TIPParser::NOT:
     opStr = "not";
+  case TIPParser::LEN:
+    opStr = '#';
   default:
     throw std::runtime_error(
         "unknown operator :" +

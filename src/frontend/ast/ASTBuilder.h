@@ -42,11 +42,14 @@ public:
   void visitUnaryExpr(T* ctx, const std::string& op); // NEW
 
  /* New visit Exprs */
-Any visitTernaryExpr(TIPParser::TernaryExprContext *ctx) override;
+  Any visitTernaryExpr(TIPParser::TernaryExprContext *ctx) override;
+  Any visitMainArray(TIPParser::MainArrayContext *ctx) override;
+  Any visitAlternateArray(TIPParser::AlternateArrayContext *ctx) override;
 
  /* New visit Stmts */
-Any visitForStmt(TIPParser::ForStmtContext *ctx) override;
-Any visitForEachStmt(TIPParser::ForEachStmtContext *ctx) override;
+  Any visitForStmt(TIPParser::ForStmtContext *ctx) override;
+  Any visitForEachStmt(TIPParser::ForEachStmtContext *ctx) override;
+  Any visitIncDecStmts(TIPParser::IncDecStmtContext *ctx) override;
 
  /* Original TIP visits */
   Any visitFunction(TIPParser::FunctionContext *ctx) override;
