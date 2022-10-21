@@ -15,11 +15,11 @@ void ASTForStmt::accept(ASTVisitor * visitor) {
 }
 
 std::ostream& ASTForStmt::print(std::ostream &out) const {
-  out << "for (" << *getStart << ":" << *getEnd << ".." << *getBegin;
+  out << "for (" << *getStart() << ":" << *getEnd() << ".." << *getBegin();
   if (getStep() != nullptr) {
-     out << "by" << *getStep;
+     out << "by" << *getStep();
   }
-  out << ")" << *getDo;
+  out << ")" << *getDo();
   return out;
 }
 

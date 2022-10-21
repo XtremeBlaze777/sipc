@@ -25,6 +25,10 @@ TEST_CASE("ASTPrinterTest: all unary expressions (excluding arr)", "[ASTNodePrin
 
     int i = 0;
     int numStmts = f->getStmts().size() - 1;  // skip the return
+    // HELPER FUNCTION 
+    for (auto s : f->getStmts()) {
+      std::cout << s << std::endl;
+    }
     for (auto s : f->getStmts()) {
       auto a = dynamic_cast<ASTAssignStmt*>(s);
       stream = std::stringstream();
@@ -60,6 +64,10 @@ TEST_CASE("ASTPrinterTest: for iterative loops", "[ASTNodePrint]") {
 
     int i = 0;
     int numStmts = f->getStmts().size() - 1;  // skip the return
+    // HELPER FUNCTION 
+    for (auto s : f->getStmts()) {
+      std::cout << s << std::endl;
+    }
     for (auto s : f->getStmts()) {
       auto a = dynamic_cast<ASTAssignStmt*>(s);
       stream = std::stringstream();
@@ -97,6 +105,10 @@ TEST_CASE("ASTPrinterTest: for each loops", "[ASTNodePrint]") {
 
     int i = 0;
     int numStmts = f->getStmts().size() - 1;  // skip the return
+    // HELPER FUNCTION 
+    for (auto s : f->getStmts()) {
+      std::cout << s << std::endl;
+    }
     for (auto s : f->getStmts()) {
       auto a = dynamic_cast<ASTAssignStmt*>(s);
       stream = std::stringstream();
@@ -129,6 +141,10 @@ TEST_CASE("ASTPrinterTest: inc/dec statements", "[ASTNodePrint]") {
 
     int i = 0;
     int numStmts = f->getStmts().size() - 1;  // skip the return
+    // HELPER FUNCTION 
+    for (auto s : f->getStmts()) {
+      std::cout << s << std::endl;
+    }
     for (auto s : f->getStmts()) {
       auto a = dynamic_cast<ASTAssignStmt*>(s);
       stream = std::stringstream();
@@ -161,6 +177,10 @@ TEST_CASE("ASTPrinterTest: ternary expressions", "[ASTNodePrint]") {
 
     int i = 0;
     int numStmts = f->getStmts().size() - 1;  // skip the return
+    // HELPER FUNCTION 
+    for (auto s : f->getStmts()) {
+      std::cout << s << std::endl;
+    }
     for (auto s : f->getStmts()) {
       auto a = dynamic_cast<ASTAssignStmt*>(s);
       stream = std::stringstream();
@@ -192,6 +212,10 @@ TEST_CASE("ASTPrinterTest: main arrays", "[ASTNodePrint]") {
 
     int i = 0;
     int numStmts = f->getStmts().size() - 1;  // skip the return
+    // HELPER FUNCTION 
+    for (auto s : f->getStmts()) {
+      std::cout << s << std::endl;
+    }
     for (auto s : f->getStmts()) {
       auto a = dynamic_cast<ASTAssignStmt*>(s);
       stream = std::stringstream();
@@ -224,6 +248,10 @@ TEST_CASE("ASTPrinterTest: alternative arrays", "[ASTNodePrint]") {
 
     int i = 0;
     int numStmts = f->getStmts().size() - 1;  // skip the return
+    // HELPER FUNCTION 
+    for (auto s : f->getStmts()) {
+      std::cout << s << std::endl;
+    }
     for (auto s : f->getStmts()) {
       auto a = dynamic_cast<ASTAssignStmt*>(s);
       stream = std::stringstream();
@@ -268,6 +296,10 @@ TEST_CASE("ASTPrinterTest: extra equality comparisons", "[ASTNodePrint]") {
 
     int i = 0;
     int numStmts = f->getStmts().size() - 1;  // skip the return
+    // HELPER FUNCTION 
+    for (auto s : f->getStmts()) {
+      std::cout << s << std::endl;
+    }
     for (auto s : f->getStmts()) {
       auto a = dynamic_cast<ASTAssignStmt*>(s);
       stream = std::stringstream();
@@ -302,6 +334,10 @@ TEST_CASE("ASTPrinterTest: modulo extension", "[ASTNodePrint]") {
 
     int i = 0;
     int numStmts = f->getStmts().size() - 1;  // skip the return
+    // HELPER FUNCTION 
+    for (auto s : f->getStmts()) {
+      std::cout << s << std::endl;
+    }
     for (auto s : f->getStmts()) {
       auto a = dynamic_cast<ASTAssignStmt*>(s);
       stream = std::stringstream();
@@ -337,6 +373,10 @@ TEST_CASE("ASTPrinterTest: booleans", "[ASTNodePrint]") {
 
     int i = 0;
     int numStmts = f->getStmts().size() - 1;  // skip the return
+    // HELPER FUNCTION 
+    for (auto s : f->getStmts()) {
+      std::cout << s << std::endl;
+    }
     for (auto s : f->getStmts()) {
       auto a = dynamic_cast<ASTAssignStmt*>(s);
       stream = std::stringstream();

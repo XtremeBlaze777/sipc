@@ -1051,4 +1051,32 @@ llvm::Value* ASTReturnStmt::codegen() {
 
   Value *argVal = getArg()->codegen();
   return Builder.CreateRet(argVal);
-} // LCOV_EXCL_LINE
+}
+
+llvm::Value* ASTForStmt::codegen() {
+  return nullptr;
+}
+
+llvm::Value* ASTForEachStmt::codegen() {
+  return nullptr;
+}
+
+llvm::Value* ASTMainArray::codegen() {
+  return nullptr;
+}
+
+llvm::Value* ASTAlternateArray::codegen() {
+  return nullptr;
+}
+
+llvm::Value* ASTTernaryExpr::codegen() {
+  return nullptr;
+}
+
+llvm::Value* ASTIncDecStmt::codegen() {
+  return nullptr;
+}
+
+llvm::Value* ASTUnaryExpr::codegen() {
+  return nullptr;
+}

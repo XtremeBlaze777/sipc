@@ -246,7 +246,7 @@ void PrettyPrinter::endVisit(ASTTernaryExpr * element) {
 }
 
 void PrettyPrinter::endVisit(ASTIncDecStmt * element) {
-  std::string exprString visitResults.back();
+  std::string exprString = visitResults.back();
   visitResults.pop_back();
   visitResults.push_back(exprString + element->getOp());
 }
@@ -262,31 +262,21 @@ void PrettyPrinter::endVisit(ASTMainArray * element) {
   }
   reverse(elements.begin(), elements.end());
 
-  std::string results = '[';
+  std::string results = "[";
   for (auto e : elements) {
-    results += e + ', ';
+    results += e + ", ";
   }
-  results += ']';
+  results += "]";
   visitResults.push_back(results);
 }
 
 void PrettyPrinter::endVisit(ASTAlternateArray * element) {
-  std::vector<std::string> elements;
-  int range = element->getChildren().size();
+  std::string endString = visitResults.back();
+  visitResults.pop_back();
+  std::string startString = visitResults.back();
+  visitResults.pop_back();
 
-  for (int i = 0; i < range; i++) {
-    std::string element = visitResults.back();
-    visitResults.pop_back();
-    elements.push_back(element);
-  }
-  reverse(elements.begin(), elements.end());
-
-  std::string results = '[';
-  for (auto e : elements) {
-    results += e + ', ';
-  }
-  results += ']';
-  visitResults.push_back(results);
+  visitResults.push_back("[" + startString + " of " + endString + "]");
 }
 
 bool PrettyPrinter::visit(ASTForEachStmt * element) {
@@ -294,14 +284,19 @@ bool PrettyPrinter::visit(ASTForEachStmt * element) {
   return true;
 }
 
+bool PrettyPrinter::visit(ASTForStmt * element) {
+  indentLevel++;
+  return true;
+}
 void PrettyPrinter::endVisit(ASTForStmt * element) {
   std::string doString = visitResults.back();
   visitResults.pop_back();
+  std::string stepString;
   if (element->getStep() != nullptr) {
-    std::string stepString = visitResults.back();
+    stepString = visitResults.back();
     visitResults.pop_back();
   } else {
-    std::string stepString = "1";
+    stepString = "1";
   }
   std::string beginString = visitResults.back();
   visitResults.pop_back();
@@ -310,12 +305,8 @@ void PrettyPrinter::endVisit(ASTForStmt * element) {
   std::string startString = visitResults.back();
   visitResults.pop_back();
 
-  visitResults.push_back("for (" + startString + " : " endString + " .. " + beginString + " by " + stepString + ") " + doString);
-}
-
-bool PrettyPrinter::visit(ASTForEachStmt * element) {
-  indentLevel++;
-  return true;
+  visitResults.push_back("for (" + startString + " : " + endString + " .. " + beginString + " by " + stepString + ") " + doString);
+  indentLevel--;
 }
 
 void PrettyPrinter::endVisit(ASTForEachStmt * element) {
@@ -324,9 +315,10 @@ void PrettyPrinter::endVisit(ASTForEachStmt * element) {
   std::string arrString = visitResults.back();
   visitResults.pop_back();
   std::string elemString = visitResults.back();
-  visitResults.pop();
+  visitResults.pop_back();
 
-  visitResults.push_back("for (" elemString + " : " + arrString + ") " + doString);
+  visitResults.push_back("for (" + elemString + " : " + arrString + ") " + doString);
+  indentLevel--;
 }
 // SIP Extensions end
 

@@ -39,6 +39,7 @@ public:
    */  
   template <typename T>
   void visitBinaryExpr(T* ctx, const std::string& op);
+  template <typename T>
   void visitUnaryExpr(const std::string& op, T* ctx); // NEW
 
  /* New visit Exprs */
@@ -49,7 +50,8 @@ public:
  /* New visit Stmts */
   Any visitForStmt(TIPParser::ForStmtContext *ctx) override;
   Any visitForEachStmt(TIPParser::ForEachStmtContext *ctx) override;
-  Any visitIncDecStmt(T* ctx, const std::string& op) override;
+  template <typename T>
+  Any visitIncDecStmt(T* ctx, const std::string op);
 
  /* Original TIP visits */
   Any visitFunction(TIPParser::FunctionContext *ctx) override;

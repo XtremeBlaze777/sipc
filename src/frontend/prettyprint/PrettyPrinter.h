@@ -58,6 +58,8 @@ public:
   // SIP Extensions
   virtual bool visit(ASTForStmt * element) override;
   virtual bool visit(ASTForEachStmt * element) override;
+  virtual void endVisit(ASTForStmt * element) override;
+  virtual void endVisit(ASTForEachStmt * element) override;
   virtual void endVisit(ASTUnaryExpr * element) override;
   virtual void endVisit(ASTTernaryExpr * element) override;
   virtual void endVisit(ASTIncDecStmt * element) override;

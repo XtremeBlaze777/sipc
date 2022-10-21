@@ -1,3 +1,4 @@
+#include "AST.h"
 #include "ParserHelper.h"
 #include "FrontEnd.h"
 #include "ParseError.h"
@@ -12,7 +13,7 @@ TEST_CASE("ASTNodeTest: ASTForEach", "[ASTNode]") {
     auto arrValue = arrBody.get();
     auto out = std::make_unique<ASTVariableExpr>("C");
     auto condBody = std::make_unique<ASTVariableExpr>(std::move(out));
-    auto condValue = cond.get();
+    auto condValue = condBody.get();
 
     auto for_each = std::make_unique<ASTForEachStmt>(std::move(elem), std::move(arrBody),
                                             std::move(condBody));
@@ -49,7 +50,7 @@ TEST_CASE("ASTNodeTest: ASTFor", "[ASTNode]") {
     auto end = std::make_unique<ASTVariableExpr>("B");
     auto begin = std::make_unique<ASTVariableExpr>("C");
     auto out = std::make_unique<ASTVariableExpr>("D");
-    auto stmt = std::make_unique<ASTOuputStmt>(std::move(Var2));
+    auto stmt = std::make_unique<ASTOutputStmt>(std::move(Var2));
     auto B = nullptr;
     // Record the raw pointers for these values because rhs and lhs will not be 
     // usable after the call to the constructor below.  This is because of the
