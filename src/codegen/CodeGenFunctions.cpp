@@ -1080,3 +1080,7 @@ llvm::Value* ASTIncDecStmt::codegen() {
 llvm::Value* ASTUnaryExpr::codegen() {
   return nullptr;
 }
+
+llvm::Value* ASTBoolExpr::codegen() {
+  return nullptr;
+}

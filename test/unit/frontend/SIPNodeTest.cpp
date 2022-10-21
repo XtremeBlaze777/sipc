@@ -6,6 +6,8 @@
 
 #include <catch2/catch_test_macros.hpp>
 
+/*
+ * ->> This is fundementally flawed and needs to be rewritten. <<-
 TEST_CASE("ASTNodeTest: ASTForEach", "[ASTNode]") {
     auto elem = std::make_unique<ASTVariableExpr>("A");
     auto elemValue = elem.get();
@@ -15,8 +17,7 @@ TEST_CASE("ASTNodeTest: ASTForEach", "[ASTNode]") {
     auto condBody = std::make_unique<ASTVariableExpr>(std::move(out));
     auto condValue = condBody.get();
 
-    auto for_each = std::make_unique<ASTForEachStmt>(std::move(elem), std::move(arrBody),
-                                            std::move(condBody));
+    auto for_each = std::make_unique<ASTForEachStmt>(std::move(elem), std::move(arrBody), std::move(condBody));
 
     // Test Print Method
     std::stringstream nodePrintStream;
@@ -44,6 +45,7 @@ TEST_CASE("ASTNodeTest: ASTForEach", "[ASTNode]") {
         REQUIRE(visitor.postPrintStrings[i] == expected[i]);
     }
 }
+*/
 
 TEST_CASE("ASTNodeTest: ASTFor", "[ASTNode]") {
     auto start = std::make_unique<ASTVariableExpr>("A");

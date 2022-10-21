@@ -13,6 +13,7 @@
 #include "ASTAssignStmt.h"
 #include "ASTBinaryExpr.h"
 #include "ASTBlockStmt.h"
+#include "ASTBoolExpr.h"
 #include "ASTDeRefExpr.h"
 #include "ASTDeclNode.h"
 #include "ASTDeclStmt.h"

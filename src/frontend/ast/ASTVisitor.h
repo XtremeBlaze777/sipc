@@ -82,5 +82,7 @@ public:
   virtual void endVisit(ASTMainArray * element) {}
   virtual bool visit(ASTAlternateArray * element) { return true; }
   virtual void endVisit(ASTAlternateArray * element) {}
+  virtual bool visit(ASTBoolExpr * element) { return true; }
+  virtual void endVisit(ASTBoolExpr * element) {}
 };
 

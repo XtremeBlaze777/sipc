@@ -166,19 +166,6 @@ Any ASTBuilder::visitFunction(TIPParser::FunctionContext *ctx) {
   return "";
 }
 
-Any ASTBuilder::visitNegNumber(TIPParser::NegNumberContext *ctx) {
-  int val = std::stoi(ctx->NUMBER()->getText());
-  val = -val;
-  visitedExpr = std::make_unique<ASTNumberExpr>(val);
-
-  LOG_S(1) << "Built AST node " << *visitedExpr;
-
-  // Set source location 
-  visitedExpr->setLocation(ctx->getStart()->getLine(), 
-                           ctx->getStart()->getCharPositionInLine());
-  return "";
-}  // LCOV_EXCL_LINE
-
 /*
  * Unfortunately, the context types for binary expressions generated
  * by ANTLR are not organized into a sub-type hierarchy.  If they were
@@ -209,7 +196,7 @@ void ASTBuilder::visitBinaryExpr(T* ctx, const std::string& op) {
 // NEW FUNCTIONS:
 template <typename T>
 void ASTBuilder::visitUnaryExpr(const std::string& op, T* ctx) {
-  visit(ctx->expr(1));
+  visit(ctx->expr());
   auto rhs = std::move(visitedExpr);
 
   visitedExpr = std::make_unique<ASTUnaryExpr>(op, std::move(rhs));
@@ -241,7 +228,7 @@ Any ASTBuilder::visitMainArray(TIPParser::MainArrayContext *ctx) {
   auto list = ctx->expr();
 
   std::vector<std::unique_ptr<ASTExpr>> elements;
-  for (int i = 1; i < list.size(); i++) {
+  for (int i = 0; i < list.size(); i++) {
     auto e = list[i];
     visit(e);
     elements.push_back(std::move(visitedExpr));
@@ -258,11 +245,11 @@ Any ASTBuilder::visitMainArray(TIPParser::MainArrayContext *ctx) {
 
 Any ASTBuilder::visitAlternateArray(TIPParser::AlternateArrayContext *ctx)  {
   visit(ctx->expr(0));
-  auto start = std::move(visitedExpr);
+  auto size = std::move(visitedExpr);
   visit(ctx->expr(1));
-  auto end = std::move(visitedExpr);
+  auto element = std::move(visitedExpr);
 
-  visitedExpr = std::make_unique<ASTAlternateArray>(std::move(start), std::move(end));
+  visitedExpr = std::make_unique<ASTAlternateArray>(std::move(size), std::move(element));
   
   LOG_S(1) << "Built AST node " << *visitedExpr;
 
@@ -270,6 +257,26 @@ Any ASTBuilder::visitAlternateArray(TIPParser::AlternateArrayContext *ctx)  {
                            ctx->getStart()->getCharPositionInLine());
   return "";
 }
+
+Any ASTBuilder::visitUnaryNegationExpr(TIPParser::UnaryNegationExprContext *ctx) {
+  visitUnaryExpr("not", ctx);
+  return "";
+} // LCOV_EXCL_LINE
+
+Any ASTBuilder::visitArrLenExpr(TIPParser::ArrLenExprContext *ctx) {
+  visitUnaryExpr("#", ctx);
+  return "";
+} // LCOV_EXCL_LINE
+
+Any ASTBuilder::visitLogicalAndExpr(TIPParser::LogicalAndExprContext *ctx) {
+  visitBinaryExpr(ctx, "and");
+  return "";
+} // LCOV_EXCL_LINE
+
+Any ASTBuilder::visitLogicalOrExpr(TIPParser::LogicalOrExprContext *ctx) {
+  visitBinaryExpr(ctx, "or");
+  return "";
+} // LCOV_EXCL_LINE
 
 Any ASTBuilder::visitAdditiveExpr(TIPParser::AdditiveExprContext *ctx) {
   visitBinaryExpr(ctx, opString(ctx->op->getType()));
@@ -310,6 +317,18 @@ Any ASTBuilder::visitNumExpr(TIPParser::NumExprContext *ctx) {
   return "";
 }  // LCOV_EXCL_LINE
 
+Any ASTBuilder::visitBoolExpr(TIPParser::BoolExprContext *ctx) {
+  std::string val = ctx->BOOLEAN()->getText();
+  visitedExpr = std::make_unique<ASTBoolExpr>(val);
+
+  LOG_S(1) << "Built AST node " << *visitedExpr;
+
+  // Set source location 
+  visitedExpr->setLocation(ctx->getStart()->getLine(), 
+                           ctx->getStart()->getCharPositionInLine());
+  return "";
+}
+
 Any ASTBuilder::visitVarExpr(TIPParser::VarExprContext *ctx) {
   std::string name = ctx->IDENTIFIER()->getText();
   visitedExpr = std::make_unique<ASTVariableExpr>(name);
@@ -332,6 +351,19 @@ Any ASTBuilder::visitInputExpr(TIPParser::InputExprContext *ctx) {
                            ctx->getStart()->getCharPositionInLine());
   return "";
 } // LCOV_EXCL_LINE
+
+Any ASTBuilder::visitNegNumber(TIPParser::NegNumberContext *ctx) {
+    int val = std::stoi(ctx->NUMBER()->getText());
+    val = -val;
+    visitedExpr = std::make_unique<ASTNumberExpr>(val);
+
+    LOG_S(1) << "Built AST node " << *visitedExpr;
+
+    // Set source location 
+    visitedExpr->setLocation(ctx->getStart()->getLine(), 
+            ctx->getStart()->getCharPositionInLine());
+    return "";
+}  // LCOV_EXCL_LINE
 
 Any ASTBuilder::visitFunAppExpr(TIPParser::FunAppExprContext *ctx) {
   std::unique_ptr<ASTExpr> fExpr = nullptr;
@@ -537,11 +569,11 @@ Any ASTBuilder::visitIfStmt(TIPParser::IfStmtContext *ctx) {
 
 Any ASTBuilder::visitForStmt(TIPParser::ForStmtContext *ctx) {
   visit(ctx->expr(0));
-  auto start = std::move(visitedExpr);
+  auto iterator = std::move(visitedExpr);
   visit(ctx->expr(1));
-  auto end = std::move(visitedExpr);
+  auto start = std::move(visitedExpr);
   visit(ctx->expr(2));
-  auto begin = std::move(visitedExpr);
+  auto end = std::move(visitedExpr);
 
   std::unique_ptr<ASTExpr> step = nullptr;
   if (ctx->expr().size() == 4) {
@@ -552,7 +584,7 @@ Any ASTBuilder::visitForStmt(TIPParser::ForStmtContext *ctx) {
   visit(ctx->statement());
   auto stmtBody = std::move(visitedStmt);
 
-  visitedStmt = std::make_unique<ASTForStmt>( std::move(start), std::move(end), std::move(begin), std::move(step), std::move(stmtBody) );
+  visitedStmt = std::make_unique<ASTForStmt>( std::move(iterator), std::move(start), std::move(end), std::move(step), std::move(stmtBody) );
 
   LOG_S(1) << "Built AST node " << *visitedStmt;
 
@@ -632,8 +664,8 @@ Any ASTBuilder::visitAssignStmt(TIPParser::AssignStmtContext *ctx) {
 }
 
 template <typename T>
-Any ASTBuilder::visitIncDecStmt(T* ctx, const std::string op) {
-  visit(ctx->expr(0));
+void ASTBuilder::visitIncDecStmt(T* ctx, const std::string op) {
+  visit(ctx->expr());
   auto var = std::move(visitedExpr);
 
   visitedStmt = std::make_unique<ASTIncDecStmt>(std::move(var), op);
@@ -643,8 +675,19 @@ Any ASTBuilder::visitIncDecStmt(T* ctx, const std::string op) {
   // Set source location 
   visitedStmt->setLocation(ctx->getStart()->getLine(), 
                            ctx->getStart()->getCharPositionInLine());
+}
+
+Any ASTBuilder::visitIncStmt(TIPParser::IncStmtContext *ctx) {
+  visitIncDecStmt(ctx, "++");
   return "";
 }
+
+Any ASTBuilder::visitDecStmt(TIPParser::DecStmtContext *ctx) {
+  visitIncDecStmt(ctx, "--");
+  return "";
+}
+
+
 
 std::string ASTBuilder::generateSHA256(std::string tohash) {
   std::vector<unsigned char> hash(picosha2::k_digest_size);

@@ -298,14 +298,14 @@ void PrettyPrinter::endVisit(ASTForStmt * element) {
   } else {
     stepString = "1";
   }
-  std::string beginString = visitResults.back();
-  visitResults.pop_back();
   std::string endString = visitResults.back();
   visitResults.pop_back();
   std::string startString = visitResults.back();
   visitResults.pop_back();
+  std::string elemString = visitResults.back();
+  visitResults.pop_back();
 
-  visitResults.push_back("for (" + startString + " : " + endString + " .. " + beginString + " by " + stepString + ") " + doString);
+  visitResults.push_back("for (" + elemString + " : " + startString + " .. " + endString + " by " + stepString + ") " + doString);
   indentLevel--;
 }
 
@@ -320,9 +320,16 @@ void PrettyPrinter::endVisit(ASTForEachStmt * element) {
   visitResults.push_back("for (" + elemString + " : " + arrString + ") " + doString);
   indentLevel--;
 }
+
+void PrettyPrinter::endVisit(ASTBoolExpr * element) {
+ std::string boolVal = element->getValue();
+ visitResults.push_back(boolVal); 
+}
+
 // SIP Extensions end
 
 std::string PrettyPrinter::indent() const {
   return std::string(indentLevel*indentSize, indentChar);
 }
+
 

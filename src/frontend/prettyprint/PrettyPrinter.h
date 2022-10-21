@@ -65,6 +65,9 @@ public:
   virtual void endVisit(ASTIncDecStmt * element) override;
   virtual void endVisit(ASTMainArray * element) override;
   virtual void endVisit(ASTAlternateArray * element) override;
+  virtual void endVisit(ASTBoolExpr * element) override;
+
+ 
 
 
 private:
