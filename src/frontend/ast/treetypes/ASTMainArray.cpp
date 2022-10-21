@@ -2,7 +2,9 @@
 #include "ASTinternal.h"
 #include "ASTVisitor.h"
 
-ASTMainArray::ASTMainArray(std::vector<std::unique_ptr<ASTExpr>> ELEMENTS) {
+ASTMainArray::ASTMainArray(const std::string& name, std::vector<std::unique_ptr<ASTExpr>> ELEMENTS) {
+    this.name = *name;
+    
     for(auto &element : ELEMENTS) {
         std::shared_ptr<ASTExpr> e = std::move(element);
         this->ELEMENTS.push_back(e);
