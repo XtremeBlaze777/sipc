@@ -8,7 +8,7 @@ void ASTIncDecStmt::accept(ASTVisitor * visitor) {
   visitor->endVisit(this);
 }
 
-std::ostream& ASTBinaryStmt::print(std::ostream &out) const {
+std::ostream& ASTIncDecStmt::print(std::ostream &out) const {
   out << "(" << *getStmt() << getOp() << ")";
   return out;
 }  // LCOV_EXCL_LINE

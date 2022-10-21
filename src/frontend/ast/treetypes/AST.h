@@ -40,5 +40,6 @@
 #include "ASTTernaryExpr.h"
 #include "ASTForStmt.h"
 #include "ASTForEachStmt.h"
+#include "ASTIncDecStmt.h"
 #include "ASTMainArray.h"
 #include "ASTAlternateArray.h"

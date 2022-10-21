@@ -211,7 +211,7 @@ void ASTBuilder::visitUnaryExpr(T* ctx, const std::string& op) {
   visit(ctx->expr(1));
   auto rhs = std::move(visitedExpr);
 
-  visitedExpr = std::make_unqiue<ASTUnaryExpr>(op, std::move(rhs));
+  visitedExpr = std::make_unique<ASTUnaryExpr>(op, std::move(rhs));
 
   LOG_S(1) << "Built AST node " << *visitedExpr;
 
@@ -227,7 +227,7 @@ Any visitTernaryExpr(TIPParser::TernaryExprContext *ctx) {
   visit(ctx->expr(2));
   auto else_ = std::move(visitedExpr);
 
-  visitedExpr = std::make_unqiue<ASTTernaryExpr>( std::move(cond), std::move(then), std::move(else_) );
+  visitedExpr = std::make_unique<ASTTernaryExpr>( std::move(cond), std::move(then), std::move(else_) );
 
   LOG_S(1) << "Built AST node " << *visitedExpr;
 
@@ -548,7 +548,7 @@ Any ASTBuilder::visitForStmt(TIPParser::ForStmtContext *ctx) {
   visit(ctx->statement(0));
   auto stmtBody = std::move(visitedStmt);
 
-  visitedStmt = std::make_unique<ASTForStmt>( std::move(start), std::move(end), std::move(beign), std::move(step), std:move(stmtBody) );
+  visitedStmt = std::make_unique<ASTForStmt>( std::move(start), std::move(end), std::move(begin), std::move(step), std::move(stmtBody) );
 
   LOG_S(1) << "Built AST node " << *visitedStmt;
 
@@ -561,7 +561,7 @@ Any ASTBuilder::visitForStmt(TIPParser::ForStmtContext *ctx) {
 Any ASTBuilder::visitForEachStmt(TIPParser::ForEachStmtContext *ctx) {
   visit(ctx->expr(0));
   auto elem = std::move(visitedExpr);
-  visit(ctx->statement(0));
+  visit(ctx->expr(1));
   auto arrBody = std::move(visitedStmt);
   visit(ctx->statement(1));
   auto condBody = std::move(visitedStmt);

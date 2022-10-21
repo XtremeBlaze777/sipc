@@ -10,13 +10,13 @@ void ASTForEachStmt::accept(ASTVisitor * visitor) {
   visitor->endVisit(this);
 }
 
-std::ostream& ASTIfStmt::print(std::ostream &out) const {
+std::ostream& ASTForEachStmt::print(std::ostream &out) const {
   out << "for (" << *getElem() << ":" << *getArr << ") ";
   out << *getDo();
   return out;
 }
 
-std::vector<std::shared_ptr<ASTNode>> ASTIfStmt::getChildren() {
+std::vector<std::shared_ptr<ASTNode>> ASTForEachStmt::getChildren() {
   std::vector<std::shared_ptr<ASTNode>> children;
 
   children.push_back(ELEM);

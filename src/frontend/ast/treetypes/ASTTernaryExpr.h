@@ -8,7 +8,7 @@ class ASTTernaryExpr : public ASTExpr {
   std::shared_ptr<ASTExpr> COND, IF, ELSE;
 public:
   std::vector<std::shared_ptr<ASTNode>> getChildren() override;
-  ASTBinaryExpr(const std::unique_ptr<ASTExpr> COND, std::unique_ptr<ASTExpr> IF, std::unique_ptr<ASTExpr> ELSE)
+  ASTTernaryExpr(std::unique_ptr<ASTExpr> COND, std::unique_ptr<ASTExpr> IF, std::unique_ptr<ASTExpr> ELSE)
       : COND(std::move(COND)), IF(std::move(IF)), ELSE(std::move(ELSE)) {}
   ASTExpr* getCond() const { return COND.get(); }
   ASTExpr* getIf() const { return IF.get(); }

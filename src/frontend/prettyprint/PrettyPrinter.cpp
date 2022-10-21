@@ -245,7 +245,7 @@ void PrettyPrinter::endVisit(ASTTernaryExpr * element) {
   visitResults.push_back('(' + condString + " ? " + ifString + " : " + elseString + ')');
 }
 
-void PrettyPrinter::endVisit(ASTIncDecExpr * element) {
+void PrettyPrinter::endVisit(ASTIncDecStmt * element) {
   std::string exprString visitResults.back();
   visitResults.pop_back();
   visitResults.push_back(exprString + element->getOp());

@@ -74,11 +74,13 @@ public:
   virtual void endVisit(ASTTernaryExpr * element) {}
   virtual bool visit(ASTIncDecStmt * element) { return true; }
   virtual void endVisit(ASTIncDecStmt * element) {}
-  virtual bool visit(ASTIncDecStmt * element) { return true; }
-  virtual void endVisit(ASTIncDecStmt * element) {}
   virtual bool visit(ASTForStmt * element) { return true; }
   virtual void endVisit(ASTForStmt * element) {}
   virtual bool visit(ASTForEachStmt * element) { return true; }
   virtual void endVisit(ASTForEachStmt * element) {}
+  virtual bool visit(ASTMainArray * element) { return true; }
+  virtual void endVisit(ASTMainArray * element) {}
+  virtual bool visit(ASTAlternateArray * element) { return true; }
+  virtual void endVisit(ASTAlternateArray * element) {}
 };
 

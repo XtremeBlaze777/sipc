@@ -10,10 +10,10 @@ class ASTForStmt : public ASTStmt {
   std::shared_ptr<ASTStmt> DO;
 public:
   std::vector<std::shared_ptr<ASTNode>> getChildren() override;
-  ASTIfStmt(std::unique_ptr<ASTExpr> START, std::unique_ptr<ASTExpr> END,
+  ASTForStmt(std::unique_ptr<ASTExpr> START, std::unique_ptr<ASTExpr> END,
           std::unique_ptr<ASTExpr> BEGIN, std::unique_ptr<ASTExpr> STEP,
           std::unique_ptr<ASTStmt> DO)
-      : START(std::move(START)), END(std::move(END)), BEGIN(std::move(BEGIN), STEP(std::move(STEP), DO(std::move(DO)) {}
+      : START(std::move(START)), END(std::move(END)), BEGIN(std::move(BEGIN)), STEP(std::move(STEP)), DO(std::move(DO)) {}
   ASTExpr* getStart() const { return START.get(); }
   ASTExpr* getEnd() const { return END.get(); }
   ASTExpr* getBegin() const { return BEGIN.get(); }

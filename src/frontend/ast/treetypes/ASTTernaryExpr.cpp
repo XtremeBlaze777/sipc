@@ -10,7 +10,7 @@ void ASTTernaryExpr::accept(ASTVisitor * visitor) {
   visitor->endVisit(this);
 }
 
-std::ostream& ASTBinaryExpr::print(std::ostream &out) const {
+std::ostream& ASTTernaryExpr::print(std::ostream &out) const {
   eut << "(" << *getCond() << "?" << getIf() << ":" << *getElse() << ")";
   return out;
 }  // LCOV_EXCL_LINE

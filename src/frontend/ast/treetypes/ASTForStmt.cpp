@@ -14,7 +14,7 @@ void ASTForStmt::accept(ASTVisitor * visitor) {
   visitor->endVisit(this);
 }
 
-std::ostream& ASTIfStmt::print(std::ostream &out) const {
+std::ostream& ASTForStmt::print(std::ostream &out) const {
   out << "for (" << *getStart << ":" << *getEnd << ".." << *getBegin;
   if (getStep() != nullptr) {
      out << "by" << *getStep;
@@ -23,7 +23,7 @@ std::ostream& ASTIfStmt::print(std::ostream &out) const {
   return out;
 }
 
-std::vector<std::shared_ptr<ASTNode>> ASTIfStmt::getChildren() {
+std::vector<std::shared_ptr<ASTNode>> ASTForStmt::getChildren() {
   std::vector<std::shared_ptr<ASTNode>> children;
 
   children.push_back(START);

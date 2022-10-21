@@ -8,7 +8,7 @@ void ASTUnaryExpr::accept(ASTVisitor * visitor) {
   visitor->endVisit(this);
 }
 
-std::ostream& ASTBinaryExpr::print(std::ostream &out) const {
+std::ostream& ASTUnaryExpr::print(std::ostream &out) const {
   out << "(" << getOp() << *getRight() << ")";
   return out;
 }  // LCOV_EXCL_LINE

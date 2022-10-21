@@ -10,7 +10,7 @@ class ASTForEachStmt : public ASTStmt {
   std::shared_ptr<ASTStmt> DO;
 public:
   std::vector<std::shared_ptr<ASTNode>> getChildren() override;
-  ASTIfStmt(std::unique_ptr<ASTExpr> ELEM, std::unique_ptr<ASTStmt> ARR,
+  ASTForEachStmt(std::unique_ptr<ASTExpr> ELEM, std::unique_ptr<ASTExpr> ARR,
             std::unique_ptr<ASTStmt> DO)
       : ELEM(std::move(ELEM)), ARR(std::move(ARR)), DO(std::move(DO)) {}
   ASTExpr* getElem() const { return ELEM.get(); }
