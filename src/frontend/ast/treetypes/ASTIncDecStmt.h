@@ -1,17 +1,17 @@
 #pragma once
 
-#include "ASTExpr.h"
+#include "ASTStmt.h"
 
 /*! \brief Class for binary operators: inc & dec.
  */
-class ASTIncDecExpr : public ASTExpr {
+class ASTIncDecStmt : public ASTStmt {
   std::string OP;
-  std::shared_ptr<ASTExpr> EXPR;
+  std::shared_ptr<ASTStmt> STMT;
 public:
-  ASTBinaryExpr(const std::string &OP, std::unique_ptr<ASTExpr> EXPR
-      : OP(OP), EXPR(std::move(EXPR)) {}
+  ASTBinaryStmt(const std::string &OP, std::unique_ptr<ASTStmt> STMT
+      : OP(OP), STMT(std::move(STMT)) {}
   std::string getOp() const { return OP; }
-  ASTExpr* getExpr() const { return EXPR.get(); }
+  ASTStmt* getStmt() const { return STMT.get(); }
   void accept(ASTVisitor * visitor) override;
   llvm::Value* codegen() override;
 
