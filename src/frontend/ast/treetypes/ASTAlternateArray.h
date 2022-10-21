@@ -6,17 +6,17 @@
 /*! \brief Class for an array.
  *
  */
-class ASTMainArray: public ASTNode {
+class ASTAlternateArray: public ASTNode {
     std::string name;
-    std::shared_ptr<ASTExpr> startExpr;
-    std::shared_ptr<ASTExpr> endExpr;
+    std::shared_ptr<ASTExpr> START;
+    std::shared_ptr<ASTExpr> END;
     public:
         std::vector<std::shared_ptr<ASTNode>> getChildren() override;
-        ASTAlternateArray(std::unique_ptr<ASTExpr> startExpr, std::unique_ptr<ASTExpr> endExpr)
-                        : startExpr(std::move(startExpr)), endExpr(std::move(lastExpr)) {}
+        ASTAlternateArray(std::unique_ptr<ASTExpr> START, std::unique_ptr<ASTExpr> END)
+                        : START(std::move(START)), endExpr(std::move(END)) {}
         std::string getName() const { return name; }
-        ASTExpr* getStartExpr() const { return startExpr.get(); }
-        ASTExpr* getEndExpr() const { return endExpr.get(); }
+        ASTExpr* getStart() const { return START.get(); }
+        ASTExpr* getEnd() const { return END.get(); }
         void accept(ASTVisitor * visitor) override;
         llvm::Value *codegen() override;
     protected:
