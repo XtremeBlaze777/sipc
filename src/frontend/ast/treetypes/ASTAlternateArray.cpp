@@ -17,6 +17,6 @@ std::vector<std::shared_ptr<ASTNode>> ASTAlternateArray::getChildren() {
 }
 
 std::ostream& ASTAlternateArray::print(std::ostream &out) const {
-    out << "[" << getStartExpr() << ":" << getEndExpr() << "]";
+    out << "[" << getStartExpr() << " of " << getEndExpr() << "]";
     return out;
 }   // LCOV_EXCL_LINE
