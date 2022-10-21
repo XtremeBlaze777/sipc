@@ -49,7 +49,7 @@ public:
  /* New visit Stmts */
   Any visitForStmt(TIPParser::ForStmtContext *ctx) override;
   Any visitForEachStmt(TIPParser::ForEachStmtContext *ctx) override;
-  Any visitIncDecStmts(TIPParser::IncDecStmtContext *ctx) override;
+  Any visitIncDecStmts(TIPParser::IncDecStmtContext *ctx, const std::string& op) override;
 
  /* Original TIP visits */
   Any visitFunction(TIPParser::FunctionContext *ctx) override;

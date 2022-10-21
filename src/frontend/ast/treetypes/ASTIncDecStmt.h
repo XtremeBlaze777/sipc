@@ -5,13 +5,13 @@
 /*! \brief Class for binary operators: inc & dec.
  */
 class ASTIncDecStmt : public ASTStmt {
-  std::string OP;
   std::shared_ptr<ASTStmt> STMT;
+  std::string OP;
 public:
-  ASTBinaryStmt(const std::string &OP, std::unique_ptr<ASTStmt> STMT
-      : OP(OP), STMT(std::move(STMT)) {}
-  std::string getOp() const { return OP; }
+  ASTBinaryStmt(std::unique_ptr<ASTStmt> STMT, const std::string &OP)
+      : STMT(std::move(STMT), OP(OP)) {}
   ASTStmt* getStmt() const { return STMT.get(); }
+  std::string getOp() const { return OP; }
   void accept(ASTVisitor * visitor) override;
   llvm::Value* codegen() override;
 
