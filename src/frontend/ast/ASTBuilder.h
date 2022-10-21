@@ -39,7 +39,30 @@ public:
    */  
   template <typename T>
   void visitBinaryExpr(T* ctx, const std::string& op);
+  template <typename T>
+  void visitUnaryExpr(const std::string& op, T* ctx); // NEW
 
+
+
+ /* New visit Exprs */
+  Any visitTernaryExpr(TIPParser::TernaryExprContext *ctx) override;
+  Any visitMainArray(TIPParser::MainArrayContext *ctx) override;
+  Any visitAlternateArray(TIPParser::AlternateArrayContext *ctx) override;
+  Any visitBoolExpr(TIPParser::BoolExprContext *ctx) override;
+  Any visitUnaryNegationExpr(TIPParser::UnaryNegationExprContext *ctx) override;
+  Any visitArrLenExpr(TIPParser::ArrLenExprContext *ctx) override;
+  Any visitLogicalAndExpr(TIPParser::LogicalAndExprContext *ctx) override;
+  Any visitLogicalOrExpr(TIPParser::LogicalOrExprContext *ctx) override;
+  Any visitIncStmt(TIPParser::IncStmtContext *ctx) override;
+  Any visitDecStmt(TIPParser::DecStmtContext *ctx) override;
+
+ /* New visit Stmts */
+  Any visitForStmt(TIPParser::ForStmtContext *ctx) override;
+  Any visitForEachStmt(TIPParser::ForEachStmtContext *ctx) override;
+  template <typename T>
+  void visitIncDecStmt(T* ctx, const std::string op);
+
+ /* Original TIP visits */
   Any visitFunction(TIPParser::FunctionContext *ctx) override;
   Any visitNegNumber(TIPParser::NegNumberContext *ctx) override;
   Any visitAdditiveExpr(TIPParser::AdditiveExprContext *ctx) override;

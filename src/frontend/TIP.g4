@@ -40,19 +40,19 @@ expr : expr '(' (expr (',' expr)*)? ')' 	#funAppExpr
      | <assoc=right> '*' expr 				#deRefExpr
      | SUB NUMBER				#negNumber
      | <assoc=right> '&' expr					#refExpr
-     | NOT expr                 #unaryNegation
+     | NOT expr                 #unaryNegationExpr
      | <assoc=right> SUB expr                 #arithmeticNegation
      | expr op=(MUL | DIV | MOD) expr 	#multiplicativeExpr
      | expr op=(ADD | SUB) expr 		#additiveExpr
      | expr op=(GT | GE | LT | LE) expr 				#relationalExpr
      | expr op=(EQ | NE) expr 			#equalityExpr
-     | expr AND expr            #bitwiseAnd
-     | expr OR expr             #bitwiseOr
+     | expr AND expr            #logicalAndExpr
+     | expr OR expr             #logicalOrExpr
      | <assoc=right> expr '?' expr ':' expr           #ternaryExpr
      | BOOLEAN                  #boolExpr
-     | LKET ( expr ( ',' expr )* )? RKET    #mainArr
-     | LKET expr 'of' expr RKET             #altArr
-     | LEN IDENTIFIER                       #arrLen
+     | LKET ( expr ( ',' expr )* )? RKET    #mainArray
+     | LKET expr 'of' expr RKET             #alternateArray
+     | LEN expr                             #arrLenExpr
      | IDENTIFIER LKET expr RKET            #arrIndex
      | IDENTIFIER				#varExpr
      | NUMBER					#numExpr

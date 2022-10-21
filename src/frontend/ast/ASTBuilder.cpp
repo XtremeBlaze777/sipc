@@ -10,6 +10,8 @@ using namespace antlrcpp;
 
 ASTBuilder::ASTBuilder(TIPParser *p) : parser{p} {}
 
+
+// SIP Extension for Unary/Binary Operators
 std::string ASTBuilder::opString(int op) {
   std::string opStr;
   switch (op) {
@@ -34,6 +36,33 @@ std::string ASTBuilder::opString(int op) {
   case TIPParser::NE:
     opStr = "!=";
     break;
+  // SIP Extensions
+  case TIPParser::MOD:
+    opStr = "%";
+    break;
+  case TIPParser::GE:
+    opStr = ">=";
+    break;
+  case TIPParser::LT:
+    opStr = "<";
+    break;
+  case TIPParser::LE:
+    opStr = "<=";
+    break;
+  case TIPParser::AND:
+    opStr = "and";
+    break;
+  case TIPParser::OR:
+    opStr = "or";
+    break;
+  case TIPParser::NOT:
+    opStr = "not";
+  case TIPParser::LEN:
+    opStr = '#';
+  case TIPParser::INC:
+    opStr = "++";
+  case TIPParser::DEC:
+    opStr = "--";
   default:
     throw std::runtime_error(
         "unknown operator :" +
@@ -137,19 +166,6 @@ Any ASTBuilder::visitFunction(TIPParser::FunctionContext *ctx) {
   return "";
 }
 
-Any ASTBuilder::visitNegNumber(TIPParser::NegNumberContext *ctx) {
-  int val = std::stoi(ctx->NUMBER()->getText());
-  val = -val;
-  visitedExpr = std::make_unique<ASTNumberExpr>(val);
-
-  LOG_S(1) << "Built AST node " << *visitedExpr;
-
-  // Set source location 
-  visitedExpr->setLocation(ctx->getStart()->getLine(), 
-                           ctx->getStart()->getCharPositionInLine());
-  return "";
-}  // LCOV_EXCL_LINE
-
 /*
  * Unfortunately, the context types for binary expressions generated
  * by ANTLR are not organized into a sub-type hierarchy.  If they were
@@ -176,6 +192,91 @@ void ASTBuilder::visitBinaryExpr(T* ctx, const std::string& op) {
   visitedExpr->setLocation(ctx->getStart()->getLine(), 
                            ctx->getStart()->getCharPositionInLine());
 }
+
+// NEW FUNCTIONS:
+template <typename T>
+void ASTBuilder::visitUnaryExpr(const std::string& op, T* ctx) {
+  visit(ctx->expr());
+  auto rhs = std::move(visitedExpr);
+
+  visitedExpr = std::make_unique<ASTUnaryExpr>(op, std::move(rhs));
+
+  LOG_S(1) << "Built AST node " << *visitedExpr;
+
+  visitedExpr->setLocation(ctx->getStart()->getLine(),
+                           ctx->getStart()->getCharPositionInLine());
+}
+
+Any ASTBuilder::visitTernaryExpr(TIPParser::TernaryExprContext *ctx) {
+  visit(ctx->expr(0));
+  auto cond = std::move(visitedExpr);
+  visit(ctx->expr(1));
+  auto then = std::move(visitedExpr);
+  visit(ctx->expr(2));
+  auto else_ = std::move(visitedExpr);
+
+  visitedExpr = std::make_unique<ASTTernaryExpr>( std::move(cond), std::move(then), std::move(else_) );
+
+  LOG_S(1) << "Built AST node " << *visitedExpr;
+
+  visitedExpr->setLocation(ctx->getStart()->getLine(),
+                           ctx->getStart()->getCharPositionInLine());
+  return "";
+}
+
+Any ASTBuilder::visitMainArray(TIPParser::MainArrayContext *ctx) {
+  auto list = ctx->expr();
+
+  std::vector<std::unique_ptr<ASTExpr>> elements;
+  for (int i = 0; i < list.size(); i++) {
+    auto e = list[i];
+    visit(e);
+    elements.push_back(std::move(visitedExpr));
+  }
+
+  visitedExpr = std::make_unique<ASTMainArray>(std::move(elements));
+
+  LOG_S(1) << "Built AST node " << *visitedExpr;
+
+  visitedExpr->setLocation(ctx->getStart()->getLine(),
+                           ctx->getStart()->getCharPositionInLine());
+  return "";
+}
+
+Any ASTBuilder::visitAlternateArray(TIPParser::AlternateArrayContext *ctx)  {
+  visit(ctx->expr(0));
+  auto size = std::move(visitedExpr);
+  visit(ctx->expr(1));
+  auto element = std::move(visitedExpr);
+
+  visitedExpr = std::make_unique<ASTAlternateArray>(std::move(size), std::move(element));
+  
+  LOG_S(1) << "Built AST node " << *visitedExpr;
+
+  visitedExpr->setLocation(ctx->getStart()->getLine(),
+                           ctx->getStart()->getCharPositionInLine());
+  return "";
+}
+
+Any ASTBuilder::visitUnaryNegationExpr(TIPParser::UnaryNegationExprContext *ctx) {
+  visitUnaryExpr("not", ctx);
+  return "";
+} // LCOV_EXCL_LINE
+
+Any ASTBuilder::visitArrLenExpr(TIPParser::ArrLenExprContext *ctx) {
+  visitUnaryExpr("#", ctx);
+  return "";
+} // LCOV_EXCL_LINE
+
+Any ASTBuilder::visitLogicalAndExpr(TIPParser::LogicalAndExprContext *ctx) {
+  visitBinaryExpr(ctx, "and");
+  return "";
+} // LCOV_EXCL_LINE
+
+Any ASTBuilder::visitLogicalOrExpr(TIPParser::LogicalOrExprContext *ctx) {
+  visitBinaryExpr(ctx, "or");
+  return "";
+} // LCOV_EXCL_LINE
 
 Any ASTBuilder::visitAdditiveExpr(TIPParser::AdditiveExprContext *ctx) {
   visitBinaryExpr(ctx, opString(ctx->op->getType()));
@@ -216,6 +317,18 @@ Any ASTBuilder::visitNumExpr(TIPParser::NumExprContext *ctx) {
   return "";
 }  // LCOV_EXCL_LINE
 
+Any ASTBuilder::visitBoolExpr(TIPParser::BoolExprContext *ctx) {
+  std::string val = ctx->BOOLEAN()->getText();
+  visitedExpr = std::make_unique<ASTBoolExpr>(val);
+
+  LOG_S(1) << "Built AST node " << *visitedExpr;
+
+  // Set source location 
+  visitedExpr->setLocation(ctx->getStart()->getLine(), 
+                           ctx->getStart()->getCharPositionInLine());
+  return "";
+}
+
 Any ASTBuilder::visitVarExpr(TIPParser::VarExprContext *ctx) {
   std::string name = ctx->IDENTIFIER()->getText();
   visitedExpr = std::make_unique<ASTVariableExpr>(name);
@@ -238,6 +351,19 @@ Any ASTBuilder::visitInputExpr(TIPParser::InputExprContext *ctx) {
                            ctx->getStart()->getCharPositionInLine());
   return "";
 } // LCOV_EXCL_LINE
+
+Any ASTBuilder::visitNegNumber(TIPParser::NegNumberContext *ctx) {
+    int val = std::stoi(ctx->NUMBER()->getText());
+    val = -val;
+    visitedExpr = std::make_unique<ASTNumberExpr>(val);
+
+    LOG_S(1) << "Built AST node " << *visitedExpr;
+
+    // Set source location 
+    visitedExpr->setLocation(ctx->getStart()->getLine(), 
+            ctx->getStart()->getCharPositionInLine());
+    return "";
+}  // LCOV_EXCL_LINE
 
 Any ASTBuilder::visitFunAppExpr(TIPParser::FunAppExprContext *ctx) {
   std::unique_ptr<ASTExpr> fExpr = nullptr;
@@ -441,6 +567,52 @@ Any ASTBuilder::visitIfStmt(TIPParser::IfStmtContext *ctx) {
   return "";
 }
 
+Any ASTBuilder::visitForStmt(TIPParser::ForStmtContext *ctx) {
+  visit(ctx->expr(0));
+  auto iterator = std::move(visitedExpr);
+  visit(ctx->expr(1));
+  auto start = std::move(visitedExpr);
+  visit(ctx->expr(2));
+  auto end = std::move(visitedExpr);
+
+  std::unique_ptr<ASTExpr> step = nullptr;
+  if (ctx->expr().size() == 4) {
+    visit(ctx->expr(3));
+    step = std::move(visitedExpr);
+  }
+
+  visit(ctx->statement());
+  auto stmtBody = std::move(visitedStmt);
+
+  visitedStmt = std::make_unique<ASTForStmt>( std::move(iterator), std::move(start), std::move(end), std::move(step), std::move(stmtBody) );
+
+  LOG_S(1) << "Built AST node " << *visitedStmt;
+
+  // Set source location 
+  visitedStmt->setLocation(ctx->getStart()->getLine(), 
+                           ctx->getStart()->getCharPositionInLine());
+  return "";
+}
+
+Any ASTBuilder::visitForEachStmt(TIPParser::ForEachStmtContext *ctx) {
+  visit(ctx->expr(0));
+  auto elem = std::move(visitedExpr);
+  visit(ctx->expr(1));
+  auto arrBody = std::move(visitedExpr);
+  visit(ctx->statement());
+  auto condBody = std::move(visitedStmt);
+
+  visitedStmt = std::make_unique<ASTForEachStmt>(std::move(elem), std::move(arrBody),
+                                            std::move(condBody));
+
+  LOG_S(1) << "Built AST node " << *visitedStmt;
+
+  // Set source location 
+  visitedStmt->setLocation(ctx->getStart()->getLine(), 
+                           ctx->getStart()->getCharPositionInLine());
+  return "";
+}
+
 Any ASTBuilder::visitOutputStmt(TIPParser::OutputStmtContext *ctx) {
   visit(ctx->expr());
   visitedStmt = std::make_unique<ASTOutputStmt>(std::move(visitedExpr));
@@ -486,11 +658,36 @@ Any ASTBuilder::visitAssignStmt(TIPParser::AssignStmtContext *ctx) {
 
   LOG_S(1) << "Built AST node " << *visitedStmt;
 
-  // Set source location 
   visitedStmt->setLocation(ctx->getStart()->getLine(), 
                            ctx->getStart()->getCharPositionInLine());
   return "";
 }
+
+template <typename T>
+void ASTBuilder::visitIncDecStmt(T* ctx, const std::string op) {
+  visit(ctx->expr());
+  auto var = std::move(visitedExpr);
+
+  visitedStmt = std::make_unique<ASTIncDecStmt>(std::move(var), op);
+
+  LOG_S(1) << "Built AST node " << *visitedStmt;
+
+  // Set source location 
+  visitedStmt->setLocation(ctx->getStart()->getLine(), 
+                           ctx->getStart()->getCharPositionInLine());
+}
+
+Any ASTBuilder::visitIncStmt(TIPParser::IncStmtContext *ctx) {
+  visitIncDecStmt(ctx, "++");
+  return "";
+}
+
+Any ASTBuilder::visitDecStmt(TIPParser::DecStmtContext *ctx) {
+  visitIncDecStmt(ctx, "--");
+  return "";
+}
+
+
 
 std::string ASTBuilder::generateSHA256(std::string tohash) {
   std::vector<unsigned char> hash(picosha2::k_digest_size);

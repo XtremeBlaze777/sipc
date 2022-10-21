@@ -56,6 +56,22 @@ target_sources(
           ${CMAKE_CURRENT_SOURCE_DIR}/treetypes/ASTVariableExpr.h
           ${CMAKE_CURRENT_SOURCE_DIR}/treetypes/ASTWhileStmt.cpp
           ${CMAKE_CURRENT_SOURCE_DIR}/treetypes/ASTWhileStmt.h
+          ${CMAKE_CURRENT_SOURCE_DIR}/treetypes/ASTUnaryExpr.cpp
+          ${CMAKE_CURRENT_SOURCE_DIR}/treetypes/ASTUnaryExpr.h
+          ${CMAKE_CURRENT_SOURCE_DIR}/treetypes/ASTBoolExpr.cpp 
+          ${CMAKE_CURRENT_SOURCE_DIR}/treetypes/ASTBoolExpr.h 
+          ${CMAKE_CURRENT_SOURCE_DIR}/treetypes/ASTTernaryExpr.cpp
+          ${CMAKE_CURRENT_SOURCE_DIR}/treetypes/ASTTernaryExpr.h
+          ${CMAKE_CURRENT_SOURCE_DIR}/treetypes/ASTIncDecStmt.cpp
+          ${CMAKE_CURRENT_SOURCE_DIR}/treetypes/ASTIncDecStmt.h
+          ${CMAKE_CURRENT_SOURCE_DIR}/treetypes/ASTForStmt.cpp
+          ${CMAKE_CURRENT_SOURCE_DIR}/treetypes/ASTForStmt.h
+          ${CMAKE_CURRENT_SOURCE_DIR}/treetypes/ASTForEachStmt.cpp
+          ${CMAKE_CURRENT_SOURCE_DIR}/treetypes/ASTForEachStmt.h
+          ${CMAKE_CURRENT_SOURCE_DIR}/treetypes/ASTMainArray.cpp
+          ${CMAKE_CURRENT_SOURCE_DIR}/treetypes/ASTMainArray.h
+          ${CMAKE_CURRENT_SOURCE_DIR}/treetypes/ASTAlternateArray.cpp
+          ${CMAKE_CURRENT_SOURCE_DIR}/treetypes/ASTAlternateArray.h
           ${CMAKE_CURRENT_SOURCE_DIR}/ASTVisitor.h
           ${CMAKE_CURRENT_SOURCE_DIR}/ASTBuilder.cpp
           ${CMAKE_CURRENT_SOURCE_DIR}/ASTBuilder.h

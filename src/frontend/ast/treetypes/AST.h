@@ -13,6 +13,7 @@
 #include "ASTAssignStmt.h"
 #include "ASTBinaryExpr.h"
 #include "ASTBlockStmt.h"
+#include "ASTBoolExpr.h"
 #include "ASTDeRefExpr.h"
 #include "ASTDeclNode.h"
 #include "ASTDeclStmt.h"
@@ -34,3 +35,12 @@
 #include "ASTStmt.h"
 #include "ASTVariableExpr.h"
 #include "ASTWhileStmt.h"
+
+// SIP Extensions
+#include "ASTUnaryExpr.h"
+#include "ASTTernaryExpr.h"
+#include "ASTForStmt.h"
+#include "ASTForEachStmt.h"
+#include "ASTIncDecStmt.h"
+#include "ASTMainArray.h"
+#include "ASTAlternateArray.h"
