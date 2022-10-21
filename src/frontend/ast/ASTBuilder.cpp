@@ -236,14 +236,17 @@ Any visitTernaryExpr(TIPParser::TernaryExprContext *ctx) {
   return "";
 }
 
-Any visitMainArray(TIPParser::MainArrayContext *ctx) {
+Any visitMainArray(const std::string& name, TIPParser::MainArrayContext *ctx) {
+  auto list = ctx->expr();
+
   std::vector<std::unique_ptr<ASTExpr>> elements;
-  for (auto e : ctx->expr()) {
+  for (int i = 1, i < list.size(), i++) {
+    auto e = list.get(i);
     visit(e);
     elements.push_back(std::move(visitedExpr));
   }
 
-  visitedExpr = std::make_unique<ASTMainArray>( std::move(elements) );
+  visitedExpr = std::make_unique<ASTMainArray>( name, std::move(elements) );
 
   LOG_S(1) << "Built AST node " << *visitedExpr;
 
@@ -252,13 +255,13 @@ Any visitMainArray(TIPParser::MainArrayContext *ctx) {
   return "";
 }
 
-Any visitAlternateArray(TIPParser::AlternateArrayContext *ctx)  {
-  visit(ctx->expr(0));
-  auto start = std::move(visitedExpr);
+Any visitAlternateArray(std::string& name, TIPParser::AlternateArrayContext *ctx)  {
   visit(ctx->expr(1));
+  auto start = std::move(visitedExpr);
+  visit(ctx->expr(2));
   auto end = std::move(visitedExpr);
 
-  visitedExpr = std::make_unique<ASTAlternateArray>( std::move(start), std::move(end) );
+  visitedExpr = std::make_unique<ASTAlternateArray>( name, std::move(start), std::move(end) );
   
   LOG_S(1) << "Built AST node " << *visitedExpr;
 

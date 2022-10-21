@@ -3,7 +3,7 @@ TODO
 [x] Pair Programming to understand how AST subnode types work
 [neil] Split up and work on ~5 cpp and header files each
 [neil] Add new visitor methods to support the new Subtypes
-[] Add new methods to build AST nodes from SIP parse trees
+[x] Add new methods to build AST nodes from SIP parse trees
 [] Update pretty printer
 
 
@@ -14,9 +14,9 @@ AST Subtypes List
 [x] Ternary 
 [x] For Loop (Iteration)
 [x] For Loop (Range)
-[X] Array (Regular)
-[X] Array (x of y)
-[] Array Element Reference Operator
+[x] Array (Regular)
+[x] Array (x of y)
+[x] Array Element Reference Operator
 
 Extend
 ------------

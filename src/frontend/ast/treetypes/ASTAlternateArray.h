@@ -12,8 +12,8 @@ class ASTAlternateArray: public ASTNode {
     std::shared_ptr<ASTExpr> END;
     public:
         std::vector<std::shared_ptr<ASTNode>> getChildren() override;
-        ASTAlternateArray(std::unique_ptr<ASTExpr> START, std::unique_ptr<ASTExpr> END)
-                        : START(std::move(START)), END(std::move(END)) {}
+        ASTAlternateArray(const std::string& name, std::unique_ptr<ASTExpr> START, std::unique_ptr<ASTExpr> END)
+                        : name(name), START(std::move(START)), END(std::move(END)) {}
         std::string getName() const { return name; }
         ASTExpr* getStart() const { return START.get(); }
         ASTExpr* getEnd() const { return END.get(); }

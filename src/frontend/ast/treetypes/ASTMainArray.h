@@ -11,7 +11,7 @@ class ASTMainArray: public ASTNode {
     std::vector<std::shared_ptr<ASTExpr>> ELEMENTS;
     public:
         std::vector<std::shared_ptr<ASTNode>> getChildren() override;
-        ASTMainArray(std::vector<std::unique_ptr<ASTExpr>> ELEMENTS);
+        ASTMainArray(const std::string& name, std::vector<std::unique_ptr<ASTExpr>> ELEMENTS) : name(name);
         std::string getName() const { return name; }
         std::vector<ASTExpr*> getElements() const;
         void accept(ASTVisitor * visitor) override;
