@@ -207,7 +207,7 @@ void ASTBuilder::visitBinaryExpr(T* ctx, const std::string& op) {
 }
 
 // NEW FUNCTIONS
-void ASTBuilder::visitUnaryExpr(T* ctx, const std::string& op) {
+void ASTBuilder::visitUnaryExpr(const std::string& op, T* ctx) {
   visit(ctx->expr(1));
   auto rhs = std::move(visitedExpr);
 
@@ -545,7 +545,7 @@ Any ASTBuilder::visitForStmt(TIPParser::ForStmtContext *ctx) {
     step = std::move(visitedExpr);
   }
 
-  visit(ctx->statement(0));
+  visit(ctx->statement());
   auto stmtBody = std::move(visitedStmt);
 
   visitedStmt = std::make_unique<ASTForStmt>( std::move(start), std::move(end), std::move(begin), std::move(step), std::move(stmtBody) );
@@ -562,8 +562,8 @@ Any ASTBuilder::visitForEachStmt(TIPParser::ForEachStmtContext *ctx) {
   visit(ctx->expr(0));
   auto elem = std::move(visitedExpr);
   visit(ctx->expr(1));
-  auto arrBody = std::move(visitedStmt);
-  visit(ctx->statement(1));
+  auto arrBody = std::move(visitedExpr);
+  visit(ctx->statement());
   auto condBody = std::move(visitedStmt);
 
   visitedStmt = std::make_unique<ASTForEachStmt>(std::move(elem), std::move(arrBody),
@@ -628,7 +628,7 @@ Any ASTBuilder::visitAssignStmt(TIPParser::AssignStmtContext *ctx) {
   return "";
 }
 
-Any visitIncDecStmts(TIPParser::IncDecStmtContext *ctx, const std::string& op) {
+Any visitIncDecStmts(T* ctx, const std::string& op) {
   visit(ctx->expr(0));
   auto var = std::move(visitedExpr);
 

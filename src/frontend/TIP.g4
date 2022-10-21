@@ -50,8 +50,8 @@ expr : expr '(' (expr (',' expr)*)? ')' 	#funAppExpr
      | expr OR expr             #logicalOr
      | <assoc=right> expr '?' expr ':' expr           #ternaryExpr
      | BOOLEAN                  #boolExpr
-     | LKET ( expr ( ',' expr )* )? RKET    #mainArr
-     | LKET expr 'of' expr RKET             #altArr
+     | LKET ( expr ( ',' expr )* )? RKET    #mainArray
+     | LKET expr 'of' expr RKET             #alternateArray
      | LEN IDENTIFIER                       #arrLen
      | IDENTIFIER LKET expr RKET            #arrIndex
      | IDENTIFIER				#varExpr

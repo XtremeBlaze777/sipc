@@ -35,32 +35,32 @@ nameDeclaration : IDENTIFIER ;
 // issues elsewhere in the compiler, e.g.,  introducing an assignable expr
 // weeding pass. 
 //
-expr : expr '(' (expr (',' expr)*)? ')' 	    #funAppExpr
-     | expr '.' IDENTIFIER 		                #accessExpr
-     | <assoc=right> '*' expr 				    #deRefExpr
-     | SUB NUMBER				                #negNumber
-     | <assoc=right> '&' expr				    #refExpr
-     | NOT expr                                 #unaryNegation
-     | <assoc=right> SUB expr                   #arithmeticNegation
-     | expr op=(MUL | DIV | MOD) expr 	        #multiplicativeExpr
-     | expr op=(ADD | SUB) expr 		        #additiveExpr
-     | expr op=(GT | GE | LT | LE) expr 	    #relationalExpr
-     | expr op=(EQ | NE) expr 			        #equalityExpr
-     | expr AND expr                            #logicalAnd
-     | expr OR expr                             #logicalOr
-     | <assoc=right> expr '?' expr ':' expr     #ternaryExpr
-     | BOOLEAN                                  #boolExpr
-     | LKET ( expr ( ',' expr )* )? RKET        #mainArr
-     | LKET expr 'of' expr RKET                 #altArr
-     | LEN IDENTIFIER                           #arrLen
-     | IDENTIFIER LKET expr RKET                #arrIndex
-     | IDENTIFIER				                #varExpr
-     | NUMBER					                #numExpr
-     | KINPUT					                #inputExpr
-     | KALLOC expr				                #allocExpr
-     | KNULL					                #nullExpr
-     | recordExpr				                #recordRule
-     | '(' expr ')'				                #parenExpr
+expr : expr '(' (expr (',' expr)*)? ')' 	#funAppExpr
+     | expr '.' IDENTIFIER 		#accessExpr
+     | <assoc=right> '*' expr 				#deRefExpr
+     | SUB NUMBER				#negNumber
+     | <assoc=right> '&' expr					#refExpr
+     | NOT expr                 #unaryNegation
+     | <assoc=right> SUB expr                 #arithmeticNegation
+     | expr op=(MUL | DIV | MOD) expr 	#multiplicativeExpr
+     | expr op=(ADD | SUB) expr 		#additiveExpr
+     | expr op=(GT | GE | LT | LE) expr 				#relationalExpr
+     | expr op=(EQ | NE) expr 			#equalityExpr
+     | expr AND expr            #logicalAnd
+     | expr OR expr             #logicalOr
+     | <assoc=right> expr '?' expr ':' expr           #ternaryExpr
+     | BOOLEAN                  #boolExpr
+     | LKET ( expr ( ',' expr )* )? RKET    #mainArray
+     | LKET expr 'of' expr RKET             #alternateArray
+     | LEN IDENTIFIER                       #arrLen
+     | IDENTIFIER LKET expr RKET            #arrIndex
+     | IDENTIFIER				#varExpr
+     | NUMBER					#numExpr
+     | KINPUT					#inputExpr
+     | KALLOC expr				#allocExpr
+     | KNULL					#nullExpr
+     | recordExpr				#recordRule
+     | '(' expr ')'				#parenExpr
 ;
 
 recordExpr : '{' (fieldExpr (',' fieldExpr)*)? '}' ;
