@@ -48,3 +48,6 @@ src/frontend/.antlr
 # Testing
 tipg4/hellosip.tip
 tipg4/test.sip
+
+# WSL
+src/semantic/weeding/CMakeLists.txt
