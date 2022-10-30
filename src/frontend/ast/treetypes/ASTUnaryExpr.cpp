@@ -9,6 +9,10 @@ void ASTUnaryExpr::accept(ASTVisitor * visitor) {
 }
 
 std::ostream& ASTUnaryExpr::print(std::ostream &out) const {
-  out << "(" << getOp() << *getRight() << ")";
+  if (this->getOp() == "not") {
+    out << getOp() << " " << *getRight(); 
+  } else {
+    out << getOp() << *getRight(); 
+  }
   return out;
 }  // LCOV_EXCL_LINE

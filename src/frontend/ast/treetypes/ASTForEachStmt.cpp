@@ -11,7 +11,7 @@ void ASTForEachStmt::accept(ASTVisitor * visitor) {
 }
 
 std::ostream& ASTForEachStmt::print(std::ostream &out) const {
-  out << "for (" << *getElem() << ":" << *getArr() << ") ";
+  out << "for (" << *getElem() << " : " << *getArr() << ") ";
   out << *getDo();
   return out;
 }

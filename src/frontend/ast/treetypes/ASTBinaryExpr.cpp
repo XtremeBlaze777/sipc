@@ -10,7 +10,11 @@ void ASTBinaryExpr::accept(ASTVisitor * visitor) {
 }
 
 std::ostream& ASTBinaryExpr::print(std::ostream &out) const {
-  out << "(" << *getLeft() << getOp() << *getRight() << ")";
+  if (getOp() == "or" || getOp() == "and") {
+    out << "(" << *getLeft() << " " << getOp() << " " << *getRight() << ")";
+  } else {
+    out << "(" << *getLeft() << getOp() << *getRight() << ")";
+  }
   return out;
 }  // LCOV_EXCL_LINE
 

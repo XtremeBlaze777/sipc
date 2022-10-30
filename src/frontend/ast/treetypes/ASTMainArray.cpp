@@ -32,11 +32,11 @@ std::vector<std::shared_ptr<ASTNode>> ASTMainArray::getChildren() {
 
 std::ostream& ASTMainArray::print(std::ostream &out) const {
     auto gotten = getElements();
-    auto &last = gotten.back();
+    auto &last = *gotten.back();
     gotten.pop_back();
     out << "[";
     for (auto &element : gotten) {
-        out << element << ",";
+        out << *element << ", ";
     }
     out << last << "]";
     return out;
