@@ -8,7 +8,6 @@ class ASTUnaryExpr : public ASTExpr {
   std::string OP;
   std::shared_ptr<ASTExpr> RIGHT;
 public:
-  std::vector<std::shared_ptr<ASTNode>> getChildren() override;
   ASTUnaryExpr(const std::string &OP, std::unique_ptr<ASTExpr> RIGHT)
       : OP(OP), RIGHT(std::move(RIGHT)) {}
   std::string getOp() const { return OP; }

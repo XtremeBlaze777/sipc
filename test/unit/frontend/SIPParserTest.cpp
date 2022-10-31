@@ -190,12 +190,12 @@ TEST_CASE("SIP Parser: for loops", "[SIP Parser]") {
 TEST_CASE("SIP Parser: arr len precedence test", "[SIP Parser]") {
     std::stringstream stream;
     stream << R"(main() {var p; p = [1 of 2]; return #p;})";
-    std::string expected = "(expr # p)";
+    std::string expected = "(expr # (expr p))";
     std::string tree = ParserHelper::parsetree(stream);
     REQUIRE(tree.find(expected) != std::string::npos); 
     stream.str("");
     stream << R"(main() {var p; p = [1, 2]; return #p;})";
-    expected = "(expr # p)";
+    expected = "(expr # (expr p))";
     tree = ParserHelper::parsetree(stream);
     REQUIRE(tree.find(expected) != std::string::npos);
 }

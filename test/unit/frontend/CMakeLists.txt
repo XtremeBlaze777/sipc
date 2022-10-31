@@ -5,6 +5,7 @@ target_sources(
           ${CMAKE_CURRENT_SOURCE_DIR}/SIPParserTest.cpp
           #${CMAKE_CURRENT_SOURCE_DIR}/SIPNodeTest.cpp 
           ${CMAKE_CURRENT_SOURCE_DIR}/SIPPrinterTest.cpp
+          ${CMAKE_CURRENT_SOURCE_DIR}/SIPPrettyPrinterTest.cpp
 		      ${CMAKE_CURRENT_SOURCE_DIR}/ASTBuilderTest.cpp
           ${CMAKE_CURRENT_SOURCE_DIR}/ASTPrinterTest.cpp
           ${CMAKE_CURRENT_SOURCE_DIR}/ASTVisualizerTest.cpp

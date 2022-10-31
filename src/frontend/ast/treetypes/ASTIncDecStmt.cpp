@@ -9,6 +9,6 @@ void ASTIncDecStmt::accept(ASTVisitor * visitor) {
 }
 
 std::ostream& ASTIncDecStmt::print(std::ostream &out) const {
-  out << "(" << *getExpr() << getOp() << ")";
+  out << *getExpr() << getOp();
   return out;
 }  // LCOV_EXCL_LINE
