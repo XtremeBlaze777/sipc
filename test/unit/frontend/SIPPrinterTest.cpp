@@ -11,13 +11,52 @@ TEST_CASE("ASTPrinterTest: all unary expressions (excluding arr)", "[ASTNodePrin
         var x, y;
         x = -x;
         y = not true;
+        y = [0, 1, 2, 3];
+        x = #y;
         return x;
       }
     )";
 
     std::vector<std::string> expected {
       "x",
-      "not true"
+      "not true",
+      "[0, 1, 2, 3]",
+      "#y"
+    };
+
+    auto ast = ASTHelper::build_ast(stream);
+
+    auto f = ast->findFunctionByName("fun");
+
+    int i = 0;
+    int numStmts = f->getStmts().size() - 1;  // skip the return
+    // HELPER FUNCTION 
+    for (auto s : f->getStmts()) {
+      auto a = dynamic_cast<ASTAssignStmt*>(s);
+      stream = std::stringstream();
+      stream << *a->getRHS();
+      auto actual = stream.str();
+      REQUIRE(actual == expected.at(i++));
+      if (i == numStmts) break;
+    } 
+}
+
+TEST_CASE("ASTPrinterTest: new equality operators", "[ASTNodePrint]") {
+ std::stringstream stream;
+    stream << R"(
+      fun() {
+        var x;
+        x = 5 >= 4;
+        x = 4 < 5;
+        x = 5 <= 5;
+        return x;
+      }
+    )";
+
+    std::vector<std::string> expected {
+      "(5>=4)",
+      "(4<5)",
+      "(5<=5)"
     };
 
     auto ast = ASTHelper::build_ast(stream);

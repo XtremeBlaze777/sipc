@@ -251,7 +251,7 @@ void PrettyPrinter::endVisit(ASTTernaryExpr * element) {
 void PrettyPrinter::endVisit(ASTIncDecStmt * element) {
     std::string exprString = visitResults.back();
     visitResults.pop_back();
-    visitResults.push_back(exprString + element->getOp());
+    visitResults.push_back(indent() + exprString + element->getOp() + ";");
 }
 
 void PrettyPrinter::endVisit(ASTMainArray * element) {
@@ -264,10 +264,13 @@ void PrettyPrinter::endVisit(ASTMainArray * element) {
         elements.push_back(element);
     }
     reverse(elements.begin(), elements.end());
-
+    int n = elements.size();
     std::string results = "[";
-    for (auto e : elements) {
-        results += e + ", ";
+    for (int i = 0; i < n - 1; i++) {
+        results += elements[i] + ", ";
+    }
+    if (elements.size() > 0) {
+        results += elements[n-1];
     }
     results += "]";
     visitResults.push_back(results);
@@ -291,6 +294,7 @@ bool PrettyPrinter::visit(ASTForStmt * element) {
     indentLevel++;
     return true;
 }
+
 void PrettyPrinter::endVisit(ASTForStmt * element) {
     std::string doString = visitResults.back();
     visitResults.pop_back();
@@ -308,8 +312,8 @@ void PrettyPrinter::endVisit(ASTForStmt * element) {
     std::string elemString = visitResults.back();
     visitResults.pop_back();
 
-    visitResults.push_back("for (" + elemString + " : " + startString + " .. " + endString + " by " + stepString + ") " + doString);
     indentLevel--;
+    visitResults.push_back(indent() + "for (" + elemString + " : " + startString + " .. " + endString + " by " + stepString + ") \n" + doString);
 }
 
 void PrettyPrinter::endVisit(ASTForEachStmt * element) {
@@ -320,8 +324,8 @@ void PrettyPrinter::endVisit(ASTForEachStmt * element) {
     std::string elemString = visitResults.back();
     visitResults.pop_back();
 
-    visitResults.push_back("for (" + elemString + " : " + arrString + ") " + doString);
     indentLevel--;
+    visitResults.push_back(indent() + "for (" + elemString + " : " + arrString + ") \n" + doString);
 }
 
 void PrettyPrinter::endVisit(ASTBoolExpr * element) {

@@ -49,20 +49,6 @@ std::string ASTBuilder::opString(int op) {
   case TIPParser::LE:
     opStr = "<=";
     break;
-  case TIPParser::AND:
-    opStr = "and";
-    break;
-  case TIPParser::OR:
-    opStr = "or";
-    break;
-  case TIPParser::NOT:
-    opStr = "not";
-  case TIPParser::LEN:
-    opStr = '#';
-  case TIPParser::INC:
-    opStr = "++";
-  case TIPParser::DEC:
-    opStr = "--";
   default:
     throw std::runtime_error(
         "unknown operator :" +
@@ -680,12 +666,12 @@ void ASTBuilder::visitIncDecStmt(T* ctx, const std::string op) {
 Any ASTBuilder::visitIncStmt(TIPParser::IncStmtContext *ctx) {
   visitIncDecStmt(ctx, "++");
   return "";
-}
+} // LCOV_EXCL_LINE  
 
 Any ASTBuilder::visitDecStmt(TIPParser::DecStmtContext *ctx) {
   visitIncDecStmt(ctx, "--");
   return "";
-}
+} // LCOV_EXCL_LINE
 
 
 
