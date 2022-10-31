@@ -277,3 +277,64 @@ void TypeConstraintVisitor::endVisit(ASTErrorStmt * element) {
   constraintHandler->handle(astToVar(element->getArg()), std::make_shared<TipInt>());
 }
 
+/*! \brief Type constraints for unary expression.
+ *
+ * Type rules for "unary E":
+ * TBD
+ */
+void TypeConstraintVisitor::endVisit(ASTUnaryExpr * element {};
+
+
+/*! \brief Type constraints for ternary expression.
+ *
+ * Type rules for "ternary E":
+ * TBD
+ */
+void TypeConstraintVisitor::endVisit(ASTTernaryExpr * element {};
+
+/*! \brief Type constraints for boolean expression.
+ *
+ * Type rules for "bool E":
+ * TBD
+ */
+void TypeConstraintVisitor::endVisit(ASTBoolExpr * element {};
+
+
+/*! \brief Type constraints for main array expression.
+ *
+ * Type rules for "mainarr E":
+ * TBD
+ */
+void TypeConstraintVisitor::endVisit(ASTMainArray * element {};
+
+
+/*! \brief Type constraints for alt array expression.
+ *
+ * Type rules for "altarr E":
+ * TBD
+ */
+void TypeConstraintVisitor::endVisit(ASTAlternateArray * element {};
+
+
+/*! \brief Type constraints of for statements.
+ *
+ * Type rules for "for E":
+ * TBD
+ */
+void TypeConstraintVisitor::endVisit(ASTForStmt * element {};
+
+
+/*! \brief Type constraints of for each statements.
+ *
+ * Type rules for "for E":
+ * TBD
+ */
+void TypeConstraintVisitor::endVisit(ASTForEachStmt * element {};
+
+
+/*! \brief Type constraints for inc/dec statements.
+ *
+ * Type rules for "E++":
+ * TBD
+ */
+void TypeConstraintVisitor::endVisit(ASTIncDecStmt * element {};
