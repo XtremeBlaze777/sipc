@@ -290,7 +290,7 @@ TEST_CASE("ASTNodeTest: ArithmeticNeg", "[ASTNode]") {
     REQUIRE(nodePrintStream.str() == "-A;");
 
     // Test getters 
-    REQUIRE(aVal == neg->getExpr());
+    REQUIRE(aVal == neg->getRight());
 
     // Test getChildren
     auto children = neg->getChildren();
@@ -311,25 +311,25 @@ TEST_CASE("ASTNodeTest: UnaryNeg", "[ASTNode]") {
     auto a = std::make_unique<ASTVariableExpr>("A");
     auto aVal = a.get();
 
-    auto not = std::make_unique<ASTUnaryExpr>("not", std::move(a));
+    auto notExpr = std::make_unique<ASTUnaryExpr>("not", std::move(a));
 
     // Test Print Method
     std::stringstream nodePrintStream;
-    nodePrintStream << *not;
+    nodePrintStream << *notExpr;
     REQUIRE(nodePrintStream.str() == "not A;");
 
     // Test getters 
-    REQUIRE(aVal == not->getExpr());
+    REQUIRE(aVal == notExpr->getRight());
 
     // Test getChildren
-    auto children = not->getChildren();
+    auto children = notExpr->getChildren();
     REQUIRE(children.size() == 1);
     REQUIRE(contains(children, aVal));
 
 
     // Test accept
     RecordPostPrint visitor;
-    not->accept(&visitor);
+    notExpr->accept(&visitor);
     std::string expected[] = { "A", "not A;" };
     for (int i=0; i < 2; i++) {
         REQUIRE(visitor.postPrintStrings[i] == expected[i]);
@@ -375,19 +375,19 @@ TEST_CASE("ASTNodeTest: And", "[ASTNode]") {
     auto b = std::make_unique<ASTVariableExpr>("B");
     auto bVal = b.get();
 
-    auto and = std::make_unique<ASTBinaryExpr>("and", std::move(a), std::move(b));
+    auto andExpr = std::make_unique<ASTBinaryExpr>("and", std::move(a), std::move(b));
 
     // Test Print Method
     std::stringstream nodePrintStream;
-    nodePrintStream << *and;
+    nodePrintStream << *andExpr;
     REQUIRE(nodePrintStream.str() == "A and B;");
 
     // Test getters 
-    REQUIRE(aVal == and->getLeft());
-    REQUIRE(bVal == and->getRight());
+    REQUIRE(aVal == andExpr->getLeft());
+    REQUIRE(bVal == andExpr->getRight());
 
     // Test getChildren
-    auto children = and->getChildren();
+    auto children = andExpr->getChildren();
     REQUIRE(children.size() == 2);
     REQUIRE(contains(children, aVal));
     REQUIRE(contains(children, bVal));
@@ -395,7 +395,7 @@ TEST_CASE("ASTNodeTest: And", "[ASTNode]") {
 
     // Test accept
     RecordPostPrint visitor;
-    and->accept(&visitor);
+    andExpr->accept(&visitor);
     std::string expected[] = { "A", "B", "A and B;" };
     for (int i=0; i < 2; i++) {
         REQUIRE(visitor.postPrintStrings[i] == expected[i]);
@@ -408,19 +408,19 @@ TEST_CASE("ASTNodeTest: Or", "[ASTNode]") {
     auto b = std::make_unique<ASTVariableExpr>("B");
     auto bVal = b.get();
 
-    auto or = std::make_unique<ASTBinaryExpr>("or", std::move(a), std::move(b));
+    auto orExpr = std::make_unique<ASTBinaryExpr>("or", std::move(a), std::move(b));
 
     // Test Print Method
     std::stringstream nodePrintStream;
-    nodePrintStream << *or;
+    nodePrintStream << *orExpr;
     REQUIRE(nodePrintStream.str() == "A or B;");
 
     // Test getters 
-    REQUIRE(aVal == or->getLeft());
-    REQUIRE(bVal == or->getRight());
+    REQUIRE(aVal == orExpr->getLeft());
+    REQUIRE(bVal == orExpr->getRight());
 
     // Test getChildren
-    auto children = or->getChildren();
+    auto children = orExpr->getChildren();
     REQUIRE(children.size() == 2);
     REQUIRE(contains(children, aVal));
     REQUIRE(contains(children, bVal));
@@ -428,7 +428,7 @@ TEST_CASE("ASTNodeTest: Or", "[ASTNode]") {
 
     // Test accept
     RecordPostPrint visitor;
-    or->accept(&visitor);
+    orExpr->accept(&visitor);
     std::string expected[] = { "A", "B", "A or B;" };
     for (int i=0; i < 2; i++) {
         REQUIRE(visitor.postPrintStrings[i] == expected[i]);
@@ -523,41 +523,3 @@ TEST_CASE("ASTNodeTest: ASTAssign", "[ASTNode]") {
     REQUIRE(visitor.postPrintStrings[i] == expected[i]);
   }
 }
-
-TEST_CASE("ASTNodeTest: ASTTernaryExpr", "[ASTNode]") {
-  auto rhs = std::make_unique<ASTNumberExpr>(42);
-  auto lhs = std::make_unique<ASTVariableExpr>("x");
-
-  // Record the raw pointers for these values because rhs and lhs will not be 
-  // usable after the call to the constructor below.  This is because of the
-  // move semantics associated with unique pointers, i.e., after the move the
-  // locals rhs and lhs are nullptrs
-  auto rhsValue = rhs.get();
-  auto lhsValue = lhs.get();
-
-  auto assign = std::make_unique<ASTAssignStmt>(std::move(lhs), std::move(rhs));
-
-  // Test Print Method
-  std::stringstream nodePrintStream;
-  nodePrintStream << *assign;
-  REQUIRE(nodePrintStream.str() == "x = 42;");
-
-  // Test getters 
-  REQUIRE(rhsValue == assign->getRHS());
-  REQUIRE(lhsValue == assign->getLHS());
-
-  // Test getChildren
-  auto children = assign->getChildren();
-  REQUIRE(children.size() == 2);
-  REQUIRE(contains(children, rhsValue));
-  REQUIRE(contains(children, lhsValue));
-
-  // Test accept
-  RecordPostPrint visitor;
-  assign->accept(&visitor);
-  std::string expected[] = { "x", "42", "x = 42;" };
-  for (int i=0; i < 3; i++) {
-    REQUIRE(visitor.postPrintStrings[i] == expected[i]);
-  }
-}
-
