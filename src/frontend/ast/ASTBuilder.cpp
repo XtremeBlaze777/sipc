@@ -244,6 +244,20 @@ Any ASTBuilder::visitAlternateArray(TIPParser::AlternateArrayContext *ctx)  {
   return "";
 }
 
+Any ASTBuilder::visitArrIndex(TIPParser::ArrIndexContext *ctx)  {
+  visit(ctx->expr());
+  auto idx = std::move(visitedExpr);
+  std::string arr = ctx->IDENTIFIER()->getText();
+  visitedExpr = std::make_unique<ASTArrIndex>(std::move(idx), arr);
+  
+  LOG_S(1) << "Built AST node " << *visitedExpr;
+
+  visitedExpr->setLocation(ctx->getStart()->getLine(),
+                           ctx->getStart()->getCharPositionInLine());
+  return "";
+}
+
+
 Any ASTBuilder::visitUnaryNegationExpr(TIPParser::UnaryNegationExprContext *ctx) {
   visitUnaryExpr("not", ctx);
   return "";

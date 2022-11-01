@@ -132,6 +132,38 @@ TEST_CASE("SIPPrettyPrinter: Arrays", "[SIPPrettyPrinter]") {
     REQUIRE(ppString == expected);
 }
 
+TEST_CASE("SIPPrettyPrinter: Array Indexing", "[SIPPrettyPrinter]") {
+    std::stringstream stream;
+    stream << R"(
+    arridx() {
+      var x, y, z;
+      x = [0, 1, 2, 3];
+      y = [10 of 5];
+      z = x[1];
+      z = y[2];
+      return z;
+    }
+    )";
+
+    std::string expect = R"(arridx()
+{
+  var x, y, z;
+  x = [0, 1, 2, 3];
+  y = [10 of 5];
+  z = x[1];
+  z = y[2];
+  return z;
+}
+)";
+
+    std::stringstream pp;
+    auto ast = ASTHelper::build_ast(stream);
+    PrettyPrinter::print(ast.get(), pp, ' ', 2);
+    std::string ppString = GeneralHelper::removeTrailingWhitespace(pp.str());
+    std::string expected = GeneralHelper::removeTrailingWhitespace(expect);
+    REQUIRE(ppString == expected);
+}
+
 
 TEST_CASE("SIPPrettyPrinter: Boolean Expressions", "[SIPPrettyPrinter]") {
     std::stringstream stream;

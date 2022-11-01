@@ -48,6 +48,7 @@ public:
   Any visitTernaryExpr(TIPParser::TernaryExprContext *ctx) override;
   Any visitMainArray(TIPParser::MainArrayContext *ctx) override;
   Any visitAlternateArray(TIPParser::AlternateArrayContext *ctx) override;
+  Any visitArrIndex(TIPParser::ArrIndexContext *ctx) override;
   Any visitBoolExpr(TIPParser::BoolExprContext *ctx) override;
   Any visitUnaryNegationExpr(TIPParser::UnaryNegationExprContext *ctx) override;
   Any visitArrLenExpr(TIPParser::ArrLenExprContext *ctx) override;
