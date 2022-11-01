@@ -53,6 +53,17 @@ public:
     void endVisit(ASTRefExpr * element) override;
     void endVisit(ASTWhileStmt * element) override;
 
+    /* SIP Extensions */
+    void endVisit(ASTMainArray * element) override;
+    void endVisit(ASTAlternateArray * element) override;
+    void endVisit(ASTForStmt * element) override;
+    void endVisit(ASTForEachStmt * element) override;
+    void endVisit(ASTBoolExpr * element) override;
+    void endVisit(ASTUnaryExpr * element) override;
+    void endVisit(ASTTernaryExpr * element) override;
+    void endVisit(ASTIncDecStmt * element) override;
+
+
 protected:
     std::unique_ptr<ConstraintHandler> constraintHandler;
 
