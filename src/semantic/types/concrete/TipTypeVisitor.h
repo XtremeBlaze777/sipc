@@ -39,5 +39,11 @@ public:
   virtual void endVisit(TipRef * element) {}
   virtual bool visit(TipVar * element) { return true; }
   virtual void endVisit(TipVar * element) {}
+  
+  // SIP Extensions
+  virtual bool visit(TipBool * element) { return true; }
+  virtual void endVisit(TipBool * element) {}
+  virtual bool visit(TipArr * element) { return true; }
+  virtual void endVisit(TipArr * element) {}
 };
 

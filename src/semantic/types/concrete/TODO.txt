@@ -1,2 +1,0 @@
-[] Update TipType.h to contain new subtypes from SIP
-[] Update all other .h files that rely on TipType.h
