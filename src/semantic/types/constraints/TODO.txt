@@ -1,0 +1,13 @@
+Semantics TODO for TypeConstraintVisitor
+
+[x] Added SIP extension template to TypeConstraintVisitor.h
+[x] Added SIP extension template to TypeConstraintVisitor.cpp
+
+[] Add type rules for ASTUnaryExpr in TypeConstraintVisitor.cpp
+[] Add type rules for ASTTernaryExpr in TypeConstraintVisitor.cpp
+[] Add type rules for ASTBoolExpr in TypeConstraintVisitor.cpp
+[] Add type rules for ASTMainArray in TypeConstraintVisitor.cpp
+[] Add type rules for ASTAlternateArray in TypeConstraintVisitor.cpp
+[] Add type rules for ASTForStmt in TypeConstraintVisitor.cpp
+[] Add type rules for ASTForEachStmt in TypeConstraintVisitor.cpp
+[] Add type rules for ASTIncDecStmt in TypeConstraintVisitor.cpp

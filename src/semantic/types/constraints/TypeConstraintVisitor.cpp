@@ -279,7 +279,11 @@ void TypeConstraintVisitor::endVisit(ASTErrorStmt * element) {
 
 /*! \brief Type constraints for unary expression.
  *
- * Type rules for "unary E":
+ * Type rules for "op E1":
+ * if "op" is array prefix notation
+ *   [[op E1]] = int
+ * and if "op" is not 
+ *   [[E1]] = bool
  * TBD
  */
 void TypeConstraintVisitor::endVisit(ASTUnaryExpr * element {};
@@ -287,14 +291,14 @@ void TypeConstraintVisitor::endVisit(ASTUnaryExpr * element {};
 
 /*! \brief Type constraints for ternary expression.
  *
- * Type rules for "ternary E":
- * TBD
+ * Type rules for "E1 ? E2 : E3":
+ * [[E1]] = [[E2]] = [[E3]] = 
  */
 void TypeConstraintVisitor::endVisit(ASTTernaryExpr * element {};
 
 /*! \brief Type constraints for boolean expression.
  *
- * Type rules for "bool E":
+ * Type rules for "B":
  * TBD
  */
 void TypeConstraintVisitor::endVisit(ASTBoolExpr * element {};
@@ -302,7 +306,7 @@ void TypeConstraintVisitor::endVisit(ASTBoolExpr * element {};
 
 /*! \brief Type constraints for main array expression.
  *
- * Type rules for "mainarr E":
+ * Type rules for "[E1, ..., En]":
  * TBD
  */
 void TypeConstraintVisitor::endVisit(ASTMainArray * element {};
@@ -310,7 +314,7 @@ void TypeConstraintVisitor::endVisit(ASTMainArray * element {};
 
 /*! \brief Type constraints for alt array expression.
  *
- * Type rules for "altarr E":
+ * Type rules for "[E1 of E2]":
  * TBD
  */
 void TypeConstraintVisitor::endVisit(ASTAlternateArray * element {};
@@ -318,7 +322,7 @@ void TypeConstraintVisitor::endVisit(ASTAlternateArray * element {};
 
 /*! \brief Type constraints of for statements.
  *
- * Type rules for "for E":
+ * Type rules for "for (E1 : E2 .. E3 by E4) S1":
  * TBD
  */
 void TypeConstraintVisitor::endVisit(ASTForStmt * element {};
@@ -326,7 +330,7 @@ void TypeConstraintVisitor::endVisit(ASTForStmt * element {};
 
 /*! \brief Type constraints of for each statements.
  *
- * Type rules for "for E":
+ * Type rules for "for (E1 : E2) S1":
  * TBD
  */
 void TypeConstraintVisitor::endVisit(ASTForEachStmt * element {};
@@ -334,7 +338,7 @@ void TypeConstraintVisitor::endVisit(ASTForEachStmt * element {};
 
 /*! \brief Type constraints for inc/dec statements.
  *
- * Type rules for "E++":
+ * Type rules for "E INC":
  * TBD
  */
 void TypeConstraintVisitor::endVisit(ASTIncDecStmt * element {};
