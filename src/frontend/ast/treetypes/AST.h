@@ -44,3 +44,4 @@
 #include "ASTIncDecStmt.h"
 #include "ASTMainArray.h"
 #include "ASTAlternateArray.h"
+#include "ASTArrIndex.h"

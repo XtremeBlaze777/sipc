@@ -1084,3 +1084,7 @@ llvm::Value* ASTUnaryExpr::codegen() {
 llvm::Value* ASTBoolExpr::codegen() {
   return nullptr;
 }
+
+llvm::Value* ASTArrIndex::codegen() {
+  return nullptr;
+}

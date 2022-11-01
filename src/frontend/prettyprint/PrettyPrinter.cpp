@@ -1,3 +1,4 @@
+#
 #include "PrettyPrinter.h"
 
 #include <iostream>
@@ -285,6 +286,12 @@ void PrettyPrinter::endVisit(ASTAlternateArray * element) {
     visitResults.push_back("[" + startString + " of " + endString + "]");
 }
 
+void PrettyPrinter::endVisit(ASTArrIndex * element) {
+    std::string idxString = visitResults.back();
+    visitResults.pop_back();
+    std::string arrString = element->getArr();
+    visitResults.push_back(arrString + "[" + idxString + "]");
+}
 bool PrettyPrinter::visit(ASTForEachStmt * element) {
     indentLevel++;
     return true;
