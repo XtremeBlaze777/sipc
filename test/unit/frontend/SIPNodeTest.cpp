@@ -49,6 +49,17 @@ public:
     void endVisit(ASTAlternateArray * element) { record(element); }
 };
 
+// Helper function that checks for raw node pointer in list
+bool contains(std::vector<std::shared_ptr<ASTNode>> nodeList, ASTNode * nodeP) {
+  bool found = false;
+  for (auto & sharedNodeP : nodeList) {
+    if (sharedNodeP.get() == nodeP) {
+      found = true;
+      break;
+    }
+  }
+  return found;
+}
 
 TEST_CASE("ASTNodeTest: ASTForEach", "[ASTNode]") {
     auto elem = std::make_unique<ASTVariableExpr>("A");
