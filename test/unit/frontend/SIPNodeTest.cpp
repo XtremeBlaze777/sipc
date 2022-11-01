@@ -67,7 +67,7 @@ TEST_CASE("ASTNodeTest: ASTForEach", "[ASTNode]") {
     auto arrBody = std::make_unique<ASTVariableExpr>("B");
     auto arrValue = arrBody.get();
     auto out = std::make_unique<ASTVariableExpr>("C");
-    auto condBody = std::make_unique<ASTOuputStmt>(std::move(out));
+    auto condBody = std::make_unique<ASTOutputStmt>(std::move(out));
     auto condValue = condBody.get();
 
     auto for_each = std::make_unique<ASTForEachStmt>(std::move(elem), std::move(arrBody), std::move(condBody));
@@ -93,7 +93,7 @@ TEST_CASE("ASTNodeTest: ASTForEach", "[ASTNode]") {
     // Test accept
     RecordPostPrint visitor;
     for_each->accept(&visitor);
-    std::string expected[] = { "A", "B", "C", ,"output C;","for (A : B) output C;" };
+    std::string expected[] = { "A", "B", "C", "output C;","for (A : B) output C;" };
     for (int i=0; i < 5; i++) {
         REQUIRE(visitor.postPrintStrings[i] == expected[i]);
     }
@@ -104,7 +104,7 @@ TEST_CASE("ASTNodeTest: ASTFor", "[ASTNode]") {
     auto end = std::make_unique<ASTVariableExpr>("B");
     auto begin = std::make_unique<ASTVariableExpr>("C");
     auto out = std::make_unique<ASTVariableExpr>("D");
-    auto stmt = std::make_unique<ASTOutputStmt>(std::move(Var2));
+    auto stmt = std::make_unique<ASTOutputStmt>(std::move(out));
     auto B = nullptr;
     // Record the raw pointers for these values because rhs and lhs will not be 
     // usable after the call to the constructor below.  This is because of the
@@ -127,7 +127,7 @@ TEST_CASE("ASTNodeTest: ASTFor", "[ASTNode]") {
     REQUIRE(endValue == ForRange->getEnd());
 
     REQUIRE(beginValue == ForRange->getBegin());
-    REQUIRE(stmtValue == ForRange->getBody());
+    REQUIRE(stmtValue == ForRange->getDo());
 
     // Test getChildren
     auto children = ForRange->getChildren();
@@ -150,14 +150,14 @@ TEST_CASE("ASTNodeTest: ASTFor", "[ASTNode]") {
 TEST_CASE("ASTNodeTest: ASTMainArray", "[ASTNode]") {
     std::vector<std::unique_ptr<ASTExpr>> elements;
     std::vector<ASTExpr*> vals;
-    std::string exprs[] = {"A", "B", "C"}
+    std::string exprs[] = {"A", "B", "C"};
     for (auto e : exprs) {
-        auto foo = std::make_unique<ASTVariableExpr>(e);
-        elements.push_back( foo; );
+        std::unique_ptr<ASTVariableExpr> foo = std::make_unique<ASTVariableExpr>(e);
+        elements.push_back( std::move(foo) );
         vals.push_back(foo.get());
     }
 
-    arr = std::make_unique<ASTMainArray>( std::move(elements) );
+    auto arr = std::make_unique<ASTMainArray>( std::move(elements) );
 
     // Test Print Method
     std::stringstream nodePrintStream;
@@ -167,7 +167,7 @@ TEST_CASE("ASTNodeTest: ASTMainArray", "[ASTNode]") {
     auto children = arr->getChildren();
     REQUIRE(children.size() == 3);
 
-    auto gotten = arr->getElements;
+    std::vector<ASTExpr*> gotten = arr->getElements();
 
     for (int i = 0; i < children.size(); i++) {
         auto foo = vals[i];
@@ -483,19 +483,6 @@ TEST_CASE("ASTNodeTest: Ternary", "[ASTNode]") {
     for (int i=0; i < 4; i++) {
         REQUIRE(visitor.postPrintStrings[i] == expected[i]);
     }
-}
-
-
-// Helper function that checks for raw node pointer in list
-bool contains(std::vector<std::shared_ptr<ASTNode>> nodeList, ASTNode * nodeP) {
-  bool found = false;
-  for (auto & sharedNodeP : nodeList) {
-    if (sharedNodeP.get() == nodeP) {
-      found = true;
-      break;
-    }
-  }
-  return found;
 }
 
 TEST_CASE("ASTNodeTest: ASTAssign", "[ASTNode]") {
