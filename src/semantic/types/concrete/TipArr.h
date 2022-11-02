@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include "TipType.h"
@@ -14,7 +13,8 @@
  */
 class TipArr: public TipCons {
 public:
-    TipArr() = delete;
+    //TipArr() = delete;
+    TipArr();
     TipArr(std::vector<std::shared_ptr<TipType>> elems);
 
     std::vector<std::shared_ptr<TipType>> getElems() const;

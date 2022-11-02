@@ -2,6 +2,7 @@
 #include "TipTypeVisitor.h"
 
 #include <sstream>
+TipArr::TipArr() { }
 
 TipArr::TipArr(std::vector<std::shared_ptr<TipType>> params): TipCons(std::move(params)) { }
 
