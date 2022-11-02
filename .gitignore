@@ -10,7 +10,7 @@ a.out
 *.interp
 
 # build directory
-build
+build/
 
 # LLVM
 *.bc
@@ -39,18 +39,17 @@ corretto.key
 llvm.sh
 kitware-archive.sh
 
-# VS Code
+# VSCode
 .vscode/
 tipg4/.antlr/
 src/frontend/.antlr
 
+# WSL
+src/semantic/weeding/CMakeLists.txt
 
 # Testing
 tipg4/hellosip.tip
 tipg4/test.sip
 ASTNodeTest.cpp
 test/unit/frontend/SIPNodeTest-flawed.cpp
-
-# WSL
-src/semantic/weeding/CMakeLists.txt
 test.tipc
