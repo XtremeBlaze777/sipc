@@ -197,7 +197,8 @@ void TypeConstraintVisitor::endVisit(ASTAssignStmt  * element) {
 /*! \brief Type constraints for while loop.
  *
  * Type rules for "while (E) S":
- *   [[E]] = int
+ *   TIP -> [[E]] = int
+ *   SIP -> [[E]] = bool
  */
 void TypeConstraintVisitor::endVisit(ASTWhileStmt * element) {
   constraintHandler->handle(astToVar(element->getCondition()), std::make_shared<TipInt>());
@@ -206,7 +207,8 @@ void TypeConstraintVisitor::endVisit(ASTWhileStmt * element) {
 /*! \brief Type constraints for if statement.
  *
  * Type rules for "if (E) S1 else S2":
- *   [[E]] = int
+ *   TIP -> [[E]] = int
+ *   SIP -> [[E]] = bool
  */
 void TypeConstraintVisitor::endVisit(ASTIfStmt * element) {
   constraintHandler->handle(astToVar(element->getCondition()), std::make_shared<TipInt>());
@@ -283,7 +285,7 @@ void TypeConstraintVisitor::endVisit(ASTErrorStmt * element) {
  * if "op" is array prefix notation
  *   [[op E1]] = int
  * and if "op" is not 
- *   [[E1]] = bool
+ *   [[op E1]] = bool
  * TBD
  */
 void TypeConstraintVisitor::endVisit(ASTUnaryExpr * element) {};
@@ -292,38 +294,57 @@ void TypeConstraintVisitor::endVisit(ASTUnaryExpr * element) {};
 /*! \brief Type constraints for ternary expression.
  *
  * Type rules for "E1 ? E2 : E3":
- * [[E1]] = [[E2]] = [[E3]] = 
+ * [[E1]] = bool
+ * [[E2]] = [[E3]] = int
  */
 void TypeConstraintVisitor::endVisit(ASTTernaryExpr * element) {};
 
 /*! \brief Type constraints for boolean expression.
  *
- * Type rules for "B":
- * TBD
+ * Type rules for "E":
+ * [[E]] = bool 
  */
-void TypeConstraintVisitor::endVisit(ASTBoolExpr * element) {};
+void TypeConstraintVisitor::endVisit(ASTBoolExpr * element) {
+    constrainthandler->handle(astToVar(element), std::make_shared<TipBool>());
+}
 
 
 /*! \brief Type constraints for main array expression.
  *
  * Type rules for "[E1, ..., En]":
- * TBD
+ * [[E1]] = [[En]] = \alpha 
  */
-void TypeConstraintVisitor::endVisit(ASTMainArray * element) {};
+void TypeConstraintVisitor::endVisit(ASTMainArray * element) {
+    std::vector<std::shared_ptr<TipType>> elems;
+    for(auto &c : element->getChildren()) {
+      elems.push_back(astToVar(c));
+    }
+
+    constraintHandler->handle(astToVar(element), std::make_shared<TipArr>(elems));
+};
 
 
 /*! \brief Type constraints for alt array expression.
  *
  * Type rules for "[E1 of E2]":
- * TBD
+ * [[E1]] = [[E2]] = int 
  */
 void TypeConstraintVisitor::endVisit(ASTAlternateArray * element) {};
 
+/*! \brief Type constraints for alt array expression.
+ *
+ * Type rules for "E1[E2]":
+ * [[E1]] = array
+ * [[E2]] = int
+ * [[E1[E2]] = \alpha
+ */
+void TypeConstraintVisitor::endVisit(ASTArrIndex * element) {
+}
 
 /*! \brief Type constraints of for statements.
  *
  * Type rules for "for (E1 : E2 .. E3 by E4) S1":
- * TBD
+ * [[E1]] = [[E2]] = [[E3]] = [[E4]] = int 
  */
 void TypeConstraintVisitor::endVisit(ASTForStmt * element) {};
 
@@ -331,14 +352,17 @@ void TypeConstraintVisitor::endVisit(ASTForStmt * element) {};
 /*! \brief Type constraints of for each statements.
  *
  * Type rules for "for (E1 : E2) S1":
- * TBD
+ * [[E1]] = var 
+ * [[E2]] = array 
  */
 void TypeConstraintVisitor::endVisit(ASTForEachStmt * element) {};
 
 
 /*! \brief Type constraints for inc/dec statements.
  *
- * Type rules for "E INC":
- * TBD
+ * Type rules for "E OP":
+ * [[E]] = int
  */
-void TypeConstraintVisitor::endVisit(ASTIncDecStmt * element) {};
+void TypeConstraintVisitor::endVisit(ASTIncDecStmt * element) {
+    constrainthandler->handle(astToVar(element), std::make_shared<tipbool>());
+}
