@@ -162,18 +162,18 @@ TEST_CASE("ASTNodeTest: ASTMainArray", "[ASTNode]") {
     // Test Print Method
     std::stringstream nodePrintStream;
     nodePrintStream << *arr;
-    REQUIRE(nodePrintStream.str() == "[A, B, C];");
+    REQUIRE(nodePrintStream.str() == "[A, B, C]");
 
     auto children = arr->getChildren();
     REQUIRE(children.size() == 3);
 
     std::vector<ASTExpr*> gotten = arr->getElements();
 
-    for (int i = 0; i < children.size(); i++) {
-        auto foo = vals[i];
+    for (int i = 0; i < vals.size(); i++) {
+        auto foo = vals.get(i);
 
         // Test getters
-        REQUIRE(foo == gotten[i]);
+        REQUIRE(foo == gotten.get(i));
 
         // Test getChildren
         REQUIRE(contains(children, foo));
@@ -182,34 +182,84 @@ TEST_CASE("ASTNodeTest: ASTMainArray", "[ASTNode]") {
     // Test accept
     RecordPostPrint visitor;
     arr->accept(&visitor);
-    std::string expected[] = { "A", "B", "C", "[A, B, C];" };
+    std::string expected[] = { "A", "B", "C", "[A, B, C]" };
     for (int i=0; i < 4; i++) {
         REQUIRE(visitor.postPrintStrings[i] == expected[i]);
     }
 }
 
-TEST_CASE("ASTNodeTest: AlternateArray_ArrLen", "[ASTNode]") {
+TEST_CASE("ASTNodeTest: ASTAssign", "[ASTNode]") {
+  auto rhs = std::make_unique<ASTNumberExpr>(42);
+  auto lhs = std::make_unique<ASTVariableExpr>("x");
+
+  // Record the raw pointers for these values because rhs and lhs will not be 
+  // usable after the call to the constructor below.  This is because of the
+  // move semantics associated with unique pointers, i.e., after the move the
+  // locals rhs and lhs are nullptrs
+  auto rhsValue = rhs.get();
+  auto lhsValue = lhs.get();
+
+  auto assign = std::make_unique<ASTAssignStmt>(std::move(lhs), std::move(rhs));
+
+  // Test Print Method
+  std::stringstream nodePrintStream;
+  nodePrintStream << *assign;
+  REQUIRE(nodePrintStream.str() == "x = 42;");
+
+  // Test getters 
+  REQUIRE(rhsValue == assign->getRHS());
+  REQUIRE(lhsValue == assign->getLHS());
+
+  // Test getChildren
+  auto children = assign->getChildren();
+  REQUIRE(children.size() == 2);
+  REQUIRE(contains(children, rhsValue));
+  REQUIRE(contains(children, lhsValue));
+
+  // Test accept
+  RecordPostPrint visitor;
+  assign->accept(&visitor);
+  std::string expected[] = { "x", "42", "x = 42;" };
+  for (int i=0; i < 3; i++) {
+    REQUIRE(visitor.postPrintStrings[i] == expected[i]);
+  }
+}
+
+TEST_CASE("ASTNodeTest: AlternateArray_ArrLen_ArrIndex", "[ASTNode]") {
     auto start = std::make_unique<ASTVariableExpr>("A");
     auto startValue = start.get();
     auto end = std::make_unique<ASTVariableExpr>("B");
     auto endValue = end.get();
+    auto name = std::make_unique<ASTVariableExpr>("arr");
+    auto nameValue = name.get();
+    auto nameMoved = std::move(name);
+    auto index = std::make_unique<ASTNumberExpr>(0);
+    auto indexValue = index.get();
 
     auto arr = std::make_unique<ASTAlternateArray>( std::move(start), std::move(end) );
-    auto len = std::make_unique<ASTUnaryExpr>("#", std::move(arr));
-    auto lenValue = arr.get(); //Here the value for the length op is the array
+    auto arrValue = arr.get();
+    auto stmt = std::make_unique<ASTAssignStmt>( nameMoved, std::move(arr) )
+    auto len = std::make_unique<ASTUnaryExpr>("#", nameMoved);
+    auto indexArr = std::make_unique<ASTArrIndex>( std::move(index), name->getName() );
 
     // Test Print Method
     std::stringstream nodePrintStream;
     nodePrintStream << *arr;
-    REQUIRE(nodePrintStream.str() == "[A of B];");
+    REQUIRE(nodePrintStream.str() == "[A of B]");
     std::stringstream nodePrintStream2;
     nodePrintStream2 << *len;
-    REQUIRE(nodePrintStream2.str() == "#[A of B];");
+    REQUIRE(nodePrintStream2.str() == "#arr");
+    std::stringstream nodePrintStream3;
+    nodePrintStream2 << *indexArr;
+    REQUIRE(nodePrintStream3.str() == "arr[0]");
 
     // Test getters 
     REQUIRE(startValue == arr->getStart());
     REQUIRE(endValue == arr->getEnd());
-    REQUIRE(lenValue == len->getRight());
+    REQUIRE(nameValue == len->getRight());
+    REQUIRE("#" == len->getOp());
+    REQUIRE(name->getName() == indexArr->getArr());
+    REQUIRE(indexValue == indexArr->getIdx());
 
     // Test getChildren
     auto children = arr->getChildren();
@@ -217,16 +267,20 @@ TEST_CASE("ASTNodeTest: AlternateArray_ArrLen", "[ASTNode]") {
     REQUIRE(contains(children, startValue));
     REQUIRE(contains(children, endValue));
 
-    auto children2 = arr->getChildren();
+    auto children2 = len->getChildren();
     REQUIRE(children2.size() == 1);
-    REQUIRE(contains(children2, lenValue));
+    REQUIRE(contains(children2, arrValue));
+
+    auto children3 = indexArr->getChildren();
+    REQUIRE(children3.size() == 1);
+    REQUIRE(contains(children3, indexValue));
 
 
     // Test accept
     RecordPostPrint visitor;
     arr->accept(&visitor);
-    std::string expected[] = { "A", "B", "[A of B];", "#[A of B];" };
-    for (int i=0; i < 4; i++) {
+    std::string expected[] = { "A", "B", "arr", "0", "[A of B]", "arr = [A of B];", "#arr", "arr[0]" };
+    for (int i=0; i < expected.size(); i++) {
         REQUIRE(visitor.postPrintStrings[i] == expected[i]);
     }
 }
@@ -483,41 +537,4 @@ TEST_CASE("ASTNodeTest: Ternary", "[ASTNode]") {
     for (int i=0; i < 4; i++) {
         REQUIRE(visitor.postPrintStrings[i] == expected[i]);
     }
-}
-
-TEST_CASE("ASTNodeTest: ASTAssign", "[ASTNode]") {
-  auto rhs = std::make_unique<ASTNumberExpr>(42);
-  auto lhs = std::make_unique<ASTVariableExpr>("x");
-
-  // Record the raw pointers for these values because rhs and lhs will not be 
-  // usable after the call to the constructor below.  This is because of the
-  // move semantics associated with unique pointers, i.e., after the move the
-  // locals rhs and lhs are nullptrs
-  auto rhsValue = rhs.get();
-  auto lhsValue = lhs.get();
-
-  auto assign = std::make_unique<ASTAssignStmt>(std::move(lhs), std::move(rhs));
-
-  // Test Print Method
-  std::stringstream nodePrintStream;
-  nodePrintStream << *assign;
-  REQUIRE(nodePrintStream.str() == "x = 42;");
-
-  // Test getters 
-  REQUIRE(rhsValue == assign->getRHS());
-  REQUIRE(lhsValue == assign->getLHS());
-
-  // Test getChildren
-  auto children = assign->getChildren();
-  REQUIRE(children.size() == 2);
-  REQUIRE(contains(children, rhsValue));
-  REQUIRE(contains(children, lhsValue));
-
-  // Test accept
-  RecordPostPrint visitor;
-  assign->accept(&visitor);
-  std::string expected[] = { "x", "42", "x = 42;" };
-  for (int i=0; i < 3; i++) {
-    REQUIRE(visitor.postPrintStrings[i] == expected[i]);
-  }
 }

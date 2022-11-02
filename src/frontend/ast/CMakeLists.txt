@@ -72,6 +72,8 @@ target_sources(
           ${CMAKE_CURRENT_SOURCE_DIR}/treetypes/ASTMainArray.h
           ${CMAKE_CURRENT_SOURCE_DIR}/treetypes/ASTAlternateArray.cpp
           ${CMAKE_CURRENT_SOURCE_DIR}/treetypes/ASTAlternateArray.h
+          ${CMAKE_CURRENT_SOURCE_DIR}/treetypes/ASTArrIndex.cpp
+          ${CMAKE_CURRENT_SOURCE_DIR}/treetypes/ASTArrIndex.h
           ${CMAKE_CURRENT_SOURCE_DIR}/ASTVisitor.h
           ${CMAKE_CURRENT_SOURCE_DIR}/ASTBuilder.cpp
           ${CMAKE_CURRENT_SOURCE_DIR}/ASTBuilder.h

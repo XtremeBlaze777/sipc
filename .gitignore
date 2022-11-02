@@ -48,9 +48,9 @@ src/frontend/.antlr
 # Testing
 tipg4/hellosip.tip
 tipg4/test.sip
-AST
 ASTNodeTest.cpp
 test/unit/frontend/SIPNodeTest-flawed.cpp
 
 # WSL
 src/semantic/weeding/CMakeLists.txt
+test.tipc
