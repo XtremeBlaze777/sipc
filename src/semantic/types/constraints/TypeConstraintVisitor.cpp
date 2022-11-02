@@ -6,6 +6,8 @@
 #include "TipRecord.h"
 #include "TipAbsentField.h"
 #include "TipInt.h"
+#include "TipBool.h"
+#include "TipArr.h"
 
 TypeConstraintVisitor::TypeConstraintVisitor(SymbolTable* st, std::unique_ptr<ConstraintHandler> handler)
   : symbolTable(st), constraintHandler(std::move(handler)) {};
@@ -305,7 +307,7 @@ void TypeConstraintVisitor::endVisit(ASTTernaryExpr * element) {};
  * [[E]] = bool 
  */
 void TypeConstraintVisitor::endVisit(ASTBoolExpr * element) {
-    constrainthandler->handle(astToVar(element), std::make_shared<TipBool>());
+    //constraintHandler->handle(astToVar(element), std::make_shared<TipBool>());
 }
 
 
@@ -315,13 +317,13 @@ void TypeConstraintVisitor::endVisit(ASTBoolExpr * element) {
  * [[E1]] = [[En]] = \alpha 
  */
 void TypeConstraintVisitor::endVisit(ASTMainArray * element) {
-    std::vector<std::shared_ptr<TipType>> elems;
-    for(auto &c : element->getChildren()) {
-      elems.push_back(astToVar(c));
-    }
+    //std::vector<std::shared_ptr<TipType>> elems;
+    //for(auto &c : element->getChildren()) {
+    //  elems.push_back(astToVar(std::shared_ptr<TipType>(c)));
+    //}
 
-    constraintHandler->handle(astToVar(element), std::make_shared<TipArr>(elems));
-};
+    //constraintHandler->handle(astToVar(element), std::make_shared<TipArr>(elems));
+}
 
 
 /*! \brief Type constraints for alt array expression.
@@ -364,5 +366,5 @@ void TypeConstraintVisitor::endVisit(ASTForEachStmt * element) {};
  * [[E]] = int
  */
 void TypeConstraintVisitor::endVisit(ASTIncDecStmt * element) {
-    constrainthandler->handle(astToVar(element), std::make_shared<tipbool>());
+    //constraintHandler->handle(astToVar(element), std::make_shared<TipBool>());
 }
