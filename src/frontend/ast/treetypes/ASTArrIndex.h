@@ -6,13 +6,12 @@
 /*! \brief Class for a unary operator.
  */
 class ASTArrIndex : public ASTExpr {
-  std::shared_ptr<ASTExpr> IDX;
-  std::string ARR;
+  std::shared_ptr<ASTExpr> IDX, ARR;
 public:
-  ASTArrIndex(std::unique_ptr<ASTExpr> IDX, std::string &ARR)
-      : IDX(std::move(IDX)), ARR(ARR) {}
+  ASTArrIndex(std::unique_ptr<ASTExpr> IDX, std::unique_ptr<ASTExpr> ARR)
+      : IDX(std::move(IDX)), ARR(std::move(ARR)) {}
   ASTExpr* getIdx() const { return IDX.get(); }
-  std::string getArr() const { return ARR; }
+  ASTExpr* getArr() const { return ARR.get(); }
   void accept(ASTVisitor * visitor) override;
   llvm::Value* codegen() override;
 

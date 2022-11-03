@@ -287,9 +287,10 @@ void PrettyPrinter::endVisit(ASTAlternateArray * element) {
 }
 
 void PrettyPrinter::endVisit(ASTArrIndex * element) {
-    std::string idxString = visitResults.back();
+    std::string arrString = visitResults.back();
     visitResults.pop_back();
-    std::string arrString = element->getArr();
+    std::string idxString = visitResults.back(); 
+    visitResults.pop_back();
     visitResults.push_back(arrString + "[" + idxString + "]");
 }
 bool PrettyPrinter::visit(ASTForEachStmt * element) {
