@@ -170,10 +170,10 @@ TEST_CASE("ASTNodeTest: ASTMainArray", "[ASTNode]") {
     std::vector<ASTExpr*> gotten = arr->getElements();
 
     for (int i = 0; i < vals.size(); i++) {
-        auto foo = vals.get(i);
+        auto foo = vals[i];
 
         // Test getters
-        REQUIRE(foo == gotten.get(i));
+        REQUIRE(foo == gotten[i]);
 
         // Test getChildren
         REQUIRE(contains(children, foo));
@@ -232,15 +232,14 @@ TEST_CASE("ASTNodeTest: AlternateArray_ArrLen_ArrIndex", "[ASTNode]") {
     auto endValue = end.get();
     auto name = std::make_unique<ASTVariableExpr>("arr");
     auto nameValue = name.get();
-    auto nameMoved = std::move(name);
     auto index = std::make_unique<ASTNumberExpr>(0);
     auto indexValue = index.get();
 
     auto arr = std::make_unique<ASTAlternateArray>( std::move(start), std::move(end) );
     auto arrValue = arr.get();
-    auto stmt = std::make_unique<ASTAssignStmt>( nameMoved, std::move(arr) )
-    auto len = std::make_unique<ASTUnaryExpr>("#", nameMoved);
-    auto indexArr = std::make_unique<ASTArrIndex>( std::move(index), name->getName() );
+    auto stmt = std::make_unique<ASTAssignStmt>( std::move(name), std::move(arr) );
+    auto len = std::make_unique<ASTUnaryExpr>("#", std::move(name) );
+    auto indexArr = std::make_unique<ASTArrIndex>( std::move(index), "arr" );
 
     // Test Print Method
     std::stringstream nodePrintStream;
@@ -258,7 +257,7 @@ TEST_CASE("ASTNodeTest: AlternateArray_ArrLen_ArrIndex", "[ASTNode]") {
     REQUIRE(endValue == arr->getEnd());
     REQUIRE(nameValue == len->getRight());
     REQUIRE("#" == len->getOp());
-    REQUIRE(name->getName() == indexArr->getArr());
+    REQUIRE("arr" == indexArr->getArr());
     REQUIRE(indexValue == indexArr->getIdx());
 
     // Test getChildren
@@ -275,12 +274,11 @@ TEST_CASE("ASTNodeTest: AlternateArray_ArrLen_ArrIndex", "[ASTNode]") {
     REQUIRE(children3.size() == 1);
     REQUIRE(contains(children3, indexValue));
 
-
     // Test accept
     RecordPostPrint visitor;
     arr->accept(&visitor);
     std::string expected[] = { "A", "B", "arr", "0", "[A of B]", "arr = [A of B];", "#arr", "arr[0]" };
-    for (int i=0; i < expected.size(); i++) {
+    for (int i=0; i < 8; i++) {
         REQUIRE(visitor.postPrintStrings[i] == expected[i]);
     }
 }
