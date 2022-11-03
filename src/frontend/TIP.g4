@@ -53,7 +53,7 @@ expr : expr '(' (expr (',' expr)*)? ')' 	#funAppExpr
      | LKET ( expr ( ',' expr )* )? RKET    #mainArray
      | LKET expr 'of' expr RKET             #alternateArray
      | LEN expr                             #arrLenExpr
-     | IDENTIFIER LKET expr RKET            #arrIndex
+     | expr LKET expr RKET            #arrIndex
      | IDENTIFIER				#varExpr
      | NUMBER					#numExpr
      | KINPUT					#inputExpr

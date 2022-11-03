@@ -245,10 +245,11 @@ Any ASTBuilder::visitAlternateArray(TIPParser::AlternateArrayContext *ctx)  {
 }
 
 Any ASTBuilder::visitArrIndex(TIPParser::ArrIndexContext *ctx)  {
-  visit(ctx->expr());
-  auto idx = std::move(visitedExpr);
-  std::string arr = ctx->IDENTIFIER()->getText();
-  visitedExpr = std::make_unique<ASTArrIndex>(std::move(idx), arr);
+  visit(ctx->expr(0));
+  auto arr = std::move(visitedExpr);
+  visit(ctx->expr(1));
+  auto idx = std::move(visitedExpr); 
+  visitedExpr = std::make_unique<ASTArrIndex>(std::move(idx), std::move(arr));
   
   LOG_S(1) << "Built AST node " << *visitedExpr;
 

@@ -17,3 +17,7 @@
 #include "TipRef.h"
 #include "TipType.h"
 #include "TipVar.h"
+
+// SIP Extensions
+#include "TipBool.h"
+#include "TipArr.h"
