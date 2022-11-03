@@ -3,7 +3,7 @@ target_sources(
   frontend_unit_tests
   PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/TIPParserTest.cpp
           ${CMAKE_CURRENT_SOURCE_DIR}/SIPParserTest.cpp
-          #${CMAKE_CURRENT_SOURCE_DIR}/SIPNodeTest.cpp 
+          ${CMAKE_CURRENT_SOURCE_DIR}/SIPNodeTest.cpp 
           ${CMAKE_CURRENT_SOURCE_DIR}/SIPPrinterTest.cpp
           ${CMAKE_CURRENT_SOURCE_DIR}/SIPPrettyPrinterTest.cpp
 		      ${CMAKE_CURRENT_SOURCE_DIR}/ASTBuilderTest.cpp
