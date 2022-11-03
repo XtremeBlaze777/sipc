@@ -41,8 +41,8 @@ kitware-archive.sh
 
 # VSCode
 .vscode/
-tipg4/.antlr/
-src/frontend/.antlr
+tipg4/.antlr/       #antlr extension
+src/frontend/.antlr #antlr extension
 
 # WSL
 src/semantic/weeding/CMakeLists.txt
