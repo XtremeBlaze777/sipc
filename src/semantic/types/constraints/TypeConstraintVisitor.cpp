@@ -299,17 +299,23 @@ void TypeConstraintVisitor::endVisit(ASTErrorStmt * element) {
  * and if "op" is not 
  *   [[op E1]] = bool
  *   [[E1]] = bool
+ * and if "op" is -
+ *   [[op E1]] = int
+ *   [[E1]] = anything?
  */
 void TypeConstraintVisitor::endVisit(ASTUnaryExpr * element) {
   auto op = element->getOp();
-  auto arrType = std::make_shared<TipArr>();
   auto intType = std::make_shared<TipInt>();
   auto boolType = std::make_shared<TipBool>();
 
   // result type is integer, otherwise boolean
   if (op == "#") {
     constraintHandler->handle(astToVar(element), intType);
+    auto arrType = std::make_shared<TipArr>(astToVar(element->getRight()));
     constraintHandler->handle(astToVar(element->getRight()), arrType);
+  } else if (op == "-") {
+      constraintHandler->handle(astToVar(element), intType);
+      constraintHandler->handle(astToVar(element->getRight()), intType);
   } else {
     constraintHandler->handle(astToVar(element), boolType);
     constraintHandler->handle(astToVar(element->getRight()), boolType);
@@ -391,7 +397,7 @@ void TypeConstraintVisitor::endVisit(ASTAlternateArray * element) {
  */
 void TypeConstraintVisitor::endVisit(ASTArrIndex * element) {
     auto intType = std::make_shared<TipInt>();
-    auto arrType = std::make_shared<TipArr>();
+    auto arrType = std::make_shared<TipArr>(astToVar(element->getArr()));
 
     constraintHandler->handle(astToVar(element->getIdx()), intType);
 
@@ -427,7 +433,7 @@ void TypeConstraintVisitor::endVisit(ASTForStmt * element) {
  */
 void TypeConstraintVisitor::endVisit(ASTForEachStmt * element) {
     auto varType = std::make_shared<TipVar>();
-    auto arrType = std::make_shared<TipArr>();
+    auto arrType = std::make_shared<TipArr>(astToVar(element->getArr()));
 
     constraintHandler->handle(astToVar(element->getElem()), varType);
     constraintHandler->handle(astToVar(element->getArr()), arrType);
