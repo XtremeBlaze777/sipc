@@ -53,6 +53,7 @@ public:
   Any visitUnaryNegationExpr(TIPParser::UnaryNegationExprContext *ctx) override;
   Any visitArrLenExpr(TIPParser::ArrLenExprContext *ctx) override;
   Any visitLogicalAndExpr(TIPParser::LogicalAndExprContext *ctx) override;
+  Any visitArithmeticNegation(TIPParser::ArithmeticNegationContext * ctx) override;
   Any visitLogicalOrExpr(TIPParser::LogicalOrExprContext *ctx) override;
   Any visitIncStmt(TIPParser::IncStmtContext *ctx) override;
   Any visitDecStmt(TIPParser::DecStmtContext *ctx) override;
