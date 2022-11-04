@@ -395,14 +395,49 @@ TEST_CASE("TypeConstraintVisitor: Boolean", "[TypeConstraintVisitor]") {
   )";
 
   std::vector<std::string> expected {
-    "\u27E6true@4:8\u27E7 = bool", //const true
+    "\u27E6true@4:8\u27E7 = bool", //const bool
     "\u27E6t@4:4\u27E7 = \u27E6true@4:8\u27E7", //assign
-    "\u27E6false@5:8\u27E7 = bool", //const false
+    "\u27E6false@5:8\u27E7 = bool", //const bool
     "\u27E6f@5:4\u27E7 = \u27E6false@5:8\u27E7", //assign
     "\u27E6(t==f)@6:12\u27E7 = bool", //comparison
-    "\u27E6check@6:4\u27E7 = \u27E6(t==f)@5:12\u27E7", //assign
+    "\u27E6check@6:4\u27E7 = \u27E6(t==f)@6:12\u27E7", //assign
     "\u27E60@7:11\u27E7 = int", // main return int
     "\u27E60@7:11\u27E7 = int", // int constant
-    "\u27E6main@2:2\u27E7 = () -> \u27E60@8:11\u27E7" // fun declaration
+    "\u27E6main@2:2\u27E7 = () -> \u27E60@7:11\u27E7" // fun declaration
   };
+
+  runtest(program, expected);
+}
+
+TEST_CASE("TypeConstraintVisitor: Ternary", "[TypeConstructorVisitor]") {
+  std::stringstream program;
+  program << R"(
+    main() {
+      var x,y,z;
+      x = true?0:1;
+      y = false?1:0;
+      z = x==y;
+      return 0;
+    }
+  )";
+
+  std::vector<std::string> expected {
+    "\u27E61@4:15\u27E7 = int", //const int
+    "\u27E60@4:13\u27E7 = int", //const int
+    "\u27E6true@4:8\u27E7 = bool", //const bool
+    "\u27E6true?0:1@4:8\u27E7 = \u27E60@4:13\u27E7", //ternary
+    "\u27E6x@4:4\u27E7 = \u27E6true?0:1@4:8\u27E7", //assign
+    "\u27E61@5:15\u27E7 = int", //const int
+    "\u27E60@5:13\u27E7 = int", //const int
+    "\u27E6false@5:8\u27E7 = bool", //const bool
+    "\u27E6false?0:1@5:8\u27E7 = \u27E60@5:13\u27E7", //ternary
+    "\u27E6y@5:4\u27E7 = \u27E6false?0:1@5:8\u27E7", //assign
+    "\u27E6x==y@6:8\u27E7 = bool", //comparison
+    "\u27E6z@6:4\u27E7 = \u27E6x==y@6:8\u27E7", //assign
+    "\u27E60@7:11\u27E7 = int", // main return int
+    "\u27E60@7:11\u27E7 = int", // int constant
+    "\u27E6main@2:2\u27E7 = () -> \u27E60@7:11\u27E7" // fun declaration
+  };
+
+  runtest(program, expected);
 }
