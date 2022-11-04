@@ -16,45 +16,24 @@ TEST_CASE("TipArr: Test getters" "[TipArr]") {
     REQUIRE(dynamic_cast<const TipInt>(elems));
 }
 
-/* TEST_CASE("TipArr: Test equality" "[TipArr]") {
+TEST_CASE("TipArr: Test equality" "[TipArr]") {
     std::shared_ptr<TipInt> intType = std::make_shared<TipInt>();
-    TipArr tipArr(intType);
-    auto elems = tipArr.getElements();
-
-    std::shared_ptr<TipInt> Type = std::make_shared<TipInt>();
-    TipArr tipArr(intType);
-    auto elems = tipArr.getElements();
+    TipArr tipArrA(intType);
+    auto elemsA = tipArrA.getElements();
 
     SECTION("Equal when fields are of same type and length") {
-        std::vector<std::shared_ptr<TipType>> initsB {
-                std::make_shared<TipInt>(),
-                std::make_shared<TipRef>(std::make_shared<TipInt>())
-        };
-        std::vector<std::string> namesB {"foo", "bar"};
-        TipArr tipArrB(initsB, namesB);
+        std::shared_ptr<TipInt> Type = std::make_shared<TipInt>();
+        TipArr tipArrB(Type);
+        auto elemsB = tipArrB.getElements();
 
         REQUIRE(tipArrA == tipArrB);
-    }
-
-    SECTION("Not equal when arguments differ by length") {
-        std::vector<std::shared_ptr<TipType>> initsB {
-                std::make_shared<TipInt>(),
-                std::make_shared<TipRef>(std::make_shared<TipInt>()),
-                std::make_shared<TipRef>(std::make_shared<TipInt>())
-        };
-        std::vector<std::string> namesB {"foo", "bar"};
-        TipArr tipArrB(initsB, namesB);
-
-        REQUIRE(tipArrA != tipArrB);
+        REQUIRE(elemsA.size() == elemsB.size());
     }
 
     SECTION("Not equal when arguments differ by type") {
-        std::vector<std::shared_ptr<TipType>> initsB {
-            std::make_shared<TipInt>(),
-            std::make_shared<TipInt>(),
-        };
-        std::vector<std::string> namesB {"foo", "bar"};
-        TipArr tipArrB(initsB, namesB);
+        std::shared_ptr<TipType> Type = std::make_shared<TipInt>();
+        TipArr tipArrB(Type);
+        auto elemsB = tipArrB.getElements();
 
         REQUIRE(tipArrA != tipArrB);
     }
@@ -67,17 +46,14 @@ TEST_CASE("TipArr: Test getters" "[TipArr]") {
 }
 
 TEST_CASE("TipArr: Test output stream" "[TipArr]") {
-    std::vector<std::shared_ptr<TipType>> inits {
-            std::make_shared<TipInt>(),
-            std::make_shared<TipRef>(std::make_shared<TipInt>())
-    };
-    std::vector<std::string> names {"foo", "bar"};
-    TipArr tipArr(inits, names);
+    std::shared_ptr<TipInt> intType = std::make_shared<TipInt>();
+    TipArr tipArr(intType);
+    auto elems = tipArr.getElements();
 
-    auto expectedValue = "{foo:int,bar:\u2B61int}";
+    auto expectedValue = "arr::int";
     std::stringstream stream;
     stream << tipArr;
     std::string actualValue = stream.str();
 
     REQUIRE(expectedValue == actualValue);
-}*/
+}
