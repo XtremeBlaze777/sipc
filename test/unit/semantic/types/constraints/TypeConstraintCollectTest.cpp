@@ -461,11 +461,54 @@ TEST_CASE("TypeConstraintVisitor: Arrays", "[TypeConstraintVisitor") {
     "\u27E6#x@5:17\u27E7 = int", // int arr length
     "\u27E61@5:11\u27E7 = int", // const int
     "\u27E6x[1]@5:9\u27E7 = \u27E61@4:11\u27E7", // arr index
-    "\u27E6[x[1] of #x]@4:8\u27E7 = arr:\u27E6x[1]@5:9\u27E7", // array
+    "\u27E6[x[1]of#x]@4:8\u27E7 = arr:\u27E6x[1]@5:9\u27E7", // array
+    "\u27E60@6:11\u27E7 = int", // main return int
+    "\u27E60@6:11\u27E7 = int", // int constant
+    "\u27E6main@2:2\u27E7 = () -> \u27E60@7:11\u27E7" // fun declaration
+  }
+
+  runtest(program, expected);
+}
+
+TEST_CASE("TypeConstraintVisitor: BinaryExpr_LogicalNot", "[TypeConstraintVisitor]") {
+  std::stringstream program;
+  program << R"(
+    main() {
+      var a,o,n, m;
+      a = (5 < 2) and (-2 <= 7);
+      o = (0 >= 0) or (a);
+      n = not (o);
+      m = -6 % 4;
+      return 0;
+    }
+  )";
+
+  std::vector<std::string> expected = {
+    "\u27E65@3:11\u27E7 = int", // const int
+    "\u27E62@3:15\u27E7 = int", // const int
+    "\u27E6(5<2)@3:10\u27E7 = bool", // comparison
+    "\u27E6-2@3:22\u27E7 = int", // const int
+    "\u27E67@3:29\u27E7 = int", // const int
+    "\u27E6(-2<=7)@3:21\u27E7 = bool", // comparison
+    "\u27E6(5<2)and(-2<=7)@3:10\u27E7 = bool", // logical and
+    "\u27E6a@3:6\u27E7 = \u27E6(5<2)and(-2<=7)@3:10\u27E7", // assign
+    "\u27E60@4:11\u27E7 = int", // const int
+    "\u27E60@4:16\u27E7 = int", // const int
+    "\u27E6(0>=0)@4:10\u27E7 = bool", // comparison
+    "\u27E6(a)@4:22\u27E7 = \u27E6a@3:6\u27E7", // access
+    "\u27E6(0>=0)or(a)@4:10\u27E7 = bool", // logical or
+    "\u27E6o@4:6\u27E7 = \u27E6(0>=0)or(a)@4:10\u27E7", // assign
+    "\u27E6(o)@5:22\u27E7 = \u27E6o@4:6\u27E7", // access
+    "\u27E6not(o)@5:10\u27E7 = bool", // logical not
+    "\u27E6n@5:10\u27E7 = \u27E6not(o)@5:10\u27E7", // assign
+    "\u27E6-6@6:11\u27E7 = int", // const int
+    "\u27E64@6:15\u27E7 = int", // const int
+    "\u27E6-6%4@6:15\u27E7 = int", // modulus
+    "\u27E6m@6:6\u27E7 = \u27E6-6%4@6:15\u27E7", // assign
     "\u27E60@7:11\u27E7 = int", // main return int
     "\u27E60@7:11\u27E7 = int", // int constant
     "\u27E6main@2:2\u27E7 = () -> \u27E60@7:11\u27E7" // fun declaration
-  }
+  };
 
   runtest(program, expected);
 }
