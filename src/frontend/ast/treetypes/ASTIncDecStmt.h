@@ -11,6 +11,8 @@ class ASTIncDecStmt : public ASTStmt {
 public:
   ASTIncDecStmt(std::unique_ptr<ASTExpr> EXPR, const std::string OP)
       : EXPR(std::move(EXPR)), OP(OP) {}
+  std::vector<std::shared_ptr<ASTNode>> getChildren() override
+      { return std::vector<std::shared_ptr<ASTNode>>{EXPR}; }
   ASTExpr* getExpr() const { return EXPR.get(); }
   std::string getOp() const { return OP; }
   void accept(ASTVisitor * visitor) override;

@@ -458,12 +458,12 @@ TEST_CASE("TypeConstraintVisitor: Arrays", "[TypeConstraintVisitor") {
   std::vector<std::string> {
     "\u27E61@4:13\u27E7 = int", // const int
     "\u27E62@4:9\u27E7 = int", // const int
-    "\u27E6[1,2]@4:10\u27E7 = arr:\u27E61@4:11\u27E7", // array
+    "\u27E6[1,2]@4:10\u27E7 = arr::\u27E61@4:11\u27E7", // array
     "\u27E6x@4:6\u27E7 = \u27E6[1,2]@4:8\u27E7", // assign
     "\u27E61@5:11\u27E7 = int", // const int
     "\u27E6x[1]@5:9\u27E7 = \u27E61@4:11\u27E7", // arr index
     "\u27E6#x@5:19\u27E7 = int", // int arr length
-    "\u27E6[x[1]of#x]@5:10\u27E7 = arr:\u27E6x[1]@5:9\u27E7", // array
+    "\u27E6[x[1]of#x]@5:10\u27E7 = arr::\u27E6x[1]@5:9\u27E7", // array
     "\u27E6y@5:6\u27E7 = \u27E6[x[1]of#x]@4:10\u27E7", // assign
     "\u27E60@6:13\u27E7 = int", // main return int
     "\u27E60@6:13\u27E7 = int", // int constant
