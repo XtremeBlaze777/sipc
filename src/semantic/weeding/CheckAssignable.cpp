@@ -23,9 +23,9 @@ bool isAssignable(ASTExpr* e) {
       return false;
     }
   }
+  if (dynamic_cast<ASTArrIndex*>(e)) return true; 
+  
   return false;
-}
-
 }
 
 void CheckAssignable::endVisit(ASTAssignStmt* element) {
