@@ -9,6 +9,7 @@ TEST_CASE("ASTPrinterTest: all unary expressions (excluding arr)", "[ASTNodePrin
     stream << R"(
       fun() {
         var x, y;
+        x = 1;
         x = -x;
         y = not true;
         y = [0, 1, 2, 3];
@@ -18,12 +19,14 @@ TEST_CASE("ASTPrinterTest: all unary expressions (excluding arr)", "[ASTNodePrin
     )";
 
     std::vector<std::string> expected {
-      "x",
-      "not true",
-      "[0, 1, 2, 3]",
-      "#y"
+      "x = 1;",
+      "x = -x;",
+      "y = not true;",
+      "y = [0, 1, 2, 3];",
+      "x = #y;",
+      "return x;"
     };
-
+    std::cout << "Building AST" << std::endl;
     auto ast = ASTHelper::build_ast(stream);
 
     auto f = ast->findFunctionByName("fun");
@@ -31,10 +34,11 @@ TEST_CASE("ASTPrinterTest: all unary expressions (excluding arr)", "[ASTNodePrin
     int i = 0;
     int numStmts = f->getStmts().size() - 1;  // skip the return
     // HELPER FUNCTION 
+    std::cout << "Checking each stmt" << std::endl;
     for (auto s : f->getStmts()) {
-      auto a = dynamic_cast<ASTAssignStmt*>(s);
+      //auto a = dynamic_cast<ASTAssignStmt*>(s);
       stream = std::stringstream();
-      stream << *a->getRHS();
+      stream << *s; 
       auto actual = stream.str();
       REQUIRE(actual == expected.at(i++));
       if (i == numStmts) break;

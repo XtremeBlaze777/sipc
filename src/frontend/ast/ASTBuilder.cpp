@@ -269,6 +269,11 @@ Any ASTBuilder::visitArrLenExpr(TIPParser::ArrLenExprContext *ctx) {
   return "";
 } // LCOV_EXCL_LINE
 
+Any ASTBuilder::visitArithmeticNegation(TIPParser::ArithmeticNegationContext * ctx) {
+  visitUnaryExpr("-", ctx);
+  return "";
+}
+
 Any ASTBuilder::visitLogicalAndExpr(TIPParser::LogicalAndExprContext *ctx) {
   visitBinaryExpr(ctx, "and");
   return "";
