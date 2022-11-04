@@ -473,7 +473,7 @@ TEST_CASE("TypeConstraintVisitor: Arrays", "[TypeConstraintVisitor") {
   runtest(program, expected);
 }
 
-TEST_CASE("TypeConstraintVisitor: BinaryExpr_LogicalNot", "[TypeConstraintVisitor]") {
+TEST_CASE("TypeConstraintVisitor: Binary_UnaryExpr", "[TypeConstraintVisitor]") {
   std::stringstream program;
   program << R"(
     main() {
@@ -482,6 +482,8 @@ TEST_CASE("TypeConstraintVisitor: BinaryExpr_LogicalNot", "[TypeConstraintVisito
       o = (0 >= 0) or (a);
       n = not (o);
       m = -6 % 4;
+      m++;
+      m--;
       return 0;
     }
   )";
@@ -508,9 +510,13 @@ TEST_CASE("TypeConstraintVisitor: BinaryExpr_LogicalNot", "[TypeConstraintVisito
     "\u27E64@7:15\u27E7 = int", // const int
     "\u27E6-6%4@7:15\u27E7 = int", // modulus
     "\u27E6m@7:6\u27E7 = \u27E6-6%4@7:15\u27E7", // assign
-    "\u27E60@8:13\u27E7 = int", // main return int
-    "\u27E60@8:13\u27E7 = int", // int constant
-    "\u27E6main@2:4\u27E7 = () -> \u27E60@7:11\u27E7" // fun declaration
+    "\u27E6m@8:6\u27E7 = \u27E6m@7:6\u27E7", // access
+    "\u27E6m++@8:6\u27E7 = int", // inc
+    "\u27E6m@9:6\u27E7 = \u27E6m@7:6\u27E7", // access
+    "\u27E6m--@9:6\u27E7 = int", // dec
+    "\u27E60@10:13\u27E7 = int", // main return int
+    "\u27E60@10:13\u27E7 = int", // int constant
+    "\u27E6main@2:4\u27E7 = () -> \u27E60@9:13\u27E7" // fun declaration
   };
 
   runtest(program, expected);
