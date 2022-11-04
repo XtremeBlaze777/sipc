@@ -177,7 +177,7 @@ TEST_CASE("TypeConstraintVisitor: ForLoops", "[TypeConstraintVisitor]") {
   program << R"(
     main() {
       var i,j,k;
-      for (i : 5) output i;
+      for (i : [5]) output i;
       for (j : 0 .. 5 by 2) output j;
       for (k : 0 .. 5) output k;
       return 0;
@@ -187,7 +187,8 @@ TEST_CASE("TypeConstraintVisitor: ForLoops", "[TypeConstraintVisitor]") {
   std::vector<std::string> expected = {
     "\u27E6i@4:25\u27E7 = int", // access
     "\u27E6i@4:11\u27E7 = int", // iterator
-    "\u27E65@4:15\u27E7 = int", // const int
+    "\u27E65@4:16\u27E7 = int", // const int
+    "\u27E6[5]@4:15\u27E7 = arr::\u27E65@4:16\u27E7", // array
     "\u27E6j@5:35\u27E7 = int", // access
     "\u27E6j@5:11\u27E7 = int", // iterator
     "\u27E60@5:15\u27E7 = int", // const int
