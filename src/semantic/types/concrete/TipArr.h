@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include "TipType.h"
@@ -14,10 +13,10 @@
  */
 class TipArr: public TipCons {
 public:
-    TipArr() = delete;
-    TipArr(std::vector<std::shared_ptr<TipType>> elems);
+    //TipArr() = delete;
+    TipArr(std::shared_ptr<TipType> type);
 
-    std::vector<std::shared_ptr<TipType>> getElems() const;
+    std::vector<std::shared_ptr<TipType>> getElements() const;
 
     bool operator==(const TipType& other) const override;
     bool operator!=(const TipType& other) const override;

@@ -3,20 +3,16 @@
 
 #include <sstream>
 
-TipArr::TipArr(std::vector<std::shared_ptr<TipType>> params): TipCons(std::move(params)) { }
+TipArr::TipArr(std::shared_ptr<TipType> type): 
+TipCons(std::move(std::vector<std::shared_ptr<TipType>>(1, type))) { }
 
-std::vector<std::shared_ptr<TipType>> TipArr::getElems() const {
-    std::vector<std::shared_ptr<TipType>> elems(arguments.begin(), arguments.end());
-    return elems;
+std::vector<std::shared_ptr<TipType>> TipArr::getElements() const {
+    std::vector<std::shared_ptr<TipType>> elements(arguments.begin(), arguments.end());
+    return elements;
 }
 
-std::ostream &TipArr::print(std::ostream &out) const {
-    out << "[";
-    int end_of_args = arguments.size() - 1;
-    for(int i = 0; i < end_of_args; i++) {
-        out << *arguments.at(i) << ", ";
-    }
-    out << *arguments.back();
+std::ostream &TipArr::print(std::ostream &out) const {   
+    out << "arr::" << *arguments.front();
     return out;
 }
 
@@ -26,16 +22,19 @@ bool TipArr::operator==(const TipType &other) const {
         return false;
     }
 
-    if(arguments.size() != otherTipArr->arguments.size()) {
+    // Empty array case
+    //if (arguments.size() == 0 || otherTipArr->arguments.size() == 0) {
+    //    if (arguments.size() != otherTipArr->arguments.size()) {
+    //        return false;
+    //    } else {
+    //        return true;
+    //    }
+    // }
+
+    if(*(arguments.at(0)) != *(otherTipArr->arguments.at(0))) {
         return false;
     }
 
-    for(int i = 0; i < arguments.size(); i++) {
-        if(*(arguments.at(i)) != *(otherTipArr->arguments.at(i))) {
-            return false;
-        }
-    }
-    
     return true;
 }
 

@@ -58,6 +58,15 @@ TEST_CASE("Check Assignable: address of field", "[Symbol]") {
     REQUIRE_NOTHROW(CheckAssignable::check(ast.get()));
 }
 
+//SIP Testing begins
+
+TEST_CASE("Check Assignable: arrays", "[Symbol]") {
+    std::stringstream stream;
+    stream << R"(arrays() { var x,y; x = [1 of 2]; y = x; return 0; })";
+    auto ast = ASTHelper::build_ast(stream);
+    REQUIRE_NOTHROW(CheckAssignable::check(ast.get()));
+}
+
 /************** the following are expected to fail the check ************/
 
 TEST_CASE("Check Assignable: constant lhs", "[Symbol]") {
@@ -121,4 +130,14 @@ TEST_CASE("Check Assignable: address of expr", "[Symbol]") {
     REQUIRE_THROWS_MATCHES(CheckAssignable::check(ast.get()),
                            SemanticError,
                            ContainsWhat("(y*y) not an l-value"));
+}
+
+//SIP Testing begins
+TEST_CASE("Check Assignable: arraysFail", "[Symbol]") {
+    std::stringstream stream;
+    stream << R"(arrays() { var x; x = [1 of 2]; [1,1] = x; return 0; })";
+    auto ast = ASTHelper::build_ast(stream);
+    REQUIRE_THROWS_MATCHES(CheckAssignable::check(ast.get()),
+                           SemanticError,
+                           ContainsWhat("[1, 1] not an l-value"));
 }

@@ -5,6 +5,8 @@
 #include "TipRef.h"
 #include "TipAlpha.h"
 #include "TipMu.h"
+#include "TipBool.h"
+#include "TipArr.h"
 #include "TypeConstraintCollectVisitor.h"
 #include "TypeConstraintUnifyVisitor.h"
 #include "TypeConstraintVisitor.h"
@@ -427,4 +429,88 @@ TEST_CASE("Unifier: Test closing mu ", "[Unifier]") {
     ss << *closed;
 
     REQUIRE_NOTHROW(ss.str() == "\u03bc\u03B1<f>.(\u03B1<f>,int) -> int");
+}
+
+TEST_CASE("Unifier: TipArr and TipBool for Unifier and Collect", "[Unifier, Collect]") {
+
+    SECTION("Boolean") {
+        std::stringstream program;
+        program << R"(
+            // x is bool, short is () -> int
+            short() {
+              var x;
+              x = true;	
+              return 0;
+            }
+         )";
+
+        auto ast = ASTHelper::build_ast(program);
+        auto symbols = SymbolTable::build(ast.get());
+
+        TypeConstraintCollectVisitor visitor(symbols.get());
+        ast->accept(&visitor);
+
+        Unifier unifier(visitor.getCollectedConstraints());
+        REQUIRE_NOTHROW(unifier.solve());
+
+        // Expected types
+        std::vector<std::shared_ptr<TipType>> emptyParams;
+        auto intType = std::make_shared<TipInt>();
+        auto boolType = std::make_shared<TipBool>();
+        auto funRetInt = std::make_shared<TipFunction>(emptyParams,intType);
+        auto ptrToInt = std::make_shared<TipRef>(intType);
+
+        auto fDecl = symbols->getFunction("short"); 
+        auto fType = std::make_shared<TipVar>(fDecl); 
+
+        REQUIRE(*unifier.inferred(fType) == *funRetInt);
+
+        auto xType = std::make_shared<TipVar>(symbols->getLocal("x",fDecl));
+        REQUIRE(*unifier.inferred(xType) == *boolType);
+    }
+
+    SECTION("Array") {
+        std::stringstream program;
+        program << R"(
+            // x is arr::int, y is arr::\alpha, z is arr::bool, short is () -> int
+            short() {
+              var x, y, z;
+              x = [0, 1, 2, 3];	
+              y = [];
+              z = [5 of true];
+              return 0;
+            }
+         )";
+
+        auto ast = ASTHelper::build_ast(program);
+        auto symbols = SymbolTable::build(ast.get());
+
+        TypeConstraintCollectVisitor visitor(symbols.get());
+        ast->accept(&visitor);
+
+        Unifier unifier(visitor.getCollectedConstraints());
+        REQUIRE_NOTHROW(unifier.solve());
+
+        // Expected types
+        std::vector<std::shared_ptr<TipType>> emptyParams;
+        auto intType = std::make_shared<TipInt>();
+        auto boolType = std::make_shared<TipBool>();
+        // auto alphaType = std::make_shared<TipAlpha>
+        auto arrIntType = std::make_shared<TipArr>(std::make_shared<TipInt>());
+        auto arrBoolType = std::make_shared<TipArr>(std::make_shared<TipBool>());
+        auto funRetInt = std::make_shared<TipFunction>(emptyParams,intType);
+
+        auto fDecl = symbols->getFunction("short"); 
+        auto fType = std::make_shared<TipVar>(fDecl); 
+
+        REQUIRE(*unifier.inferred(fType) == *funRetInt);
+
+
+        auto xType = std::make_shared<TipVar>(symbols->getLocal("x",fDecl));
+        REQUIRE(*unifier.inferred(xType) == *arrIntType);
+
+
+        auto zType = std::make_shared<TipVar>(symbols->getLocal("z",fDecl));
+        REQUIRE(*unifier.inferred(zType) == *arrBoolType);
+    }
 }

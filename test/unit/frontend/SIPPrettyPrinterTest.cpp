@@ -256,3 +256,38 @@ TEST_CASE("SIPPrettyPrinter: For Statements", "[SIPPrettyPrinter]") {
     std::string expected = GeneralHelper::removeTrailingWhitespace(expect);
     REQUIRE(ppString == expected);
 }
+
+
+TEST_CASE("SIPPrettyPrinter: Operation Extensions", "[SIPPrettyPrinter]") {
+    std::stringstream stream;
+    stream << R"(
+    test() {
+      var x, y, z;
+      x = 5 % 4;
+      y = 5 >= 4;
+      z = 5 < 4;
+      x = 4 <= 5;
+      x = 10 % 4 <= 5;
+      return x;
+    }
+    )";
+
+    std::string expect = R"(test()
+{
+  var x, y, z;
+  x = (5 % 4);
+  y = (5 >= 4); 
+  z = (5 < 4);
+  x = (4 <= 5);
+  x = ((10 % 4) <= 5);
+  return x;
+}
+)";
+
+    std::stringstream pp;
+    auto ast = ASTHelper::build_ast(stream);
+    PrettyPrinter::print(ast.get(), pp, ' ', 2);
+    std::string ppString = GeneralHelper::removeTrailingWhitespace(pp.str());
+    std::string expected = GeneralHelper::removeTrailingWhitespace(expect);
+    REQUIRE(ppString == expected);
+}

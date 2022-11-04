@@ -172,6 +172,8 @@ TEST_CASE("ASTNodeTest: ASTMainArray", "[ASTNode]") {
     for (int i = 0; i < vals.size(); i++) {
         auto foo = vals[i];
 
+        std::cout << "value: " << foo << "\tgotten: " << gotten[i] << "\n\n";
+
         // Test getters
         REQUIRE(foo == gotten[i]);
 
@@ -186,6 +188,7 @@ TEST_CASE("ASTNodeTest: ASTMainArray", "[ASTNode]") {
     for (int i=0; i < 4; i++) {
         REQUIRE(visitor.postPrintStrings[i] == expected[i]);
     }
+    std::cout << "\n" << std::endl;
 }
 
 TEST_CASE("ASTNodeTest: ASTAssign", "[ASTNode]") {
@@ -235,11 +238,17 @@ TEST_CASE("ASTNodeTest: AlternateArray_ArrLen_ArrIndex", "[ASTNode]") {
     auto index = std::make_unique<ASTNumberExpr>(0);
     auto indexValue = index.get();
 
+    //Debug
+    std::cout << "expressions good\n\n";
+
     auto arr = std::make_unique<ASTAlternateArray>( std::move(start), std::move(end) );
     auto arrValue = arr.get();
     auto stmt = std::make_unique<ASTAssignStmt>( std::move(name), std::move(arr) );
     auto len = std::make_unique<ASTUnaryExpr>("#", std::move(name) );
-    auto indexArr = std::make_unique<ASTArrIndex>( std::move(index), "arr" );
+    auto indexArr = std::make_unique<ASTArrIndex>( std::move(index), std::move(name) );
+    
+    //Debug
+    std::cout << "statements good\n\n";
 
     // Test Print Method
     std::stringstream nodePrintStream;
@@ -251,14 +260,20 @@ TEST_CASE("ASTNodeTest: AlternateArray_ArrLen_ArrIndex", "[ASTNode]") {
     std::stringstream nodePrintStream3;
     nodePrintStream2 << *indexArr;
     REQUIRE(nodePrintStream3.str() == "arr[0]");
+    
+    //Debug
+    std::cout << "printing good\n\n";
 
     // Test getters 
     REQUIRE(startValue == arr->getStart());
     REQUIRE(endValue == arr->getEnd());
     REQUIRE(nameValue == len->getRight());
     REQUIRE("#" == len->getOp());
-    REQUIRE("arr" == indexArr->getArr());
+    REQUIRE(nameValue == indexArr->getArr());
     REQUIRE(indexValue == indexArr->getIdx());
+    
+    //Debug
+    std::cout << "getters good\n\n";
 
     // Test getChildren
     auto children = arr->getChildren();
@@ -273,14 +288,54 @@ TEST_CASE("ASTNodeTest: AlternateArray_ArrLen_ArrIndex", "[ASTNode]") {
     auto children3 = indexArr->getChildren();
     REQUIRE(children3.size() == 1);
     REQUIRE(contains(children3, indexValue));
+    
+    //Debug
+    std::cout << "children good\n\n";
 
     // Test accept
-    RecordPostPrint visitor;
+    RecordPostPrint visitor, visitor2, visitor3;
     arr->accept(&visitor);
-    std::string expected[] = { "A", "B", "arr", "0", "[A of B]", "arr = [A of B];", "#arr", "arr[0]" };
-    for (int i=0; i < 8; i++) {
-        REQUIRE(visitor.postPrintStrings[i] == expected[i]);
+    len->accept(&visitor2);
+    indexArr->accept(&visitor3);
+    std::string arrExpected[] = { "A", "B", "[A of B]" };
+    std::string lenExpected[] = { "#", "arr", "#arr" };
+    std::string indexExpected[] = { "0", "arr", "arr[0]" };
+    for (int i=0; i < 3; i++) {
+        REQUIRE(visitor.postPrintStrings[i] == arrExpected[i]);
+        REQUIRE(visitor2.postPrintStrings[i] == lenExpected[i]);
+        REQUIRE(visitor3.postPrintStrings[i] == indexExpected[i]);
     }
+
+    std::cout << "\n" << std::endl;
+}
+
+TEST_CASE("ASTNodeTest: BoolExpr", "[ASTNode]") {
+    auto True = std::make_unique<ASTBoolExpr>("true");
+    auto trueVal = True.get();
+    auto False = std::make_unique<ASTBoolExpr>("false");
+    auto falseVal = False.get();
+
+    // Test Print Method
+    std::stringstream nodePrintStream;
+    nodePrintStream << *True;
+    REQUIRE(nodePrintStream.str() == "true");
+    std::stringstream nodePrintStream2;
+    nodePrintStream2 << *False;
+    REQUIRE(nodePrintStream2.str() == "false");
+
+    // Test getter
+    REQUIRE(True->getValue() == "true");
+    REQUIRE(False->getValue() == "false");
+
+    // BoolExpr has no children! So no tests!
+
+    // Test accept
+    RecordPostPrint visitor, visitor2;
+    True->accept(&visitor);
+    False->accept(&visitor2);
+    REQUIRE(visitor.postPrintStrings[0] == "true");
+    REQUIRE(visitor2.postPrintStrings[0] == "false");
+
 }
 
 TEST_CASE("ASTNodeTest: IncStmt", "[ASTNode]") {

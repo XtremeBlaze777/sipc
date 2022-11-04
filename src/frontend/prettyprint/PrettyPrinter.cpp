@@ -289,7 +289,7 @@ void PrettyPrinter::endVisit(ASTAlternateArray * element) {
 void PrettyPrinter::endVisit(ASTArrIndex * element) {
     std::string arrString = visitResults.back();
     visitResults.pop_back();
-    std::string idxString = visitResults.back();
+    std::string idxString = visitResults.back(); 
     visitResults.pop_back();
     visitResults.push_back(arrString + "[" + idxString + "]");
 }
