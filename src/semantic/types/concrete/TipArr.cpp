@@ -3,10 +3,11 @@
 
 #include <sstream>
 
-TipArr::TipArr(std::vector<std::shared_ptr<TipType>> type): TipCons(std::move(type)) { }
+TipArr::TipArr(std::shared_ptr<TipType> type): TipCons(std::move(std::vector<std::shared_ptr<TipType>>(1, type))) { }
 
-std::shared_ptr<TipType> TipArr::getType() const {
-    return arguments.front();
+std::vector<std::shared_ptr<TipType>> TipArr::getElements() const {
+    std::vector<std::shared_ptr<TipType>> elements(arguments.begin(), arguments.end());
+    return elements;
 }
 
 std::ostream &TipArr::print(std::ostream &out) const {   
