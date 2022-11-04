@@ -7,10 +7,10 @@ TipArr::TipArr() { }
 TipArr::TipArr(std::vector<std::shared_ptr<TipType>> elems): TipCons(std::move(elems)) { }
 
 TipArr::TipArr(std::shared_ptr<TipInt> num, std::shared_ptr<TipType> expr) { 
-    std::vector<std::shared_ptr<TipType>> elems;
-    for (int i = 0; i < n; i++) {
-        elems.push_back(expr);
-    }
+    // std::vector<std::shared_ptr<TipType>> elems;
+    // for (int i = 0; i < n; i++) {
+    //     elems.push_back(expr);
+    // }
 } 
 
 std::vector<std::shared_ptr<TipType>> TipArr::getElems() const {

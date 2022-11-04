@@ -441,3 +441,31 @@ TEST_CASE("TypeConstraintVisitor: Ternary", "[TypeConstructorVisitor]") {
 
   runtest(program, expected);
 }
+
+TEST_CASE("TypeConstraintVisitor: Arrays", "[TypeConstraintVisitor") {
+  std::stringstream program;
+  program << R"(
+    main() {
+      var x,y;
+      x = [1,2];
+      y = [x[1] of #x];
+      return 0;
+    }
+  )";
+
+  std::vector<std::string> {
+    "\u27E62@4:9\u27E7 = int", // const int
+    "\u27E61@4:11\u27E7 = int", // const int
+    "\u27E6[1,2]@4:8\u27E7 = arr:\u27E61@4:11\u27E7", // array
+    "\u27E6x@4:4\u27E7 = \u27E6[1,2]@4:8\u27E7", // assign
+    "\u27E6#x@5:17\u27E7 = int", // int arr length
+    "\u27E61@5:11\u27E7 = int", // const int
+    "\u27E6x[1]@5:9\u27E7 = \u27E61@4:11\u27E7", // arr index
+    "\u27E6[x[1] of #x]@4:8\u27E7 = arr:\u27E6x[1]@5:9\u27E7", // array
+    "\u27E60@7:11\u27E7 = int", // main return int
+    "\u27E60@7:11\u27E7 = int", // int constant
+    "\u27E6main@2:2\u27E7 = () -> \u27E60@7:11\u27E7" // fun declaration
+  }
+
+  runtest(program, expected);
+}
