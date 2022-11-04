@@ -5,6 +5,8 @@
 #include "TipRef.h"
 #include "TipAlpha.h"
 #include "TipMu.h"
+#include "TipBool.h"
+#include "TipArr.h"
 #include "TypeConstraintCollectVisitor.h"
 #include "TypeConstraintUnifyVisitor.h"
 #include "TypeConstraintVisitor.h"
@@ -434,14 +436,11 @@ TEST_CASE("Unifier: TipArr and TipBool for Unifier and Collect", "[Unifier, Coll
     SECTION("Boolean") {
         std::stringstream program;
         program << R"(
-            // x is int, y is &int, z is int, short is () -> int
+            // x is bool, short is () -> int
             short() {
-              var x, y, z;
+              var x;
               x = true;	
-              y = alloc x;
-              *y = x;
-              z = *y;
-              return z;
+              return 0;
             }
          )";
 
@@ -457,6 +456,7 @@ TEST_CASE("Unifier: TipArr and TipBool for Unifier and Collect", "[Unifier, Coll
         // Expected types
         std::vector<std::shared_ptr<TipType>> emptyParams;
         auto intType = std::make_shared<TipInt>();
+        auto boolType = std::make_shared<TipBool>();
         auto funRetInt = std::make_shared<TipFunction>(emptyParams,intType);
         auto ptrToInt = std::make_shared<TipRef>(intType);
 
@@ -466,13 +466,7 @@ TEST_CASE("Unifier: TipArr and TipBool for Unifier and Collect", "[Unifier, Coll
         REQUIRE(*unifier.inferred(fType) == *funRetInt);
 
         auto xType = std::make_shared<TipVar>(symbols->getLocal("x",fDecl));
-        REQUIRE(*unifier.inferred(xType) == *intType);
-
-        auto yType = std::make_shared<TipVar>(symbols->getLocal("y",fDecl));
-        REQUIRE(*unifier.inferred(yType) == *ptrToInt);
-
-        auto zType = std::make_shared<TipVar>(symbols->getLocal("z",fDecl));
-        REQUIRE(*unifier.inferred(zType) == *intType);
+        REQUIRE(*unifier.inferred(xType) == *boolType);
     }
 
     SECTION("Array") {
@@ -500,21 +494,23 @@ TEST_CASE("Unifier: TipArr and TipBool for Unifier and Collect", "[Unifier, Coll
         // Expected types
         std::vector<std::shared_ptr<TipType>> emptyParams;
         auto intType = std::make_shared<TipInt>();
+        auto boolType = std::make_shared<TipBool>();
+        // auto alphaType = std::make_shared<TipAlpha>
+        auto arrIntType = std::make_shared<TipArr>(std::make_shared<TipInt>());
+        auto arrBoolType = std::make_shared<TipArr>(std::make_shared<TipBool>());
         auto funRetInt = std::make_shared<TipFunction>(emptyParams,intType);
-        auto ptrToInt = std::make_shared<TipRef>(intType);
 
         auto fDecl = symbols->getFunction("short"); 
         auto fType = std::make_shared<TipVar>(fDecl); 
 
         REQUIRE(*unifier.inferred(fType) == *funRetInt);
 
-        auto xType = std::make_shared<TipVar>(symbols->getLocal("x",fDecl));
-        REQUIRE(*unifier.inferred(xType) == *intType);
 
-        auto yType = std::make_shared<TipVar>(symbols->getLocal("y",fDecl));
-        REQUIRE(*unifier.inferred(yType) == *ptrToInt);
+        auto xType = std::make_shared<TipVar>(symbols->getLocal("x",fDecl));
+        REQUIRE(*unifier.inferred(xType) == *arrIntType);
+
 
         auto zType = std::make_shared<TipVar>(symbols->getLocal("z",fDecl));
-        REQUIRE(*unifier.inferred(zType) == *intType);
+        REQUIRE(*unifier.inferred(zType) == *arrBoolType);
     }
 }

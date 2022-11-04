@@ -381,8 +381,8 @@ void TypeConstraintVisitor::endVisit(ASTMainArray * element) {
  */
 void TypeConstraintVisitor::endVisit(ASTAlternateArray * element) {
     auto intType = std::make_shared<TipInt>();
-    constraintHandler->handle(astToVar(element), std::make_shared<TipArr>(astToVar(element->getStart())));
-    constraintHandler->handle(astToVar(element->getEnd()), intType);
+    constraintHandler->handle(astToVar(element), std::make_shared<TipArr>(astToVar(element->getEnd())));
+    constraintHandler->handle(astToVar(element->getStart()), intType);
 }
 
 /*! \brief Type constraints for array index expression.
