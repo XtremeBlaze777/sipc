@@ -47,15 +47,11 @@ static void diff(std::stringstream &program, std::vector<std::string> constraint
 
 static void runtest(std::stringstream &program, std::vector<std::string> constraints) {
     std::cout << constraints[0] << std::endl;
-    std::cout << "Building AST" << std::endl;
     auto ast = ASTHelper::build_ast(program);
-    std::cout << "Building Symbol Table" << std::endl;
     auto symbols = SymbolTable::build(ast.get());
 
-    std::cout << "Visiting Symbol Table" << std::endl;
     TypeConstraintCollectVisitor visitor(symbols.get());
     ast->accept(&visitor);
-    std::cout << "Collecting constraints" << std::endl; 
     auto collected = visitor.getCollectedConstraints();
 
     // Copy the vectors to sets to allow for a single equality test
@@ -65,7 +61,6 @@ static void runtest(std::stringstream &program, std::vector<std::string> constra
 
     std::set<std::string> collectedSet;
     for(int i = 0; i < collected.size(); i++) {
-        std::cout << i << std::endl;
         std::stringstream stream;
         stream << collected.at(i);
         collectedSet.insert(stream.str());
@@ -153,8 +148,6 @@ TEST_CASE("TypeConstraintVisitor: Ternary", "[TypeConstructorVisitor]") {
     "\u27E6y@6:13\u27E7 = \u27E6y@5:6\u27E7",
     "\u27E6z@6:6\u27E7 = \u27E6x==y@6:8\u27E7"
   };
-
-  diff(program, expected);
   runtest(program, expected);
 }
 
@@ -170,21 +163,23 @@ TEST_CASE("TypeConstraintVisitor: Arrays", "[TypeConstraintVisitor") {
   )";
 
   std::vector<std::string> expected {
-    "\u27E61@4:13\u27E7 = int", // const int
-    "\u27E62@4:9\u27E7 = int", // const int
-    "\u27E6[1,2]@4:10\u27E7 = arr::\u27E61@4:11\u27E7", // array
-    "\u27E6x@4:6\u27E7 = \u27E6[1,2]@4:8\u27E7", // assign
-    "\u27E61@5:11\u27E7 = int", // const int
-    "\u27E6x[1]@5:9\u27E7 = \u27E61@4:11\u27E7", // arr index
-    "\u27E6#x@5:19\u27E7 = int", // int arr length
-    "\u27E6[x[1]of#x]@5:10\u27E7 = arr::\u27E6x[1]@5:9\u27E7", // array
-    "\u27E6y@5:6\u27E7 = \u27E6[x[1]of#x]@4:10\u27E7", // assign
-    "\u27E60@6:13\u27E7 = int", // main return int
-    "\u27E60@6:13\u27E7 = int", // int constant
-    "\u27E6main@2:4\u27E7 = () -> \u27E60@7:11\u27E7" // fun declaration
+      "\u27E6#x@5:19\u27E7 = int",
+      "\u27E60@6:13\u27E7 = int",
+      "\u27E61@4:11\u27E7 = int",
+      "\u27E61@4:11\u27E7 = \u27E61@4:11\u27E7",
+      "\u27E61@4:11\u27E7 = \u27E62@4:13\u27E7",
+      "\u27E61@5:13\u27E7 = int",
+      "\u27E62@4:13\u27E7 = int",
+      "\u27E6[1, 2]@4:10\u27E7 = arr::\u27E61@4:11\u27E7",
+      "\u27E6[x[1] of #x]@5:10\u27E7 = arr::\u27E6#x@5:19\u27E7",
+      "\u27E6main@2:4\u27E7 = () -> \u27E60@6:13\u27E7",
+      "\u27E6x@3:10\u27E7 = arr::\u03b1<x>",
+      "\u27E6x@3:10\u27E7 = arr::\u27E6x[1]@5:11\u27E7",
+      "\u27E6x@3:10\u27E7 = \u27E6[1, 2]@4:10\u27E7",
+      "\u27E6x[1]@5:11\u27E7 = int",
+      "\u27E6y@3:12\u27E7 = \u27E6[x[1] of #x]@5:10\u27E7"
   };
-
-  diff(program, expected);
+  //diff(program, expected);
   runtest(program, expected);
 }
 
