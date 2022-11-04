@@ -8,45 +8,7 @@
 #include <sstream>
 #include <set>
 
-static void diff(std::stringstream &program, std::vector<std::string> constraints) {
-    auto ast = ASTHelper::build_ast(program);
-    auto symbols = SymbolTable::build(ast.get());
-
-    TypeConstraintCollectVisitor visitor(symbols.get());
-    ast->accept(&visitor);
-
-    auto collected = visitor.getCollectedConstraints();
-
-    // Copy the vectors to sets to allow for a single equality test
-    std::set<std::string> expectedSet;
-    copy(constraints.begin(), constraints.end(), 
-            inserter(expectedSet, expectedSet.end()));    
-
-    std::set<std::string> collectedSet;
-    for(int i = 0; i < collected.size(); i++) {
-        std::stringstream stream;
-        stream << collected.at(i);
-        collectedSet.insert(stream.str());
-    }
-
-    std::set<std::string> result;
-    std::set_difference(collectedSet.begin(), collectedSet.end(), expectedSet.begin(), expectedSet.end(),
-            std::inserter(result, result.end()));
-    std::cout << "Program has that expected doesn't:" << std::endl;
-    for ( auto &s : result ) {
-        std::cout << s << std::endl;
-    }
-    std::set<std::string> result2;
-    std::set_difference(expectedSet.begin(), expectedSet.end(), collectedSet.begin(), collectedSet.end(), 
-            std::inserter(result2, result2.end()));
-    std::cout << "\nExpected has that prog doesn't:" << std::endl;
-    for ( auto &s : result2 ) {
-        std::cout << s << std::endl;
-    }
-}
-
 static void runtest(std::stringstream &program, std::vector<std::string> constraints) {
-    std::cout << constraints[0] << std::endl;
     auto ast = ASTHelper::build_ast(program);
     auto symbols = SymbolTable::build(ast.get());
 
@@ -109,44 +71,24 @@ TEST_CASE("TypeConstraintVisitor: Ternary", "[TypeConstructorVisitor]") {
     }
   )";
 
-//   std::vector<std::string> expected {
-//     "\u27E6true@4:10\u27E7 = bool", //const bool
-//     "\u27E60@4:15\u27E7 = int", //const int
-//     "\u27E61@4:17\u27E7 = int", //const int
-//     "\u27E6true?0:1@4:10\u27E7 = \u27E60@4:13\u27E7", //ternary
-//     "\u27E6x@4:6\u27E7 = \u27E6true?0:1@4:8\u27E7", //assign
-//     "\u27E6false@5:10\u27E7 = bool", //const bool
-//     "\u27E60@5:15\u27E7 = int", //const int
-//     "\u27E61@5:17\u27E7 = int", //const int
-//     "\u27E6false?0:1@5:10\u27E7 = \u27E60@5:13\u27E7", //ternary
-//     "\u27E6y@5:6\u27E7 = \u27E6false?0:1@5:8\u27E7", //assign
-//     "\u27E6x@6:10\u27E7 = \u27E6x@4:6\u27E7", //access
-//     "\u27E6y@6:13\u27E7 = \u27E6y@5:6\u27E7", //access
-//     "\u27E6x==y@6:10\u27E7 = bool", //comparison
-//     "\u27E6z@6:6\u27E7 = \u27E6x==y@6:8\u27E7", //assign
-//     "\u27E60@7:13\u27E7 = int", // main return int
-//     "\u27E60@7:13\u27E7 = int", // int constant
-//     "\u27E6main@2:4\u27E7 = () -> \u27E60@7:11\u27E7" // fun declaration
-//   };
 
   std::vector<std::string> expected {
-    "\u27E60@4:15\u27E7 = int",
-    "\u27E60@5:15\u27E7 = int",
-    "\u27E60@7:13\u27E7 = int",
-    "\u27E61@4:17\u27E7 = int",
-    "\u27E61@5:17\u27E7 = int",
-    "\u27E6false?0:1@5:10\u27E7 = \u27E60@5:13\u27E7",
-
-    "\u27E6false@5:10\u27E7 = bool",
-    "\u27E6main@2:4\u27E7 = () -> \u27E60@7:11\u27E7",
-    "\u27E6true?0:1@4:10\u27E7 = \u27E60@4:13\u27E7",
-    "\u27E6true@4:10\u27E7 = bool",
-    "\u27E6x==y@6:10\u27E7 = bool",
-    "\u27E6x@4:6\u27E7 = \u27E6true?0:1@4:8\u27E7",
-    "\u27E6x@6:10\u27E7 = \u27E6x@4:6\u27E7",
-    "\u27E6y@5:6\u27E7 = \u27E6false?0:1@5:8\u27E7",
-    "\u27E6y@6:13\u27E7 = \u27E6y@5:6\u27E7",
-    "\u27E6z@6:6\u27E7 = \u27E6x==y@6:8\u27E7"
+      "\u27E6(x==y)@6:10\u27E7 = bool",
+      "\u27E60@4:15\u27E7 = int",
+      "\u27E60@4:15\u27E7 = \u27E61@4:17\u27E7",
+      "\u27E60@5:16\u27E7 = int",
+      "\u27E60@5:16\u27E7 = \u27E61@5:18\u27E7",
+      "\u27E60@7:13\u27E7 = int",
+      "\u27E61@4:17\u27E7 = int",
+      "\u27E61@5:18\u27E7 = int",
+      "\u27E6false@5:10\u27E7 = bool",
+      "\u27E6main@2:4\u27E7 = () -> \u27E60@7:13\u27E7",
+      "\u27E6true@4:10\u27E7 = bool",
+      "\u27E6x@3:10\u27E7 = int",
+      "\u27E6x@3:10\u27E7 = \u27E6true ? 0 : 1@4:10\u27E7",
+      "\u27E6y@3:12\u27E7 = int",
+      "\u27E6y@3:12\u27E7 = \u27E6false ? 0 : 1@5:10\u27E7",
+      "\u27E6z@3:14\u27E7 = \u27E6(x==y)@6:10\u27E7"
   };
   runtest(program, expected);
 }
@@ -179,7 +121,6 @@ TEST_CASE("TypeConstraintVisitor: Arrays", "[TypeConstraintVisitor") {
       "\u27E6x[1]@5:11\u27E7 = int",
       "\u27E6y@3:12\u27E7 = \u27E6[x[1] of #x]@5:10\u27E7"
   };
-  //diff(program, expected);
   runtest(program, expected);
 }
 
@@ -227,7 +168,6 @@ TEST_CASE("TypeConstraintVisitor: Binary_UnaryExpr", "[TypeConstraintVisitor]") 
     "\u27E6o@3:12\u27E7 = bool",
     "\u27E6o@3:12\u27E7 = \u27E6((0>=0) or a)@5:10\u27E7" 
   };
-  //diff(program, expected);
   runtest(program, expected);
 }
 

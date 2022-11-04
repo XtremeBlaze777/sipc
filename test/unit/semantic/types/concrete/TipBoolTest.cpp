@@ -1,6 +1,6 @@
 #include "TipBool.h"
 #include <catch2/catch_test_macros.hpp>
-#include <stringstream>
+#include <sstream>
 
 TEST_CASE("TipBool: test TipBool is a TipCons" "[tip_bool]") {
     TipBool t;

@@ -13,3 +13,5 @@ Finally, TipArr was a challenge to support for both the comma constructor and of
 # Testing Approach
 
 We tackled testing by splitting up tests based on the SIP extension, so we had one for boolean, one for inc/dec statements, etc. It was particularly tricky to make these tests due to the specifics of the program (ex. figuring out the right line/columns of the expressions, all the unicode, etc.). 
+
+We had some troubles finishing up our test cases for this assignment, it mainly had to due with working with system test suite cases failing. Otherwise, all other tests were working perfectly. We ran into an issue where we had a unify error with a<null> with int.
