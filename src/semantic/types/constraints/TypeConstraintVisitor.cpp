@@ -376,8 +376,8 @@ void TypeConstraintVisitor::endVisit(ASTMainArray * element) {
 /*! \brief Type constraints for alt array expression.
  *
  * Type rules for "[E1 of E2]": 
- * [[E2]] = int 
- * [[E1 of E2]] = arr of [[E1]]
+ * [[E1]] = int
+ * [[E2]] = \alpha
  */
 void TypeConstraintVisitor::endVisit(ASTAlternateArray * element) {
     auto intType = std::make_shared<TipInt>();
@@ -388,19 +388,15 @@ void TypeConstraintVisitor::endVisit(ASTAlternateArray * element) {
 /*! \brief Type constraints for array index expression.
  *
  * Type rules for "E1[E2]":
- * [[E1]] = arr of [[E1]]
+ * [[E1]] = arr of E1[E2]
  * [[E2]] = int
- * [[E1[E2]] = \alpha 
  */
 void TypeConstraintVisitor::endVisit(ASTArrIndex * element) {
     auto intType = std::make_shared<TipInt>();
     auto alphaType = std::make_shared<TipAlpha>(element);
 
     constraintHandler->handle(astToVar(element->getIdx()), intType);
-    constraintHandler->handle(astToVar(element->getArr()), std::make_shared<TipArr>(
-      std::make_shared<TipAlpha>(element->getArr())
-    ));
-    constraintHandler->handle(astToVar(element), alphaType);
+    constraintHandler->handle(astToVar(element->getArr()), std::make_shared<TipArr>(astToVar(element)));
 }
 
 /*! \brief Type constraints of for statements.
@@ -427,10 +423,10 @@ void TypeConstraintVisitor::endVisit(ASTForStmt * element) {
  * [[E2]] = array of [[E1]] 
  */
 void TypeConstraintVisitor::endVisit(ASTForEachStmt * element) {
-    auto varType = std::make_shared<TipVar>();
+    auto alphaType = std::make_shared<TipAlpha>(element->getElem());
     auto arrType = std::make_shared<TipArr>(astToVar(element->getArr()));
 
-    constraintHandler->handle(astToVar(element->getElem()), varType);
+    constraintHandler->handle(astToVar(element->getElem()), alphaType);
     constraintHandler->handle(astToVar(element->getArr()), arrType);
 }
 

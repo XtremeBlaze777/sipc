@@ -99,11 +99,9 @@ void Substituter::endVisit(TipBool * element) {
 }
 
 void Substituter::endVisit(TipArr * element) {
-  std::vector<std::shared_ptr<TipType>> elements;
-  for (auto &elem : element->getElements()) {
-    elements.push_back(std::move(visitedTypes.back()));
-    visitedTypes.pop_back();
-  }
+  // for (auto &elem : element->getElements()) {
+    // visitedTypes.pop_back();
+  // }
 
   // the post-order visit will reverse the arguments in visitedTypes
   // so we set them right here

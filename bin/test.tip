@@ -1,0 +1,5 @@
+main() {
+    var i, j;
+    j = [];
+    return 0;
+}
