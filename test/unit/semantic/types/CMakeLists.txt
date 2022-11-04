@@ -15,7 +15,10 @@ target_sources(
           ${CMAKE_CURRENT_SOURCE_DIR}/constraints/TypeConstraintTest.cpp
           ${CMAKE_CURRENT_SOURCE_DIR}/constraints/AbsentFieldCheckerTest.cpp
           ${CMAKE_CURRENT_SOURCE_DIR}/solvers/UnifierTest.cpp
-          ${CMAKE_CURRENT_SOURCE_DIR}/solvers/UnionFindTest.cpp)
+          ${CMAKE_CURRENT_SOURCE_DIR}/solvers/UnionFindTest.cpp
+          ${CMAKE_CURRENT_SOURCE_DIR}/concrete/TipBoolTest.cpp
+          ${CMAKE_CURRENT_SOURCE_DIR}/concrete/TipArrTest.cpp
+)
 target_include_directories(
   typeinference_unit_tests
   PRIVATE ${CMAKE_SOURCE_DIR}/src/error
