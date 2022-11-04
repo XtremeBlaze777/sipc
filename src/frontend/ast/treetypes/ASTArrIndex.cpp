@@ -10,6 +10,6 @@ void ASTArrIndex::accept(ASTVisitor * visitor) {
 }
 
 std::ostream& ASTArrIndex::print(std::ostream &out) const {
-  out << *getArr() << "[" << *getIdx() << "]"; 
+  out << *getArr() << "[" << *getIdx() << "]";
   return out;
 }  // LCOV_EXCL_LINE
