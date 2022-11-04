@@ -27,6 +27,7 @@ bool isAssignable(ASTExpr* e) {
   
   return false;
 }
+}
 
 void CheckAssignable::endVisit(ASTAssignStmt* element) {
   LOG_S(1) << "Checking assignability of " << *element;
