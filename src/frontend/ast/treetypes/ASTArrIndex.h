@@ -10,6 +10,8 @@ class ASTArrIndex : public ASTExpr {
 public:
   ASTArrIndex(std::unique_ptr<ASTExpr> IDX, std::unique_ptr<ASTExpr> ARR)
       : IDX(std::move(IDX)), ARR(std::move(ARR) ){}
+  std::vector<std::shared_ptr<ASTNode>> getChildren() override
+      { return std::vector<std::shared_ptr<ASTNode>>{IDX, ARR}; }
   ASTExpr* getIdx() const { return IDX.get(); }
   ASTExpr* getArr() const { return ARR.get(); }
   void accept(ASTVisitor * visitor) override;
