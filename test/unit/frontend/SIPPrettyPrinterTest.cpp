@@ -16,6 +16,8 @@ TEST_CASE("SIPPrettyPrinter: Unary Expressions", "[SIPPrettyPrinter]") {
         z = not x;
         x = [0, 1, 2, 3];
         y = #x;
+        x = 1;
+        y = -x;
         return x;
       }
     )";
@@ -28,6 +30,8 @@ TEST_CASE("SIPPrettyPrinter: Unary Expressions", "[SIPPrettyPrinter]") {
   z = not x;
   x = [0, 1, 2, 3];
   y = #x;
+  x = 1;
+  y = -x;
   return x;
 }
 )";

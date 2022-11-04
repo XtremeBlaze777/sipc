@@ -4,7 +4,14 @@
 #include <sstream>
 TipArr::TipArr() { }
 
-TipArr::TipArr(std::vector<std::shared_ptr<TipType>> params): TipCons(std::move(params)) { }
+TipArr::TipArr(std::vector<std::shared_ptr<TipType>> elems): TipCons(std::move(elems)) { }
+
+TipArr::TipArr(std::shared_ptr<TipInt> num, std::shared_ptr<TipType> expr) { 
+    std::vector<std::shared_ptr<TipType>> elems;
+    for (int i = 0; i < n; i++) {
+        elems.push_back(expr);
+    }
+} 
 
 std::vector<std::shared_ptr<TipType>> TipArr::getElems() const {
     std::vector<std::shared_ptr<TipType>> elems(arguments.begin(), arguments.end());
@@ -17,7 +24,7 @@ std::ostream &TipArr::print(std::ostream &out) const {
     for(int i = 0; i < end_of_args; i++) {
         out << *arguments.at(i) << ", ";
     }
-    out << *arguments.back();
+    out << *arguments.back() << "]";
     return out;
 }
 

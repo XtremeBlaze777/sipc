@@ -13,9 +13,9 @@
  */
 class TipArr: public TipCons {
 public:
-    //TipArr() = delete;
     TipArr();
     TipArr(std::vector<std::shared_ptr<TipType>> elems);
+    TipArr::TipArr(std::shared_ptr<TipInt> num, std::shared_ptr<TipType> expr);
 
     std::vector<std::shared_ptr<TipType>> getElems() const;
 

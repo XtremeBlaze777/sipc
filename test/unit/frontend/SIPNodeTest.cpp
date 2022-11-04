@@ -333,8 +333,8 @@ TEST_CASE("ASTNodeTest: BoolExpr", "[ASTNode]") {
     RecordPostPrint visitor, visitor2;
     True->accept(&visitor);
     False->accept(&visitor2);
-    REQUIRE(visitor.PostPrintStrings[0] == "true");
-    REQUIRE(visitor2.PostPrintStrings[0] == "false");
+    REQUIRE(visitor.postPrintStrings[0] == "true");
+    REQUIRE(visitor2.postPrintStrings[0] == "false");
 
 }
 
