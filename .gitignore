@@ -53,3 +53,4 @@ tipg4/test.sip
 ASTNodeTest.cpp
 test/unit/frontend/SIPNodeTest-flawed.cpp
 test.tipc
+test.cpp

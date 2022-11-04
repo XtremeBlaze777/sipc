@@ -381,3 +381,28 @@ main() {
 
     runtest(program, expected);
 }
+
+TEST_CASE("TypeConstraintVisitor: Boolean", "[TypeConstraintVisitor]") {
+  std::stringstream program;
+  program << R"(
+    main() {
+      var t,f,check;
+      t = true;
+      f = false;
+      check = (t==f);
+      return 0;
+    }
+  )";
+
+  std::vector<std::string> expected {
+    "\u27E6true@4:8\u27E7 = bool", //const true
+    "\u27E6t@4:4\u27E7 = \u27E6true@4:8\u27E7", //assign
+    "\u27E6false@5:8\u27E7 = bool", //const false
+    "\u27E6f@5:4\u27E7 = \u27E6false@5:8\u27E7", //assign
+    "\u27E6(t==f)@6:12\u27E7 = bool", //comparison
+    "\u27E6check@6:4\u27E7 = \u27E6(t==f)@5:12\u27E7", //assign
+    "\u27E60@7:11\u27E7 = int", // main return int
+    "\u27E60@7:11\u27E7 = int", // int constant
+    "\u27E6main@2:2\u27E7 = () -> \u27E60@8:11\u27E7" // fun declaration
+  };
+}

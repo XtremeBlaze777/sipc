@@ -2,6 +2,7 @@
 
 #include "TipType.h"
 #include "TipCons.h"
+#include "TipInt.h"
 #include <string>
 #include <vector>
 #include <memory>
@@ -15,7 +16,7 @@ class TipArr: public TipCons {
 public:
     TipArr();
     TipArr(std::vector<std::shared_ptr<TipType>> elems);
-    TipArr::TipArr(std::shared_ptr<TipInt> num, std::shared_ptr<TipType> expr);
+    TipArr(std::shared_ptr<TipInt> num, std::shared_ptr<TipType> expr);
 
     std::vector<std::shared_ptr<TipType>> getElems() const;
 
