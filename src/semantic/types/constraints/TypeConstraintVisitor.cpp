@@ -371,15 +371,15 @@ void TypeConstraintVisitor::endVisit(ASTMainArray * element) {
 /*! \brief Type constraints for alt array expression.
  *
  * Type rules for "[E1 of E2]":
- * [[E1]] = int 
- * [[E2]] = \alpha
+ * [[E1]] = \alpha 
+ * [[E2]] = int 
  */
 void TypeConstraintVisitor::endVisit(ASTAlternateArray * element) {
     auto intType = std::make_shared<TipInt>();
     auto alphaType = std::make_shared<TipAlpha>(element->getEnd());
 
-    constraintHandler->handle(astToVar(element->getStart()), intType);
-    constraintHandler->handle(astToVar(element->getEnd()), alphaType);
+    constraintHandler->handle(astToVar(element->getStart()), alphaType);
+    constraintHandler->handle(astToVar(element->getEnd()), intType);
 }
 
 /*! \brief Type constraints for alt array expression.
