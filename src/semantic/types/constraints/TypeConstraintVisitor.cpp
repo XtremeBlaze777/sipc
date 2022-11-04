@@ -381,26 +381,26 @@ void TypeConstraintVisitor::endVisit(ASTMainArray * element) {
  */
 void TypeConstraintVisitor::endVisit(ASTAlternateArray * element) {
     auto intType = std::make_shared<TipInt>();
-
-    constraintHandler->handle(astToVar(element), astToVar(element->getStart()));
+    constraintHandler->handle(astToVar(element), std::make_shared<TipArr>(astToVar(element->getStart())));
     constraintHandler->handle(astToVar(element->getEnd()), intType);
 }
 
 /*! \brief Type constraints for array index expression.
  *
  * Type rules for "E1[E2]":
- * [[E1]] = array of some type
+ * [[E1]] = arr of [[E1]]
  * [[E2]] = int
- * [[E1[E2]] = value in [[E1]] 
+ * [[E1[E2]] = \alpha 
  */
 void TypeConstraintVisitor::endVisit(ASTArrIndex * element) {
     auto intType = std::make_shared<TipInt>();
-    //auto arrValType = dynamic_cast<std::shared_ptr<TipArr>>(astToVar(element->getArr()));
+    auto alphaType = std::make_shared<TipAlpha>(element);
 
     constraintHandler->handle(astToVar(element->getIdx()), intType);
-
-    //constraintHandler->handle(astToVar(element->getArr()), arrType);
-    //constraintHandler->handle(astToVar(element), alphaType);
+    constraintHandler->handle(astToVar(element->getArr()), std::make_shared<TipArr>(
+      std::make_shared<TipAlpha>(element->getArr())
+    ));
+    constraintHandler->handle(astToVar(element), alphaType);
 }
 
 /*! \brief Type constraints of for statements.
@@ -424,7 +424,7 @@ void TypeConstraintVisitor::endVisit(ASTForStmt * element) {
  *
  * Type rules for "for (E1 : E2) S1":
  * [[E1]] = \alpha 
- * [[E2]] = array 
+ * [[E2]] = array of [[E1]] 
  */
 void TypeConstraintVisitor::endVisit(ASTForEachStmt * element) {
     auto varType = std::make_shared<TipVar>();
@@ -438,13 +438,11 @@ void TypeConstraintVisitor::endVisit(ASTForEachStmt * element) {
 /*! \brief Type constraints for inc/dec statements.
  *
  * Type rules for "E OP":
- * [[E]] = var
- * [[E OP]] = int
+ * [[E OP]] = [[E]] = int
  */
 void TypeConstraintVisitor::endVisit(ASTIncDecStmt * element) {
     auto intType = std::make_shared<TipInt>();
-    auto varType = std::make_shared<TipVar>();
 
     constraintHandler->handle(astToVar(element), intType);
-    constraintHandler->handle(astToVar(element->getExpr()), varType);
+    constraintHandler->handle(astToVar(element->getExpr()), intType);
 }

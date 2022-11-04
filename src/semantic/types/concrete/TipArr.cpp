@@ -3,7 +3,8 @@
 
 #include <sstream>
 
-TipArr::TipArr(std::shared_ptr<TipType> type): TipCons(std::move(std::vector<std::shared_ptr<TipType>>(1, type))) { }
+TipArr::TipArr(std::shared_ptr<TipType> type): 
+TipCons(std::move(std::vector<std::shared_ptr<TipType>>(1, type))) { }
 
 std::vector<std::shared_ptr<TipType>> TipArr::getElements() const {
     std::vector<std::shared_ptr<TipType>> elements(arguments.begin(), arguments.end());
@@ -11,7 +12,7 @@ std::vector<std::shared_ptr<TipType>> TipArr::getElements() const {
 }
 
 std::ostream &TipArr::print(std::ostream &out) const {   
-    out << "arr::" << *(arguments.front());
+    out << "arr::" << *arguments.front();
     return out;
 }
 
