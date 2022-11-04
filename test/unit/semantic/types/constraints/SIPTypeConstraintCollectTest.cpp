@@ -153,6 +153,8 @@ TEST_CASE("TypeConstraintVisitor: Ternary", "[TypeConstructorVisitor]") {
     "\u27E6y@6:13\u27E7 = \u27E6y@5:6\u27E7",
     "\u27E6z@6:6\u27E7 = \u27E6x==y@6:8\u27E7"
   };
+
+  diff(program, expected);
   runtest(program, expected);
 }
 
@@ -181,6 +183,8 @@ TEST_CASE("TypeConstraintVisitor: Arrays", "[TypeConstraintVisitor") {
     "\u27E60@6:13\u27E7 = int", // int constant
     "\u27E6main@2:4\u27E7 = () -> \u27E60@7:11\u27E7" // fun declaration
   };
+
+  diff(program, expected);
   runtest(program, expected);
 }
 
