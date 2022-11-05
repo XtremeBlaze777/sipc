@@ -102,10 +102,13 @@ void TypeConstraintVisitor::endVisit(ASTBinaryExpr  * element) {
   auto boolType = std::make_shared<TipBool>();
 
   // operands and result are bool, LHS and RHS are int
-  if (op == "==" || op == "!=" || op == ">" ||
-      op == ">=" || op == "<" || op == "<=") {
+  if (op == ">" || op == ">=" || op == "<" || op == "<=") {
     constraintHandler->handle(astToVar(element->getLeft()), intType);
     constraintHandler->handle(astToVar(element->getRight()), intType);
+    constraintHandler->handle(astToVar(element), boolType);
+  // everything
+  } else if (op == "==" || op == "!=") {
+    constraintHandler->handle(astToVar(element->getLeft()), astToVar(element->getRight()));
     constraintHandler->handle(astToVar(element), boolType);
   // everything is bool
   } else if (op == "and" || op == "or") {
