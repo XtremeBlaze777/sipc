@@ -481,6 +481,20 @@ llvm::Value* ASTBinaryExpr::codegen() {
     return Builder.CreateICmpEQ(L, R, "eqtmp");
   } else if (getOp() == "!=") {
     return Builder.CreateICmpNE(L, R, "netmp");
+  // SIP Extensions begin
+  } else if (getOp() == ">=") {
+      return Builder.CreateICmpSGE(L, R, "gtetmp");
+  } else if (getOp() == "<") {
+      return Builder.CreateICmpSLT(L, R, "lttmp");
+  } else if (getOp() == "<=") {
+      return Builder.CreateICmpSLE(L, R, "ltetmp");
+  } else if (getOp() == "%") { // Unsure if this should be signed or unsigned remainder?
+      return Builder.CreateUrem(L, R, "modtmp");
+  } else if (getOp() == "and") {
+      return Builder.CreateAnd(L, R, "andtmp");
+  } else if (getOp() == "or") {
+      return Builder.CreateOr(L, R, "ortmp");
+  // SIP Extensions end
   } else {
     throw InternalError("Invalid binary operator: " + OP);
   }
