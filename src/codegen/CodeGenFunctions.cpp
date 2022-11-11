@@ -1067,38 +1067,57 @@ llvm::Value* ASTReturnStmt::codegen() {
   return Builder.CreateRet(argVal);
 }
 
-llvm::Value* ASTForStmt::codegen() {
-  return nullptr;
+/* To minimize the number of changes to the current TIP types,
+ * the following boolean convention is set as:
+ *
+ * "true" -> 0
+ * "false" -> 1
+ */ 
+llvm::Value* ASTBoolExpr::codegen() {
+  LOG_S(1) << "Generating code for " << *this;
+
+  if (getValue() == "true") 
+    return ConstantInt::get(Type::getInt64Ty(TheContext), 0);
+  return ConstantInt::get(Type::getInt64Ty(TheContext), 1);
 }
 
-llvm::Value* ASTForEachStmt::codegen() {
-  return nullptr;
-}
-
-llvm::Value* ASTMainArray::codegen() {
-  return nullptr;
-}
-
-llvm::Value* ASTAlternateArray::codegen() {
+llvm::Value* ASTUnaryExpr::codegen() {
+  LOG_S(1) << "Generating code for " << *this;
   return nullptr;
 }
 
 llvm::Value* ASTTernaryExpr::codegen() {
-  return nullptr;
-}
-
-llvm::Value* ASTIncDecStmt::codegen() {
-  return nullptr;
-}
-
-llvm::Value* ASTUnaryExpr::codegen() {
-  return nullptr;
-}
-
-llvm::Value* ASTBoolExpr::codegen() {
+  LOG_S(1) << "Generating code for " << *this;
   return nullptr;
 }
 
 llvm::Value* ASTArrIndex::codegen() {
+  LOG_S(1) << "Generating code for " << *this;
   return nullptr;
 }
+
+llvm::Value* ASTMainArray::codegen() {
+  LOG_S(1) << "Generating code for " << *this;
+  return nullptr;
+}
+
+llvm::Value* ASTAlternateArray::codegen() {
+  LOG_S(1) << "Generating code for " << *this;
+  return nullptr;
+}
+
+llvm::Value* ASTForStmt::codegen() {
+  LOG_S(1) << "Generating code for " << *this;
+  return nullptr;
+}
+
+llvm::Value* ASTForEachStmt::codegen() {
+  LOG_S(1) << "Generating code for " << *this;
+  return nullptr;
+}
+
+llvm::Value* ASTIncDecStmt::codegen() {
+  LOG_S(1) << "Generating code for " << *this;
+  return nullptr;
+}
+

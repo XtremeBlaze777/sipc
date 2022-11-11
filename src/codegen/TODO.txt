@@ -1,0 +1,19 @@
+Code Generation TODO List
+
+Update Previous TIP Types
+----------------------------------
+[x] Update ASTBinaryExpr
+[] Update If/While statements
+
+
+Including New TIP Types
+----------------------------------
+[] ASTBoolExpr
+[] ASTUnaryExpr
+[] ASTTernaryExpr
+[] ASTMainArray
+[] ASTAlternateArray
+[] ASTArrIndex
+[] ASTForStmt
+[] ASTForEachStmt
+[] ASTIncDecStmt
