@@ -8,6 +8,43 @@
 #include <sstream>
 #include <set>
 
+static void diff(std::stringstream &program, std::vector<std::string> constraints) {
+    auto ast = ASTHelper::build_ast(program);
+    auto symbols = SymbolTable::build(ast.get());
+
+    TypeConstraintCollectVisitor visitor(symbols.get());
+    ast->accept(&visitor);
+
+    auto collected = visitor.getCollectedConstraints();
+
+    // Copy the vectors to sets to allow for a single equality test
+    std::set<std::string> expectedSet;
+    copy(constraints.begin(), constraints.end(), 
+            inserter(expectedSet, expectedSet.end()));    
+
+    std::set<std::string> collectedSet;
+    for(int i = 0; i < collected.size(); i++) {
+        std::stringstream stream;
+        stream << collected.at(i);
+        collectedSet.insert(stream.str());
+    }
+
+    std::set<std::string> result;
+    std::set_difference(collectedSet.begin(), collectedSet.end(), expectedSet.begin(), expectedSet.end(),
+            std::inserter(result, result.end()));
+    std::cout << "Program has that expected doesn't:" << std::endl;
+    for ( auto &s : result ) {
+        std::cout << s << std::endl;
+    }
+    std::set<std::string> result2;
+    std::set_difference(expectedSet.begin(), expectedSet.end(), collectedSet.begin(), collectedSet.end(), 
+            std::inserter(result2, result2.end()));
+    std::cout << "\nExpected has that prog doesn't:" << std::endl;
+    for ( auto &s : result2 ) {
+        std::cout << s << std::endl;
+    }
+}
+
 static void runtest(std::stringstream &program, std::vector<std::string> constraints) {
     auto ast = ASTHelper::build_ast(program);
     auto symbols = SymbolTable::build(ast.get());
@@ -44,18 +81,16 @@ TEST_CASE("TypeConstraintVisitor: Boolean", "[TypeConstraintVisitor]") {
   )";
 
   std::vector<std::string> expected {
-    "\u27E6(t==f)@6:15\u27E7 = bool",
-    "\u27E60@7:13\u27E7 = int",
-    "\u27E6check@3:14\u27E7 = \u27E6(t==f)@6:15\u27E7",
-    "\u27E6f@3:12\u27E7 = int",
-    "\u27E6f@3:12\u27E7 = \u27E6false@5:10\u27E7",
-    "\u27E6false@5:10\u27E7 = bool",
-    "\u27E6main@2:4\u27E7 = () -> \u27E60@7:13\u27E7",
-    "\u27E6t@3:10\u27E7 = int",
-    "\u27E6t@3:10\u27E7 = \u27E6true@4:10\u27E7",
-    "\u27E6true@4:10\u27E7 = bool"
+      "\u27E6(t==f)@6:15\u27E7 = bool",
+      "\u27E60@7:13\u27E7 = int",
+      "\u27E6check@3:14\u27E7 = \u27E6(t==f)@6:15\u27E7",
+      "\u27E6f@3:12\u27E7 = \u27E6false@5:10\u27E7",
+      "\u27E6false@5:10\u27E7 = bool",
+      "\u27E6main@2:4\u27E7 = () -> \u27E60@7:13\u27E7",
+      "\u27E6t@3:10\u27E7 = \u27E6f@3:12\u27E7",
+      "\u27E6t@3:10\u27E7 = \u27E6true@4:10\u27E7",
+      "\u27E6true@4:10\u27E7 = bool"
   };
-  //diff(program, expected);
   runtest(program, expected);
 }
 
@@ -84,9 +119,8 @@ TEST_CASE("TypeConstraintVisitor: Ternary", "[TypeConstructorVisitor]") {
       "\u27E6false@5:10\u27E7 = bool",
       "\u27E6main@2:4\u27E7 = () -> \u27E60@7:13\u27E7",
       "\u27E6true@4:10\u27E7 = bool",
-      "\u27E6x@3:10\u27E7 = int",
       "\u27E6x@3:10\u27E7 = \u27E6true ? 0 : 1@4:10\u27E7",
-      "\u27E6y@3:12\u27E7 = int",
+      "\u27E6x@3:10\u27E7 = \u27E6y@3:12\u27E7",
       "\u27E6y@3:12\u27E7 = \u27E6false ? 0 : 1@5:10\u27E7",
       "\u27E6z@3:14\u27E7 = \u27E6(x==y)@6:10\u27E7"
   };
