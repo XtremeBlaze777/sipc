@@ -1,4 +1,3 @@
-
 #include <ASTDeclNode.h>
 
 #include "AST.h"
@@ -489,7 +488,7 @@ llvm::Value* ASTBinaryExpr::codegen() {
   } else if (getOp() == "<=") {
       return Builder.CreateICmpSLE(L, R, "ltetmp");
   } else if (getOp() == "%") { // Unsure if this should be signed or unsigned remainder?
-      return Builder.CreateUrem(L, R, "modtmp");
+      return Builder.CreateSRem(L, R, "modtmp");
   } else if (getOp() == "and") {
       return Builder.CreateAnd(L, R, "andtmp");
   } else if (getOp() == "or") {
@@ -1078,16 +1077,46 @@ llvm::Value* ASTBoolExpr::codegen() {
 
   if (getValue() == "true") 
     return ConstantInt::get(Type::getInt64Ty(TheContext), 0);
-  return ConstantInt::get(Type::getInt64Ty(TheContext), 1);
+  else if (getValue() == "false")
+    return ConstantInt::get(Type::getInt64Ty(TheContext), 1);
+  throw InternalError("failed to generate bitcode for boolean type");
 }
 
 llvm::Value* ASTUnaryExpr::codegen() {
   LOG_S(1) << "Generating code for " << *this;
-  return nullptr;
+
+  Value *R = getRight()->codegen();
+  if (R == nullptr) {
+    throw InternalError("null unary operand");
+  }
+
+  // Arithmetic Negation Operator
+  if (getOp() == "-") {
+    return Builder.CreateAdd(R, "arithnegtmp");
+  // Logical Negation Operator
+  } else if (getOp() == "not") {
+    return Builder.CreateNeg(R, "lognegtmp");
+  // Array Length Operator
+  } else if (getOp() == "#") {
+    return Builder.CreateMul(R, "arrlentmp");
+  } else {
+    throw InternalError("Invalid unary operator: " + OP);
+  }
 }
 
 llvm::Value* ASTTernaryExpr::codegen() {
   LOG_S(1) << "Generating code for " << *this;
+
+  Value *CondV = getCond()->codegen();
+  if (CondV == nullptr) {
+    throw InternalError("failed to generate bitcode for the condition of the if statement");
+  }
+
+  // Convert condition to a bool by comparing non-equal to 0.
+  CondV = Builder.CreateICmpNE(CondV, ConstantInt::get(CondV->getType(), 0), "ifcond");
+
+  llvm::Function *TheFunction = Builder.GetInsertBlock()->getParent();
+
   return nullptr;
 }
 
@@ -1106,14 +1135,152 @@ llvm::Value* ASTAlternateArray::codegen() {
   return nullptr;
 }
 
+/*
+ * The code generated for a forStmt looks like this:
+ *
+ *       <COND> == 0
+ *   true   /     \   false
+ *         v       v
+ *      <THEN>   <ELSE>  if defined, otherwise use a nop
+ *          \     /
+ *           v   v
+ *            nop        this is called the merge basic block
+ *
+ * Much of the code involves setting up the different blocks, establishing
+ * the insertion point, and then letting other codegen functions write
+ * code at that insertion point.
+ */
 llvm::Value* ASTForStmt::codegen() {
   LOG_S(1) << "Generating code for " << *this;
-  return nullptr;
+  
+  llvm::Function *TheFunction = Builder.GetInsertBlock()->getParent();
+
+  /*
+   * Create blocks for the loop header, body, and exit; HeaderBB is first
+   * so it is added to the function in the constructor.
+   *
+   * Blocks don't need to be contiguous or ordered in
+   * any particular way because we will explicitly branch between them.
+   * This can be optimized by later passes.
+   */
+  labelNum++; // create unique labels for these BBs
+
+  BasicBlock *HeaderBB = BasicBlock::Create(
+      TheContext, "header" + std::to_string(labelNum), TheFunction);
+  BasicBlock *BodyBB =
+      BasicBlock::Create(TheContext, "body" + std::to_string(labelNum));
+  BasicBlock *ExitBB =
+      BasicBlock::Create(TheContext, "exit" + std::to_string(labelNum));
+
+  // Add an explicit branch from the current BB to the header
+  Builder.CreateBr(HeaderBB);
+
+  // Emit loop header
+  {
+    Builder.SetInsertPoint(HeaderBB);
+
+    Value *CondV = getCondition()->codegen();
+    if (CondV == nullptr) {
+      throw InternalError("failed to generate bitcode for the conditional"); // LCOV_EXCL_LINE
+    }
+
+    // Convert condition to a bool by comparing non-equal to 0.
+    CondV = Builder.CreateICmpNE(CondV, ConstantInt::get(CondV->getType(), 0), "loopcond");
+
+    Builder.CreateCondBr(CondV, BodyBB, ExitBB);
+  }
+
+  // Emit loop body
+  {
+    TheFunction->getBasicBlockList().push_back(BodyBB);
+    Builder.SetInsertPoint(BodyBB);
+
+    Value *BodyV = getBody()->codegen();
+    if (BodyV == nullptr) {
+      throw InternalError("failed to generate bitcode for the loop body"); // LCOV_EXCL_LINE
+    }
+
+    Builder.CreateBr(HeaderBB);
+  }
+
+  // Emit loop exit block.
+  TheFunction->getBasicBlockList().push_back(ExitBB);
+  Builder.SetInsertPoint(ExitBB);
+  return Builder.CreateCall(nop);
 }
 
+/*
+ * The code generated for an IfStmt looks like this:
+ *
+ *       <COND> == 0
+ *   true   /     \   false
+ *         v       v
+ *      <THEN>   <ELSE>  if defined, otherwise use a nop
+ *          \     /
+ *           v   v
+ *            nop        this is called the merge basic block
+ *
+ * Much of the code involves setting up the different blocks, establishing
+ * the insertion point, and then letting other codegen functions write
+ * code at that insertion point.
+ */
 llvm::Value* ASTForEachStmt::codegen() {
   LOG_S(1) << "Generating code for " << *this;
-  return nullptr;
+  
+  llvm::Function *TheFunction = Builder.GetInsertBlock()->getParent();
+
+  /*
+   * Create blocks for the loop header, body, and exit; HeaderBB is first
+   * so it is added to the function in the constructor.
+   *
+   * Blocks don't need to be contiguous or ordered in
+   * any particular way because we will explicitly branch between them.
+   * This can be optimized by later passes.
+   */
+  labelNum++; // create unique labels for these BBs
+
+  BasicBlock *HeaderBB = BasicBlock::Create(
+      TheContext, "header" + std::to_string(labelNum), TheFunction);
+  BasicBlock *BodyBB =
+      BasicBlock::Create(TheContext, "body" + std::to_string(labelNum));
+  BasicBlock *ExitBB =
+      BasicBlock::Create(TheContext, "exit" + std::to_string(labelNum));
+
+  // Add an explicit branch from the current BB to the header
+  Builder.CreateBr(HeaderBB);
+
+  // Emit loop header
+  {
+    Builder.SetInsertPoint(HeaderBB);
+
+    Value *CondV = getCondition()->codegen();
+    if (CondV == nullptr) {
+      throw InternalError("failed to generate bitcode for the conditional"); // LCOV_EXCL_LINE
+    }
+
+    // Convert condition to a bool by comparing non-equal to 0.
+    CondV = Builder.CreateICmpNE(CondV, ConstantInt::get(CondV->getType(), 0), "loopcond");
+
+    Builder.CreateCondBr(CondV, BodyBB, ExitBB);
+  }
+
+  // Emit loop body
+  {
+    TheFunction->getBasicBlockList().push_back(BodyBB);
+    Builder.SetInsertPoint(BodyBB);
+
+    Value *BodyV = getBody()->codegen();
+    if (BodyV == nullptr) {
+      throw InternalError("failed to generate bitcode for the loop body"); // LCOV_EXCL_LINE
+    }
+
+    Builder.CreateBr(HeaderBB);
+  }
+
+  // Emit loop exit block.
+  TheFunction->getBasicBlockList().push_back(ExitBB);
+  Builder.SetInsertPoint(ExitBB);
+  return Builder.CreateCall(nop);
 }
 
 llvm::Value* ASTIncDecStmt::codegen() {
