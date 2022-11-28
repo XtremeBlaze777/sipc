@@ -490,9 +490,9 @@ llvm::Value* ASTBinaryExpr::codegen() {
   } else if (getOp() == "%") { // Unsure if this should be signed or unsigned remainder?
       return Builder.CreateSRem(L, R, "modtmp");
   } else if (getOp() == "and") {
-      return Builder.CreateAnd(L, R, "andtmp");
+      return Builder.CreateLogicalAnd(L, R, "andtmp");
   } else if (getOp() == "or") {
-      return Builder.CreateOr(L, R, "ortmp");
+      return Builder.CreateLogicalOr(L, R, "ortmp");
   // SIP Extensions end
   } else {
     throw InternalError("Invalid binary operator: " + OP);
@@ -1092,10 +1092,10 @@ llvm::Value* ASTUnaryExpr::codegen() {
 
   // Arithmetic Negation Operator
   if (getOp() == "-") {
-    return Builder.CreateAdd(R, "arithnegtmp");
+    return Builder.CreateNeg(R, "arinegtmp");
   // Logical Negation Operator
   } else if (getOp() == "not") {
-    return Builder.CreateNeg(R, "lognegtmp");
+    return Builder.CreateNot(R, "lognegtmp");
   // Array Length Operator
   } else if (getOp() == "#") {
     return Builder.CreateMul(R, "arrlentmp");
@@ -1109,12 +1109,12 @@ llvm::Value* ASTTernaryExpr::codegen() {
 
   Value *CondV = getCond()->codegen();
   if (CondV == nullptr) {
-    throw InternalError("failed to generate bitcode for the condition of the if statement");
+    throw InternalError("failed to generate bitcode for the condition of the ternary expr");
   }
 
   // Convert condition to a bool by comparing non-equal to 0.
-  CondV = Builder.CreateICmpNE(CondV, ConstantInt::get(CondV->getType(), 0), "ifcond");
-
+  CondV = Builder.CreateICmpNE(CondV, ConstantInt::get(CondV->getType(), 0), "terncond");
+  
   llvm::Function *TheFunction = Builder.GetInsertBlock()->getParent();
 
   return nullptr;
@@ -1126,6 +1126,54 @@ llvm::Value* ASTArrIndex::codegen() {
 }
 
 llvm::Value* ASTMainArray::codegen() {
+  LOG_S(1) << "Generating code for " << *this;
+
+  if(allocFlag) {
+    //Allocate the a pointer to an uber record
+    auto *allocaRecord = Builder.CreateAlloca(ptrToUberRecordType);
+
+    // Use Builder to create the calloc call using pre-defined callocFun
+    auto sizeOfUberRecord = CurrentModule->getDataLayout().getStructLayout(uberRecordType)->getSizeInBytes();
+    std::vector<Value *> callocArgs;
+    callocArgs.push_back(oneV); 
+    callocArgs.push_back(ConstantInt::get(Type::getInt64Ty(TheContext), sizeOfUberRecord));
+    auto *calloc = Builder.CreateCall(callocFun, callocArgs, "callocedPtr");
+
+    //Bitcast the calloc call to theStruct Type
+    auto recordPtr = Builder.CreatePointerCast(calloc, ptrToUberRecordType, "recordCalloc");
+
+    //Store the ptr to the record in the record alloc
+    Builder.CreateStore(recordPtr, allocaRecord);
+
+    //Load allocaRecord
+    auto loadInst = Builder.CreateLoad(ptrToUberRecordType,allocaRecord);
+
+    //For each field, generate GEP for location of field in the uberRecord
+    //Generate the code for the field and store it in the GEP
+    for(auto const &field : getFields()){
+        auto *gep = Builder.CreateStructGEP(uberRecordType, loadInst, fieldIndex[field->getField()], field->getField());
+        auto value = field->codegen();
+        Builder.CreateStore(value, gep);
+    }
+
+  //Return int64 pointer to the pointer to the record
+  return Builder.CreatePtrToInt(recordPtr, Type::getInt64Ty(TheContext), "recordPtr");
+  }
+  else{
+    //Allocate a the space for a uber record
+    auto *allocaRecord = Builder.CreateAlloca(uberRecordType);
+
+    //Codegen the fields present in this record and store them in the appropriate location
+    //We do not give a value to fields that are not explictly set. Thus, accessing them is
+    //undefined behavior
+    for(auto const &field : getFields()){
+      auto *gep = Builder.CreateStructGEP(allocaRecord->getAllocatedType(), allocaRecord, fieldIndex[field->getField()], field->getField());
+      auto value = field->codegen();
+      Builder.CreateStore(value, gep);
+    }
+    //Return int64 pointer to the record since all variables are pointers to ints
+    return Builder.CreatePtrToInt(allocaRecord, Type::getInt64Ty(TheContext), "record");
+  }
   LOG_S(1) << "Generating code for " << *this;
   return nullptr;
 }
@@ -1175,18 +1223,32 @@ llvm::Value* ASTForStmt::codegen() {
   // Add an explicit branch from the current BB to the header
   Builder.CreateBr(HeaderBB);
 
+  Value *CurrV = getStart()->codegen();
+  if (CurrV == nullptr) {
+    throw InternalError("failed to generate bitcode for the curr iter position");
+  }
+  Value *StartV = getEnd()->codegen();
+  if (StartV == nullptr) {
+    throw InternalError("failed to generate bitcode for start position");
+  }
+
+  Builder.CreateStore(StartV, CurrV);
+
+  Value *EndV = getBegin()->codegen();
+  if (EndV == nullptr) {
+    throw InternalError("failed to generate bitcode for end position");
+  }
+  Value *StepV = getStep()->codegen();
+  if (StepV == nullptr) {
+    StepV = ConstantInt::get(Type::getInt64Ty(TheContext), 1);
+  }
   // Emit loop header
   {
     Builder.SetInsertPoint(HeaderBB);
 
-    Value *CondV = getCondition()->codegen();
-    if (CondV == nullptr) {
-      throw InternalError("failed to generate bitcode for the conditional"); // LCOV_EXCL_LINE
-    }
-
-    // Convert condition to a bool by comparing non-equal to 0.
-    CondV = Builder.CreateICmpNE(CondV, ConstantInt::get(CondV->getType(), 0), "loopcond");
-
+    // Check if the curr value is in between the start/end values 
+    Value *CondV = Builder.CreateICmpSLT(CurrV, ConstantInt::get(EndV->getType()), "loopcond");
+    Builder.CreateAdd(CurrV, StepV, "steptmp");
     Builder.CreateCondBr(CondV, BodyBB, ExitBB);
   }
 
@@ -1195,11 +1257,10 @@ llvm::Value* ASTForStmt::codegen() {
     TheFunction->getBasicBlockList().push_back(BodyBB);
     Builder.SetInsertPoint(BodyBB);
 
-    Value *BodyV = getBody()->codegen();
+    Value *BodyV = getDo()->codegen();
     if (BodyV == nullptr) {
       throw InternalError("failed to generate bitcode for the loop body"); // LCOV_EXCL_LINE
     }
-
     Builder.CreateBr(HeaderBB);
   }
 
@@ -1285,6 +1346,14 @@ llvm::Value* ASTForEachStmt::codegen() {
 
 llvm::Value* ASTIncDecStmt::codegen() {
   LOG_S(1) << "Generating code for " << *this;
-  return nullptr;
+
+  Value *EXPR = getExpr()->codegen();
+  if (getOp() == "++") {
+    return ConstantInt::get(Type::getInt64Ty(TheContext), getValue()->codegen()+1);
+  } else if (getOp == "--") {
+    return ConstantInt::get(Type::getInt64Ty(TheContext), getValue()->codegen()-1);
+  } else {
+      throw InternalError("failed to generate bitcode for incdec stmt"); // LCOV_EXCL_LINE
+  }
 }
 
