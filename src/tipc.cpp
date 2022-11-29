@@ -88,7 +88,8 @@ int main(int argc, char *argv[]) {
     std::shared_ptr<ASTProgram> ast = std::move(FrontEnd::parse(stream));
 
     try {
-      if (!distyp) {
+        if (!distyp)
+        {
         auto analysisResults = SemanticAnalysis::analyze(ast.get());
 
         if (ppretty) {
@@ -136,7 +137,7 @@ int main(int argc, char *argv[]) {
 
         FrontEnd::astVisualize(ast, astStream);
       }
-    }
+      }
     } catch (SemanticError& e) {
       LOG_S(ERROR) << "tipc: " << e.what();
       LOG_S(ERROR) << "tipc: semantic error";

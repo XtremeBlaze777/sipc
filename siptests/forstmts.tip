@@ -1,0 +1,25 @@
+main() {
+  var x, y, z;
+  x = 0;
+  for (x: 0 .. 10) {
+    y = x;
+  }
+  if (y != 9) error 1;
+
+  for (x: 0 .. 10 by 2) {
+    y = x;
+  }
+  if (y != 8) error 2;
+
+  z = [0, 1, 2, 3, 999];
+  for (x in z) {
+    y = x;
+  }
+  if (y != 999) error 3;
+
+  z = [10 of 5];
+  for (x in z) {
+    y = x;
+  }
+  if (y != 5) error 4;
+}

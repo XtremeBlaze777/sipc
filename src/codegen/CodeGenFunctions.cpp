@@ -1076,9 +1076,9 @@ llvm::Value* ASTBoolExpr::codegen() {
   LOG_S(1) << "Generating code for " << *this;
 
   if (getValue() == "true") 
-    return ConstantInt::get(Type::getInt1Ty(TheContext), 0);
+    return ConstantInt::get(Type::getInt64Ty(TheContext), 0);
   else if (getValue() == "false")
-    return ConstantInt::get(Type::getInt1Ty(TheContext), 1);
+    return ConstantInt::get(Type::getInt64Ty(TheContext), 1);
   throw InternalError("failed to generate bitcode for boolean type");
 }
 
@@ -1098,14 +1098,85 @@ llvm::Value* ASTUnaryExpr::codegen() {
     return Builder.CreateNot(R, "lognegtmp");
   // Array Length Operator
   } else if (getOp() == "#") {
+      return nullptr;
   } else {
     throw InternalError("Invalid unary operator: " + OP);
   }
   return nullptr;
 }
 
+/*
+ * The ternary expression codegen is based off the IfStmt codegen.
+ *
+ *
+ *       <COND> == 0
+ *   true   /     \   false
+ *         v       v
+ *       <IF>   <ELSE>  if defined, otherwise use a nop
+ *          \     /
+ *           v   v
+ *            nop        this is called the merge basic block
+ */
 llvm::Value* ASTTernaryExpr::codegen() {
-    return nullptr;
+  Value *CondV = getCond()->codegen();
+  if (CondV == nullptr) {
+    throw InternalError("failed to generate bitcode for the condition of the ternary operator");
+  }
+
+  // Convert condition to a bool by comparing non-equal to 0.
+  CondV = Builder.CreateICmpNE(CondV, ConstantInt::get(CondV->getType(), 0), "terncond");
+
+  llvm::Function *TheFunction = Builder.GetInsertBlock()->getParent();
+
+  /*
+   * Create blocks for the then and else cases.  The then block is first so
+   * it is inserted in the function in the constructor. The rest of the blocks
+   * need to be inserted explicitly into the functions basic block list
+   * (via a push_back() call).
+   *
+   * Blocks don't need to be contiguous or ordered in
+   * any particular way because we will explicitly branch between them.
+   * This can be optimized to fall through behavior by later passes.
+   */
+  labelNum++; // create unique labels for these BBs
+  BasicBlock *IfBB = BasicBlock::Create(
+      TheContext, "then" + std::to_string(labelNum), TheFunction);
+  BasicBlock *ElseBB =
+      BasicBlock::Create(TheContext, "else" + std::to_string(labelNum));
+  BasicBlock *MergeBB =
+      BasicBlock::Create(TheContext, "ifmerge" + std::to_string(labelNum));
+
+  Builder.CreateCondBr(CondV, IfBB, ElseBB);
+
+  // Emit if block.
+  {
+    Builder.SetInsertPoint(IfBB);
+
+    Value *IfV = getIf()->codegen();
+    if (IfV == nullptr) {
+      throw InternalError("failed to generate bitcode for the ternary if block"); // LCOV_EXCL_LINE
+    }
+
+    Builder.CreateBr(MergeBB);
+  }
+
+  // Emit else block.
+  {
+    TheFunction->getBasicBlockList().push_back(ElseBB);
+    Builder.SetInsertPoint(ElseBB);
+
+    Value *ElseV = getElse()->codegen();
+    if (ElseV == nullptr) {
+      throw InternalError("failed to generate bitcode for the ternary else block"); // LCOV_EXCL_LINE
+    }
+
+    Builder.CreateBr(MergeBB);
+  }
+
+  // Emit merge block.
+  TheFunction->getBasicBlockList().push_back(MergeBB);
+  Builder.SetInsertPoint(MergeBB);
+  return Builder.CreateCall(nop);
 }
 
 llvm::Value* ASTArrIndex::codegen() {
@@ -1124,19 +1195,16 @@ llvm::Value* ASTAlternateArray::codegen() {
 }
 
 /*
- * The code generated for a forStmt looks like this:
+ * The ForStmt is similar to the while statement, the only difference
+ * being how it's structured below:
  *
- *       <COND> == 0
- *   true   /     \   false
- *         v       v
- *      <THEN>   <ELSE>  if defined, otherwise use a nop
- *          \     /
- *           v   v
- *            nop        this is called the merge basic block
+ * for (E1 : E2 .. E3 by E4) S
  *
- * Much of the code involves setting up the different blocks, establishing
- * the insertion point, and then letting other codegen functions write
- * code at that insertion point.
+ * E1 = E2;
+ * while (E1 < E3) {
+ *   S
+ *   E1 += E4
+ * }
  */
 llvm::Value* ASTForStmt::codegen() {
   LOG_S(1) << "Generating code for " << *this;
@@ -1211,25 +1279,20 @@ llvm::Value* ASTForStmt::codegen() {
 }
 
 /*
- * The code generated for an IfStmt looks like this:
- *
- *       <COND> == 0
- *   true   /     \   false
- *         v       v
- *      <THEN>   <ELSE>  if defined, otherwise use a nop
- *          \     /
- *           v   v
- *            nop        this is called the merge basic block
- *
- * Much of the code involves setting up the different blocks, establishing
- * the insertion point, and then letting other codegen functions write
- * code at that insertion point.
  */
 llvm::Value* ASTForEachStmt::codegen() {
   LOG_S(1) << "Generating code for " << *this;
   return nullptr;  
 }
 
+/*
+ * The IncDec statement will check for which operator we are using (++ or --).
+ * Once it determines the operator, it will use CreateAdd to add +1 or -1 to the
+ * expression found in the codegen.
+ *
+ * (++) -> EXPR + 1
+ * (--) -> EXPR + (-1)
+ */
 llvm::Value* ASTIncDecStmt::codegen() {
   LOG_S(1) << "Generating code for " << *this;
 

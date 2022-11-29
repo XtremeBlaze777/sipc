@@ -1,0 +1,41 @@
+main() {
+  var x, y, z;
+  x = true;
+  if (x != true) error 1;
+  y = false;
+  if (y != false) error 2;
+  z = not x;
+  if (z != false) error 3;
+  z = not y;
+  if (z != true) error 4;
+  z = x and y;
+  if (z != false) error 5;
+  z = x or y;
+  if (z != true) error 6;
+  z = not (x and y);
+  if (z != true) error 7;
+  z = not (x or y);
+  if (z != false) error 8;
+  z = x and y or x;
+  if (z != true) error 9;
+
+  var a, b, c;
+  a = 5;
+  b = 4;
+  c = a > b;
+  if (c != true) error 10;
+  c = a < b;
+  if (c != false) error 11;
+  c = a >= b;
+  if (c != true) error 12;
+  c = a <= b;
+  if (c != false) error 13;
+  a = 4;
+  c = a <= b;
+  if (c != true) error 14;
+  c = a != b;
+  if (c != false) error 15;
+  c = a == b;
+  if (c != true) error 16;
+  return 0;
+}
