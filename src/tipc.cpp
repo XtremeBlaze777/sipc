@@ -18,6 +18,7 @@ static cl::opt<bool> ppretty("pp", cl::desc("pretty print"), cl::cat(TIPcat));
 static cl::opt<bool> psym("ps", cl::desc("print symbols"), cl::cat(TIPcat));
 static cl::opt<bool> ptypes("pt", cl::desc("print symbols with types (supercedes --ps)"), cl::cat(TIPcat));
 static cl::opt<bool> disopt("do", cl::desc("disable bitcode optimization"), cl::cat(TIPcat));
+static cl::opt<bool> distyp("dt", cl::desc("disable type inference"), cl::cat(TIPcat));
 static cl::opt<int> debug("verbose", cl::desc("enable log messages (Levels 1-3) \n Level 1 - Basic logging for every phase.\n Level 2 - Level 1 and type constraints being unified.\n Level 3 - Level 2 and union-find solving steps."), cl::cat(TIPcat));
 static cl::opt<bool> emitHrAsm("asm",
                            cl::desc("emit human-readable LLVM assembly language"),
@@ -87,42 +88,42 @@ int main(int argc, char *argv[]) {
     std::shared_ptr<ASTProgram> ast = std::move(FrontEnd::parse(stream));
 
     try {
-      auto analysisResults = SemanticAnalysis::analyze(ast.get());
+      if (!distyp) {
+        auto analysisResults = SemanticAnalysis::analyze(ast.get());
 
-
-      if (ppretty) {
-        FrontEnd::prettyprint(ast.get(), std::cout);
-      }
-
-      if (ptypes) {
-        analysisResults->getTypeResults()->print(std::cout);
-      } else if (psym) {
-        analysisResults->getSymbolTable()->print(std::cout);
-      }
-
-      bool printCG = !cgFile.getValue().empty();
-      if(printCG) {
-        std::ofstream cgStream;
-        cgStream.open(cgFile);
-        if(!cgStream.good()) {
-          LOG_S(ERROR) << "tipc: error: failed to open '" << cgFile << "' for writing";
-          exit(1);
+        if (ppretty) {
+          FrontEnd::prettyprint(ast.get(), std::cout);
         }
 
+        if (ptypes) {
+          analysisResults->getTypeResults()->print(std::cout);
+        } else if (psym) {
+          analysisResults->getSymbolTable()->print(std::cout);
+        }
+
+        bool printCG = !cgFile.getValue().empty();
+        if(printCG) {
+          std::ofstream cgStream;
+          cgStream.open(cgFile);
+          if(!cgStream.good()) {
+            LOG_S(ERROR) << "tipc: error: failed to open '" << cgFile << "' for writing";
+            exit(1);
+          }
+
         analysisResults->getCallGraph()->print(cgStream);
-      }
+        }
 
-      auto llvmModule = CodeGenerator::generate(ast.get(), analysisResults.get(), sourceFile);
+        auto llvmModule = CodeGenerator::generate(ast.get(), analysisResults.get(), sourceFile);
+      
+        if (!disopt) {
+          Optimizer::optimize(llvmModule.get());
+        }
 
-      if (!disopt) {
-        Optimizer::optimize(llvmModule.get());
-      }
-
-      if(emitHrAsm) {
-        CodeGenerator::emitHumanReadableAssembly(llvmModule.get(), outputfile);
-      } else {
-        CodeGenerator::emit(llvmModule.get(), outputfile);
-      }
+        if(emitHrAsm) {
+          CodeGenerator::emitHumanReadableAssembly(llvmModule.get(), outputfile);
+        } else {
+          CodeGenerator::emit(llvmModule.get(), outputfile);
+        }
 
       bool printAST = !astFile.getValue().empty();
       if(printAST) {
@@ -135,7 +136,7 @@ int main(int argc, char *argv[]) {
 
         FrontEnd::astVisualize(ast, astStream);
       }
-
+    }
     } catch (SemanticError& e) {
       LOG_S(ERROR) << "tipc: " << e.what();
       LOG_S(ERROR) << "tipc: semantic error";

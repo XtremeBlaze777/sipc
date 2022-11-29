@@ -490,9 +490,9 @@ llvm::Value* ASTBinaryExpr::codegen() {
   } else if (getOp() == "%") { // Unsure if this should be signed or unsigned remainder?
       return Builder.CreateSRem(L, R, "modtmp");
   } else if (getOp() == "and") {
-      return Builder.CreateLogicalAnd(L, R, "andtmp");
+      return Builder.CreateAnd(L, R, "andtmp");
   } else if (getOp() == "or") {
-      return Builder.CreateLogicalOr(L, R, "ortmp");
+      return Builder.CreateOr(L, R, "ortmp");
   // SIP Extensions end
   } else {
     throw InternalError("Invalid binary operator: " + OP);

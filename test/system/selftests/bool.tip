@@ -1,0 +1,14 @@
+main() {
+    var x, y, z;
+    x = true;
+    y = false;
+    x = true or false;
+    x = not true and false or false and false;
+    x = x != x;
+    if (x == true) {
+        z = 5;
+    } else {
+        z = 4;
+    }
+    return z;
+}
