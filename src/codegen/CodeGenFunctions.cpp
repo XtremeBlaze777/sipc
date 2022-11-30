@@ -1076,9 +1076,9 @@ llvm::Value* ASTBoolExpr::codegen() {
   LOG_S(1) << "Generating code for " << *this;
 
   if (getValue() == "true") 
-    return ConstantInt::get(Type::getInt64Ty(TheContext), 1);
-  else if (getValue() == "false")
     return ConstantInt::get(Type::getInt64Ty(TheContext), 0);
+  else if (getValue() == "false")
+    return ConstantInt::get(Type::getInt64Ty(TheContext), 1);
   throw InternalError("failed to generate bitcode for boolean type");
 }
 
