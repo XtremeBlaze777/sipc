@@ -1,4 +1,5 @@
 main() {
     if ( (true ? 1 : 0)!=1) error (true ? 1 : 0);
     if ( (false ? 1 : 0)!=0) error (false ? 1 : 0);
+    return 0;
 }
