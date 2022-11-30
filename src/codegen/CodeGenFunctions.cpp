@@ -1098,7 +1098,10 @@ llvm::Value* ASTUnaryExpr::codegen() {
     return Builder.CreateNot(R, "lognegtmp");
   // Array Length Operator
   } else if (getOp() == "#") {
-      return nullptr;
+      Value* arr = getRight()->codegen();
+      Value* gep = Builder.CreateGEP(Type::getInt64Ty(TheContext), arr, zeroV);
+      if (lValueGen) return gep;
+      else return Builder.CreateLoad(arr->getType()->getPointerElementType(), gep);
   } else {
     throw InternalError("Invalid unary operator: " + OP);
   }
@@ -1184,40 +1187,145 @@ llvm::Value* ASTTernaryExpr::codegen() {
   return Builder.CreateLoad(retVal->getAllocatedType(), retVal);
 }  // LCOV_EXCL_LINE
 
+// TODO: Implement Bounds Checking for array accesses
 llvm::Value* ASTArrIndex::codegen() {
   LOG_S(1) << "Generating code for " << *this;
-  return nullptr;
+  Value* arr = getArr()->codegen();
+  Value* idx = getIdx()->codegen();
+  Value* gep = Builder.CreateGEP(Type::getInt64Ty(TheContext), arr, idx);
+  if (lValueGen) return gep;
+  else return Builder.CreateLoad(arr->getType()->getPointerElementType(), gep);
 }
 
 llvm::Value* ASTMainArray::codegen() {
   LOG_S(1) << "Generating code for " << *this;
 
-  // allocFlag = true;
-  // Value *argVal = getInitializer()->codegen();
-  // allocFlag = false;
-  // if (argVal == nullptr) {
-  //   throw InternalError("failed to generate bitcode for the initializer of the alloc expression");
-  // }
-  
-  // //Allocate an int pointer with calloc
-  // std::vector<Value *> twoArg;
-  // twoArg.push_back(ConstantInt::get(Type::getInt64Ty(TheContext), 1));
-  // twoArg.push_back(ConstantInt::get(Type::getInt64Ty(TheContext), 8));
-  // auto *allocInst = Builder.CreateCall(callocFun, twoArg, "allocPtr");
-  // auto *castPtr = Builder.CreatePointerCast(
-  //     allocInst, Type::getInt64PtrTy(TheContext), "castPtr");
-  // // Initialize with argument
-  // auto *initializingStore = Builder.CreateStore(argVal, castPtr);
+  auto vec = getElements();
+  int loopSize = vec.size();
 
-  // return Builder.CreatePtrToInt(castPtr, Type::getInt64Ty(TheContext),
-  //                               "allocIntVal");
-  return nullptr;
+  Value* arrLen = ConstantInt::get(Type::getInt64Ty(TheContext), loopSize);
+
+  //Allocate an int pointer with calloc
+  std::vector<Value *> twoArg;
+  twoArg.push_back(ConstantInt::get(Type::getInt64Ty(TheContext), loopSize+1));
+  twoArg.push_back(ConstantInt::get(Type::getInt64Ty(TheContext), 8));
+  auto *allocInst = Builder.CreateCall(callocFun, twoArg, "allocPtr");
+  auto *castPtr = Builder.CreatePointerCast(
+      allocInst, Type::getInt64PtrTy(TheContext), "castPtr");
+
+  Builder.CreateStore(arrLen, castPtr);
+
+  for (int i = 0; i < loopSize; i++) {
+    Value* counter = ConstantInt::get(Type::getInt64Ty(TheContext), i+1);
+    Value* ElemV = vec.at(i)->codegen();
+    Value* gep = Builder.CreateGEP(Type::getInt64Ty(TheContext), castPtr, std::vector<Value*>{counter});
+    Builder.CreateStore(ElemV, gep);
+  }
+
+  return Builder.CreateCall(nop);
 }
 
+/*
+ * [E1 of E2]
+ *
+ * alloc len
+ * store codegen(E1) -> len
+ * alloc arrPtr
+ * store len -> arrPtr // storing the array length in the array
+ * add len, 1
+ * alloc arrVal
+ * store codegen(E2) -> arrVal
+ * alloc counter
+ * store 1 -> counter
+ * header:
+ *  cmp counter < len
+ *  br cmp, body, exit
+ * body:
+ *  gep arrPtr + counter
+ *  store arrVal -> gep
+ *  add counter + 1
+ *  br header
+ * exit:
+ */
 llvm::Value* ASTAlternateArray::codegen() {
   LOG_S(1) << "Generating code for " << *this;
-  return nullptr;
-}
+
+  Value* elemLength = getStart()->codegen();
+  Value* length = Builder.CreateAdd(elemLength, oneV, "elemsAndLen");
+  Value* arrVal = getEnd()->codegen();
+  auto * counter = Builder.CreateAlloca(Type::getInt64Ty(TheContext), 0, "ofArrayCounter");
+
+  //Allocate an int pointer with calloc
+  std::vector<Value *> twoArg;
+  twoArg.push_back(length);
+  twoArg.push_back(ConstantInt::get(Type::getInt64Ty(TheContext), 8));
+  auto *allocInst = Builder.CreateCall(callocFun, twoArg, "allocPtr");
+  auto *castPtr = Builder.CreatePointerCast(
+      allocInst, Type::getInt64PtrTy(TheContext), "castPtr");
+  
+  Builder.CreateStore(elemLength, castPtr);
+
+  // Increment the counter
+  Value* loadedCounter = Builder.CreateLoad(counter->getAllocatedType(), counter, "loadedCounter");
+  Value* tmp = Builder.CreateAdd(loadedCounter, oneV, "storeArrLen");
+  Builder.CreateStore(tmp, counter);
+
+  llvm::Function *TheFunction = Builder.GetInsertBlock()->getParent();
+
+  /*
+   * Create blocks for the loop header, body, and exit; HeaderBB is first
+   * so it is added to the function in the constructor.
+   *
+   * Blocks don't need to be contiguous or ordered in
+   * any particular way because we will explicitly branch between them.
+   * This can be optimized by later passes.
+   */
+  labelNum++; // create unique labels for these BBs
+
+  BasicBlock *HeaderBB = BasicBlock::Create(
+      TheContext, "header" + std::to_string(labelNum), TheFunction);
+  BasicBlock *BodyBB =
+      BasicBlock::Create(TheContext, "body" + std::to_string(labelNum));
+  BasicBlock *ExitBB =
+      BasicBlock::Create(TheContext, "exit" + std::to_string(labelNum));
+
+  // Add an explicit branch from the current BB to the header
+  Builder.CreateBr(HeaderBB);
+
+  // Emit loop header
+  {
+    Builder.SetInsertPoint(HeaderBB);
+
+    loadedCounter = Builder.CreateLoad(counter->getAllocatedType(), counter, "loadedCounter");
+    Value* CondV = Builder.CreateICmpSLT(loadedCounter, length, "loopcond");
+
+    Builder.CreateCondBr(CondV, BodyBB, ExitBB);
+  }
+
+  // Emit loop body
+  {
+    TheFunction->getBasicBlockList().push_back(BodyBB);
+    Builder.SetInsertPoint(BodyBB);
+
+    // Convert l-value to r-value
+    loadedCounter = Builder.CreateLoad(counter->getAllocatedType(), counter, "loadedCounter");
+    
+    // Store in array memory
+    Value* gep = Builder.CreateGEP(Type::getInt64Ty(TheContext), castPtr, std::vector<Value*>{loadedCounter});
+    Builder.CreateStore(arrVal, gep);
+
+    // Increment the counter
+    tmp = Builder.CreateAdd(loadedCounter, oneV, "storeArrLen");
+    Builder.CreateStore(tmp, counter);
+
+    Builder.CreateBr(HeaderBB);
+  }
+
+  // Emit loop exit block.
+  TheFunction->getBasicBlockList().push_back(ExitBB);
+  Builder.SetInsertPoint(ExitBB);
+  return Builder.CreateCall(nop);
+}  // LCOV_EXCL_LINE
 
 /*
  * The ForStmt is similar to the while statement, the only difference
@@ -1245,7 +1353,7 @@ llvm::Value* ASTAlternateArray::codegen() {
  * exit
  */
 llvm::Value* ASTForStmt::codegen() {
-   LOG_S(1) << "Generating code for " << *this;
+  LOG_S(1) << "Generating code for " << *this;
   
   llvm::Function *TheFunction = Builder.GetInsertBlock()->getParent();
 
@@ -1387,8 +1495,15 @@ llvm::Value* ASTForEachStmt::codegen() {
     throw InternalError("failed to generate bitcode for iterable array");
   }
 
-  // TODO: FIGURE OUT HOW TO GET ARR LENGTH
+  // An attempt at getting array length?
+  Value* arrLenGEP = Builder.CreateGEP(Type::getInt64Ty(TheContext), ArrV, zeroV);
   Value *ArrLenV = nullptr;
+  if (lValueGen) {
+    ArrLenV = arrLenGEP;
+  }
+  else {
+    ArrLenV = Builder.CreateLoad(ArrV->getType()->getPointerElementType(), arrLenGEP);
+  }
 
   Value *CounterV = zeroV;
   Value *StepV = oneV;
