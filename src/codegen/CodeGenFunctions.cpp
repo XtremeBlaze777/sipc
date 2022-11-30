@@ -1525,12 +1525,12 @@ llvm::Value* ASTForEachStmt::codegen() {
 
     // An attempt at getting array elements?
     Value* arrLenGEP = Builder.CreateGEP(Type::getInt64Ty(TheContext), ArrV, CounterV);
-    Value *ArrLenV = nullptr;
+    Value *ArrAccessV = nullptr;
     if (lValueGen) {
-      ArrLenV = arrLenGEP;
+      ArrAccessV = arrLenGEP;
     }
     else {
-      ArrLenV = Builder.CreateLoad(ArrV->getType()->getPointerElementType(), arrLenGEP);
+      ArrAcessV = Builder.CreateLoad(ArrV->getType()->getPointerElementType(), arrLenGEP);
     }
     Builder.CreateStore(ArrAccessV, ElemV);
 
