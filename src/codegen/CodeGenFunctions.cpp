@@ -1152,7 +1152,7 @@ llvm::Value* ASTTernaryExpr::codegen() {
 
   // Emit if block.
   {
-    Builder.SetInsertPoint(ThenBB);
+    Builder.SetInsertPoint(IfBB);
 
     Value *IfV = getIf()->codegen();
     if (IfV == nullptr) {

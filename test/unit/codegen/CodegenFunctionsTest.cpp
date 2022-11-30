@@ -111,27 +111,27 @@ TEST_CASE("CodegenFunction: ASTFunAppExpr throws InternalError on FUN codegen nu
 
 TEST_CASE("CodegenFunction: ASTTernaryExpr throes InternalError on cond codegen nullptr", "[CodegenFunctions]") {
   ASTTernaryExpr tern(
-    std::make_unique<nullcodegen::MockASTExpr>().
-    std::make_unique<ASTInputExpr>(),
-    std::make_unique<ASTInputExpr>()
+      std::make_unique<nullcodegen::MockASTExpr>(),
+      std::make_unique<ASTInputExpr>(),
+      std::make_unique<ASTInputExpr>()
   );
   REQUIRE_THROWS_AS(tern.codegen(), InternalError);
 }
 
 TEST_CASE("CodegenFunction: ASTTernaryExpr throes InternalError on if codegen nullptr", "[CodegenFunctions]") {
   ASTTernaryExpr tern(
-    std::make_unique<ASTInputExpr>(),
-    std::make_unique<nullcodegen::MockASTExpr>().
-    std::make_unique<ASTInputExpr>()
+      std::make_unique<ASTInputExpr>(),
+      std::make_unique<nullcodegen::MockASTExpr>(),
+      std::make_unique<ASTInputExpr>()
   );
   REQUIRE_THROWS_AS(tern.codegen(), InternalError);
 }
 
 TEST_CASE("CodegenFunction: ASTTernaryExpr throes InternalError on else codegen nullptr", "[CodegenFunctions]") {
   ASTTernaryExpr tern(
-    std::make_unique<ASTInputExpr>(),
-    std::make_unique<ASTInputExpr>()
-    std::make_unique<nullcodegen::MockASTExpr>().
+      std::make_unique<ASTInputExpr>(),
+      std::make_unique<ASTInputExpr>(),
+      std::make_unique<nullcodegen::MockASTExpr>()
   );
   REQUIRE_THROWS_AS(tern.codegen(), InternalError);
 }
