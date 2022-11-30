@@ -1,0 +1,7 @@
+main() {
+  var a, b;
+  for (a : 2 .. 8 by 4) {
+    b = a;
+  }
+  return b;
+}
