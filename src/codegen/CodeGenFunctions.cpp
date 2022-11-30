@@ -1076,9 +1076,9 @@ llvm::Value* ASTBoolExpr::codegen() {
   LOG_S(1) << "Generating code for " << *this;
 
   if (getValue() == "true") 
-    return ConstantInt::get(Type::getInt64Ty(TheContext), 0);
-  else if (getValue() == "false")
     return ConstantInt::get(Type::getInt64Ty(TheContext), 1);
+  else if (getValue() == "false")
+    return ConstantInt::get(Type::getInt64Ty(TheContext), 0);
   throw InternalError("failed to generate bitcode for boolean type");
 }
 
@@ -1127,7 +1127,6 @@ llvm::Value* ASTTernaryExpr::codegen() {
 
   // Convert condition to a bool by comparing non-equal to 0.
   CondV = Builder.CreateICmpNE(CondV, ConstantInt::get(CondV->getType(), 0), "terncond");
-
   llvm::Function *TheFunction = Builder.GetInsertBlock()->getParent();
 
   /*
@@ -1141,24 +1140,27 @@ llvm::Value* ASTTernaryExpr::codegen() {
    * This can be optimized to fall through behavior by later passes.
    */
   labelNum++; // create unique labels for these BBs
+  auto *retVal = Builder.CreateAlloca(Type::getInt64Ty(TheContext), 0, "return");
   BasicBlock *IfBB = BasicBlock::Create(
-      TheContext, "if" + std::to_string(labelNum), TheFunction);
+      TheContext, "if" + std::to_string(labelNum));
   BasicBlock *ElseBB =
       BasicBlock::Create(TheContext, "else" + std::to_string(labelNum));
   BasicBlock *MergeBB =
-      BasicBlock::Create(TheContext, "ifmerge" + std::to_string(labelNum));
+      BasicBlock::Create(TheContext, "ternmerge" + std::to_string(labelNum));
 
   Builder.CreateCondBr(CondV, IfBB, ElseBB);
 
   // Emit if block.
   {
+    TheFunction->getBasicBlockList().push_back(IfBB);
     Builder.SetInsertPoint(IfBB);
 
     Value *IfV = getIf()->codegen();
     if (IfV == nullptr) {
-      throw InternalError("failed to generate bitcode for the ternary if block"); // LCOV_EXCL_LINE
+      throw InternalError("failed to generate bitcode for ternary if block"); // LCOV_EXCL_LINE
     }
 
+    Builder.CreateStore(IfV, retVal);
     Builder.CreateBr(MergeBB);
   }
 
@@ -1169,16 +1171,17 @@ llvm::Value* ASTTernaryExpr::codegen() {
 
     Value *ElseV = getElse()->codegen();
     if (ElseV == nullptr) {
-      throw InternalError("failed to generate bitcode for the ternary else block"); // LCOV_EXCL_LINE
+      throw InternalError("failed to generate bitcode for ternary else block"); // LCOV_EXCL_LINE
     }
 
+    Builder.CreateStore(ElseV, retVal);
     Builder.CreateBr(MergeBB);
   }
 
   // Emit merge block.
   TheFunction->getBasicBlockList().push_back(MergeBB);
   Builder.SetInsertPoint(MergeBB);
-  return Builder.CreateCall(nop);
+  return Builder.CreateLoad(retVal->getAllocatedType(), retVal);
 }  // LCOV_EXCL_LINE
 
 llvm::Value* ASTArrIndex::codegen() {
@@ -1204,8 +1207,8 @@ llvm::Value* ASTAlternateArray::codegen() {
  *
  * E1 = E2;
  * while (E1 < E3) {
- *   S
- *   E1 += E4
+ *   S;
+ *   E1 += E4;
  * }
  */
 llvm::Value* ASTForStmt::codegen() {
@@ -1231,9 +1234,9 @@ llvm::Value* ASTForStmt::codegen() {
       BasicBlock::Create(TheContext, "exit" + std::to_string(labelNum));
 
   // Add an explicit branch from the current BB to the header
-  Builder.CreateBr(HeaderBB);
-
+  lValueGen = true;
   Value *CurrV = getStart()->codegen();
+  lValueGen = false;
   if (CurrV == nullptr) {
     throw InternalError("failed to generate bitcode for the curr iter position");
   }
@@ -1248,17 +1251,20 @@ llvm::Value* ASTForStmt::codegen() {
   if (EndV == nullptr) {
     throw InternalError("failed to generate bitcode for end position");
   }
-  Value *StepV = getStep()->codegen();
-  if (StepV == nullptr) {
+  Value *StepV;
+  if (getStep() != nullptr) {
+     StepV = getStep()->codegen();
+  } else {
     StepV = ConstantInt::get(Type::getInt64Ty(TheContext), 1);
   }
+
+  Builder.CreateBr(HeaderBB);
   // Emit loop header
   {
     Builder.SetInsertPoint(HeaderBB);
 
     // Check if the curr value is in between the start/end values 
-    Value *CondV = Builder.CreateICmpSLT(CurrV, EndV, "loopcond");
-    Builder.CreateAdd(CurrV, StepV, "steptmp");
+    Value *CondV = Builder.CreateICmpSLT(getStart()->codegen(), EndV, "loopcond");
     Builder.CreateCondBr(CondV, BodyBB, ExitBB);
   }
 
@@ -1271,6 +1277,8 @@ llvm::Value* ASTForStmt::codegen() {
     if (BodyV == nullptr) {
       throw InternalError("failed to generate bitcode for the loop body"); // LCOV_EXCL_LINE
     }
+    Value* tmp = Builder.CreateAdd(getStart()->codegen(), StepV, "steptmp");
+    Builder.CreateStore(tmp, CurrV);
     Builder.CreateBr(HeaderBB);
   }
 
@@ -1298,13 +1306,19 @@ llvm::Value* ASTForEachStmt::codegen() {
 llvm::Value* ASTIncDecStmt::codegen() {
   LOG_S(1) << "Generating code for " << *this;
 
+  lValueGen = true;
+  Value *lValue = getExpr()->codegen();
+  lValueGen = false;
+
   Value *Expr = getExpr()->codegen();
+  Value *tmp;
   if (getOp() == "++") {
-      return Builder.CreateAdd(Expr, ConstantInt::get(Type::getInt64Ty(TheContext), 1));
+      tmp = Builder.CreateAdd(Expr, ConstantInt::get(Type::getInt64Ty(TheContext), 1));
   } else if (getOp() == "--") {
-      return Builder.CreateAdd(Expr, ConstantInt::get(Type::getInt64Ty(TheContext), -1));
+      tmp = Builder.CreateSub(Expr, ConstantInt::get(Type::getInt64Ty(TheContext), 1));
   } else {
       throw InternalError("failed to generate bitcode for incdec stmt"); // LCOV_EXCL_LINE
   }
+  return Builder.CreateStore(tmp,lValue);
 }
 

@@ -1,5 +1,5 @@
 main() {
-  var x, y, z;
+  var a, b, c, x, y, z;
   x = true;
   if (x != true) error 1;
   y = false;
@@ -18,8 +18,6 @@ main() {
   if (z != false) error 8;
   z = x and y or x;
   if (z != true) error 9;
-
-  var a, b, c;
   a = 5;
   b = 4;
   c = a > b;
