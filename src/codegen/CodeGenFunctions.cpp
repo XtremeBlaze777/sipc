@@ -1530,7 +1530,7 @@ llvm::Value* ASTForEachStmt::codegen() {
       ArrAccessV = arrLenGEP;
     }
     else {
-      ArrAcessV = Builder.CreateLoad(ArrV->getType()->getPointerElementType(), arrLenGEP);
+      ArrAccessV = Builder.CreateLoad(ArrV->getType()->getPointerElementType(), arrLenGEP);
     }
     Builder.CreateStore(ArrAccessV, ElemV);
 
