@@ -1203,13 +1203,26 @@ llvm::Value* ASTAlternateArray::codegen() {
  * The ForStmt is similar to the while statement, the only difference
  * being how it's structured below:
  *
- * for (E1 : E2 .. E3 by E4) S
+ * for (E1 : E2 .. E3 by E4) S;
  *
  * E1 = E2;
  * while (E1 < E3) {
  *   S;
  *   E1 += E4;
  * }
+ * 
+ * load E2
+ * store E2 -> E1
+ * load E1
+ * load E3
+ * cmp E1 < E3
+ * br cmp, S, merge
+ * codegen(S)
+ * load E4
+ * add E1 + E4
+ * store add -> E1
+ * br "load E1"
+ * merge
  */
 llvm::Value* ASTForStmt::codegen() {
   LOG_S(1) << "Generating code for " << *this;
@@ -1287,9 +1300,41 @@ llvm::Value* ASTForStmt::codegen() {
 }
 
 /*
+ * The foreach operates similar to a for loop with step 1, but instead checks elements of an array
+ *
+ * for (E1 : E2) S;
+ *
+ * counter = 0;
+ * while (counter < #E2) {
+ *  E1 = E2[counter];
+ *  S;
+ *  counter += 1;
+ * }
+ *
+ * alloc counter
+ * alloc len
+ * store 0 -> counter
+ * codegen(#E2)
+ * store #E2 -> len
+ * header:
+ *  load counter
+ *  load len
+ *  cmp counter < len
+ *  br cmp, body, merge
+ * body:
+ *  codegen(E2[counter])
+ *  store E2[counter] -> E1
+ *  codegen(S)
+ *  load counter
+ *  add counter + 1
+ *  store add -> counter
+ *  br header
+ * merge:
+ *  nop
  */
 llvm::Value* ASTForEachStmt::codegen() {
   LOG_S(1) << "Generating code for " << *this;
+
   return nullptr;  
 }
 
