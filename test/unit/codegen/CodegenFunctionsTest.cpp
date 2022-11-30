@@ -109,7 +109,7 @@ TEST_CASE("CodegenFunction: ASTFunAppExpr throws InternalError on FUN codegen nu
   REQUIRE_THROWS_AS(funAppExpr.codegen(), InternalError);
 }
 
-TEST_CASE("CodegenFunction: ASTTernaryExpr throes InternalError on cond codegen nullptr", "[CodegenFunctions]") {
+TEST_CASE("CodegenFunction: ASTTernaryExpr throws InternalError on cond codegen nullptr", "[CodegenFunctions]") {
   ASTTernaryExpr tern(
       std::make_unique<nullcodegen::MockASTExpr>(),
       std::make_unique<ASTVariableExpr>("A"),
@@ -118,7 +118,7 @@ TEST_CASE("CodegenFunction: ASTTernaryExpr throes InternalError on cond codegen 
   REQUIRE_THROWS_AS(tern.codegen(), InternalError);
 }
 
-TEST_CASE("CodegenFunction: ASTTernaryExpr throes InternalError on if codegen nullptr", "[CodegenFunctions]") {
+TEST_CASE("CodegenFunction: ASTTernaryExpr throws InternalError on if codegen nullptr", "[CodegenFunctions]") {
   ASTTernaryExpr tern(
       std::make_unique<ASTVariableExpr>("A"),
       std::make_unique<nullcodegen::MockASTExpr>(),
@@ -127,11 +127,89 @@ TEST_CASE("CodegenFunction: ASTTernaryExpr throes InternalError on if codegen nu
   REQUIRE_THROWS_AS(tern.codegen(), InternalError);
 }
 
-TEST_CASE("CodegenFunction: ASTTernaryExpr throes InternalError on else codegen nullptr", "[CodegenFunctions]") {
+TEST_CASE("CodegenFunction: ASTTernaryExpr throws InternalError on else codegen nullptr", "[CodegenFunctions]") {
   ASTTernaryExpr tern(
       std::make_unique<ASTVariableExpr>("A"),
       std::make_unique<ASTVariableExpr>("A"),
       std::make_unique<nullcodegen::MockASTExpr>()
   );
   REQUIRE_THROWS_AS(tern.codegen(), InternalError);
+}
+
+TEST_CASE("CodegenFunction: ASTIncDecStmt throws InternalError on ivalid op codegen", "[CodegenFunctions]") {
+  ASTIncDecStmt incDec(
+    std::make_unique<ASTVariableExpr>("A"),
+    "+-"
+  );
+  REQUIRE_THROWS_AS(incDec.codegen(), InternalError);
+}
+
+TEST_CASE("CodegenFunction: ASTIncDecStmt throws InternalError on expr codegen nullptr", "[CodegenFunctions]") {
+  ASTIncDecStmt incDec(
+    std::make_unique<nullcodegen::MockASTExpr>(),
+    "++"
+  );
+  REQUIRE_THROWS_AS(incDec.codegen(), InternalError);
+}
+
+TEST_CASE("CodegenFunction: ASTUnaryExpr throws InternalError on expr codegen nullptr", "[CodegenFunctions]") {
+  ASTUnaryExpr notExpr(
+    "not",
+    std::make_unique<nullcodegen::MockASTExpr>()
+  );
+  REQUIRE_THROWS_AS(notExpr.codegen(), InternalError);
+}
+
+TEST_CASE("CodegenFunction: ASTUnaryExpr throws InternalError on invalid op codegen", "[CodegenFunctions]") {
+  ASTUnaryExpr mockExpr(
+    "yes",
+    std::make_unique<ASTVariableExpr>("A")
+  );
+  REQUIRE_THROWS_AS(mockExpr.codegen(), InternalError);
+}
+
+TEST_CASE("CodegenFunction: ASTForStmt throws InternalError on start codegen nullptr", "[CodegenFunctions]") {
+  ASTForStmt For(
+    std::make_unique<nullcodegen::MockASTExpr>(),
+    std::make_unique<ASTVariableExpr>("A"),
+    std::make_unique<ASTVariableExpr>("A"),
+    std::make_unique<ASTVariableExpr>("A"),
+    std::make_unique<ASTOutputStmt>( std::make_unique<ASTVariableExpr>("A") )
+  );
+  REQUIRE_THROWS_AS(For.codegen(), InternalError);
+}
+
+TEST_CASE("CodegenFunction: ASTForStmt throws InternalError on end codegen nullptr", "[CodegenFunctions]") {
+  ASTForStmt For(
+    std::make_unique<ASTVariableExpr>("A"),
+    std::make_unique<nullcodegen::MockASTExpr>(),
+    std::make_unique<ASTVariableExpr>("A"),
+    std::make_unique<ASTVariableExpr>("A"),
+    std::make_unique<ASTOutputStmt>( std::make_unique<ASTVariableExpr>("A") )
+  );
+  REQUIRE_THROWS_AS(For.codegen(), InternalError);
+}
+
+TEST_CASE("CodegenFunction: ASTForStmt throws InternalError on begin codegen nullptr", "[CodegenFunctions]") {
+  ASTForStmt For(
+    std::make_unique<ASTVariableExpr>("A"),
+    std::make_unique<ASTVariableExpr>("A"),
+    std::make_unique<nullcodegen::MockASTExpr>(),
+    std::make_unique<ASTVariableExpr>("A"),
+    std::make_unique<ASTOutputStmt>( std::make_unique<ASTVariableExpr>("A") )
+  );
+  REQUIRE_THROWS_AS(For.codegen(), InternalError);
+}
+
+// ASTForStmt step is allowed to be null
+
+TEST_CASE("CodegenFunction: ASTForStmt throws InternalError on do codegen nullptr", "[CodegenFunctions]") {
+  ASTForStmt For(
+    std::make_unique<ASTVariableExpr>("A"),
+    std::make_unique<ASTVariableExpr>("A"),
+    std::make_unique<ASTVariableExpr>("A"),
+    std::make_unique<ASTVariableExpr>("A"),
+    std::make_unique<nullcodegen::MockASTStmt>()
+  );
+  REQUIRE_THROWS_AS(For.codegen(), InternalError);
 }
