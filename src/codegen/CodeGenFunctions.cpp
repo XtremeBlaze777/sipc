@@ -1216,13 +1216,13 @@ llvm::Value* ASTAlternateArray::codegen() {
  * load E1
  * load E3
  * cmp E1 < E3
- * br cmp, S, merge
+ * br cmp, codegen(S), exit
  * codegen(S)
  * load E4
  * add E1 + E4
  * store add -> E1
  * br "load E1"
- * merge
+ * exit
  */
 llvm::Value* ASTForStmt::codegen() {
   LOG_S(1) << "Generating code for " << *this;
@@ -1320,7 +1320,7 @@ llvm::Value* ASTForStmt::codegen() {
  *  load counter
  *  load len
  *  cmp counter < len
- *  br cmp, body, merge
+ *  br cmp, body, exit
  * body:
  *  codegen(E2[counter])
  *  store E2[counter] -> E1
@@ -1329,13 +1329,81 @@ llvm::Value* ASTForStmt::codegen() {
  *  add counter + 1
  *  store add -> counter
  *  br header
- * merge:
- *  nop
+ * exit:
  */
 llvm::Value* ASTForEachStmt::codegen() {
   LOG_S(1) << "Generating code for " << *this;
+  
+  llvm::Function *TheFunction = Builder.GetInsertBlock()->getParent();
 
-  return nullptr;  
+  /*
+   * Create blocks for the loop header, body, and exit; HeaderBB is first
+   * so it is added to the function in the constructor.
+   *
+   * Blocks don't need to be contiguous or ordered in
+   * any particular way because we will explicitly branch between them.
+   * This can be optimized by later passes.
+   */
+  labelNum++; // create unique labels for these BBs
+
+  BasicBlock *HeaderBB = BasicBlock::Create(
+      TheContext, "header" + std::to_string(labelNum), TheFunction);
+  BasicBlock *BodyBB =
+      BasicBlock::Create(TheContext, "body" + std::to_string(labelNum));
+  BasicBlock *ExitBB =
+      BasicBlock::Create(TheContext, "exit" + std::to_string(labelNum));
+
+  // Add an explicit branch from the current BB to the header
+  lValueGen = true;
+  Value *ElemV = getElem()->codegen();
+  lValueGen = false;
+  if (ElemV == nullptr) {
+    throw InternalError("failed to generate bitcode for the curr iter position");
+  }
+  Value *ArrV = getArr()->codegen();
+  if (StartV == nullptr) {
+    throw InternalError("failed to generate bitcode for iterable array");
+  }
+
+  // TODO: FIGURE OUT HOW TO GET ARR LENGTH
+  Value *ArrLenV = nullptr;
+
+  Value *CounterV = zeroV;
+  Value *StepV = oneV;
+
+  Builder.CreateBr(HeaderBB);
+  // Emit loop header
+  {
+    Builder.SetInsertPoint(HeaderBB);
+
+    // Check if the curr value is in between the start/end values 
+    Value *CondV = Builder.CreateICmpSLT(CounterV, ArrLenV, "loopcond");
+    Builder.CreateCondBr(CondV, BodyBB, ExitBB);
+  }
+
+  // Emit loop body
+  {
+    TheFunction->getBasicBlockList().push_back(BodyBB);
+    Builder.SetInsertPoint(BodyBB);
+
+    // TODO: FIGURE OUT HOW TO ACCESS ARRAY ELEMENTS
+    Value *ArrAccessV = nullptr;
+    Builder.CreateStore(ArrAccessV, ElemV);
+
+    Value *BodyV = getDo()->codegen();
+    if (BodyV == nullptr) {
+      throw InternalError("failed to generate bitcode for the loop body"); // LCOV_EXCL_LINE
+    }
+    Value* tmp = Builder.CreateAdd(CounterV, StepV, "steptmp");
+    Builder.CreateStore(tmp, CounterV);
+    Builder.CreateBr(HeaderBB);
+  }
+
+  // Emit loop exit block.
+  TheFunction->getBasicBlockList().push_back(ExitBB);
+  Builder.SetInsertPoint(ExitBB);
+  return Builder.CreateCall(nop);
+}
 }
 
 /*
