@@ -13,14 +13,14 @@ TEST_CASE("CodegenFunction: ASTDeclNode throws InternalError on codegen", "[Code
 TEST_CASE("CodegenFunction: ASTAssignsStmt throws InternalError on LHS codegen nullptr", "[CodegenFunctions]") {
   ASTAssignStmt assignStmt(
       std::make_unique<nullcodegen::MockASTExpr>(),
-      std::make_unique<ASTInputExpr>()
+      std::make_unique<ASTVariableExpr>("A")
   );
   REQUIRE_THROWS_AS(assignStmt.codegen(), InternalError);
 }
 
 TEST_CASE("CodegenFunction: ASTAssignsStmt throws InternalError on RHS codegen nullptr", "[CodegenFunctions]") {
   ASTAssignStmt assignStmt(
-      std::make_unique<ASTInputExpr>(),
+      std::make_unique<ASTVariableExpr>("A"),
       std::make_unique<nullcodegen::MockASTExpr>()
   );
   REQUIRE_THROWS_AS(assignStmt.codegen(), InternalError);
@@ -39,7 +39,7 @@ TEST_CASE("CodegenFunction: ASTBinaryExpr throws InternalError on LHS codegen nu
   ASTBinaryExpr binaryExpr(
       "+",
       std::make_unique<nullcodegen::MockASTExpr>(),
-      std::make_unique<ASTInputExpr>()
+      std::make_unique<ASTVariableExpr>("A")
   );
   REQUIRE_THROWS_AS(binaryExpr.codegen(), InternalError);
 }
@@ -47,7 +47,7 @@ TEST_CASE("CodegenFunction: ASTBinaryExpr throws InternalError on LHS codegen nu
 TEST_CASE("CodegenFunction: ASTBinaryExpr throws InternalError on RHS codegen nullptr", "[CodegenFunctions]") {
   ASTBinaryExpr binaryExpr(
       "+",
-      std::make_unique<ASTInputExpr>(),
+      std::make_unique<ASTVariableExpr>("A"),
       std::make_unique<nullcodegen::MockASTExpr>()
   );
   REQUIRE_THROWS_AS(binaryExpr.codegen(), InternalError);
@@ -56,8 +56,8 @@ TEST_CASE("CodegenFunction: ASTBinaryExpr throws InternalError on RHS codegen nu
 TEST_CASE("CodegenFunction: ASTBinaryExpr throws InternalError on bad OP", "[CodegenFunctions]") {
   ASTBinaryExpr binaryExpr(
       "ADDITION",
-      std::make_unique<ASTInputExpr>(),
-      std::make_unique<ASTInputExpr>()
+      std::make_unique<ASTVariableExpr>("A"),
+      std::make_unique<ASTVariableExpr>("A")
   );
   REQUIRE_THROWS_AS(binaryExpr.codegen(), InternalError);
 }
@@ -112,25 +112,25 @@ TEST_CASE("CodegenFunction: ASTFunAppExpr throws InternalError on FUN codegen nu
 TEST_CASE("CodegenFunction: ASTTernaryExpr throes InternalError on cond codegen nullptr", "[CodegenFunctions]") {
   ASTTernaryExpr tern(
       std::make_unique<nullcodegen::MockASTExpr>(),
-      std::make_unique<ASTInputExpr>(),
-      std::make_unique<ASTInputExpr>()
+      std::make_unique<ASTVariableExpr>("A"),
+      std::make_unique<ASTVariableExpr>("A")
   );
   REQUIRE_THROWS_AS(tern.codegen(), InternalError);
 }
 
 TEST_CASE("CodegenFunction: ASTTernaryExpr throes InternalError on if codegen nullptr", "[CodegenFunctions]") {
   ASTTernaryExpr tern(
-      std::make_unique<ASTInputExpr>(),
+      std::make_unique<ASTVariableExpr>("A"),
       std::make_unique<nullcodegen::MockASTExpr>(),
-      std::make_unique<ASTInputExpr>()
+      std::make_unique<ASTVariableExpr>("A")
   );
   REQUIRE_THROWS_AS(tern.codegen(), InternalError);
 }
 
 TEST_CASE("CodegenFunction: ASTTernaryExpr throes InternalError on else codegen nullptr", "[CodegenFunctions]") {
   ASTTernaryExpr tern(
-      std::make_unique<ASTInputExpr>(),
-      std::make_unique<ASTInputExpr>(),
+      std::make_unique<ASTVariableExpr>("A"),
+      std::make_unique<ASTVariableExpr>("A"),
       std::make_unique<nullcodegen::MockASTExpr>()
   );
   REQUIRE_THROWS_AS(tern.codegen(), InternalError);
