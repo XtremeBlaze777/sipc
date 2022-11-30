@@ -1523,8 +1523,15 @@ llvm::Value* ASTForEachStmt::codegen() {
     TheFunction->getBasicBlockList().push_back(BodyBB);
     Builder.SetInsertPoint(BodyBB);
 
-    // TODO: FIGURE OUT HOW TO ACCESS ARRAY ELEMENTS
-    Value *ArrAccessV = nullptr;
+    // An attempt at getting array elements?
+    Value* arrLenGEP = Builder.CreateGEP(Type::getInt64Ty(TheContext), ArrV, CounterV);
+    Value *ArrLenV = nullptr;
+    if (lValueGen) {
+      ArrLenV = arrLenGEP;
+    }
+    else {
+      ArrLenV = Builder.CreateLoad(ArrV->getType()->getPointerElementType(), arrLenGEP);
+    }
     Builder.CreateStore(ArrAccessV, ElemV);
 
     Value *BodyV = getDo()->codegen();
