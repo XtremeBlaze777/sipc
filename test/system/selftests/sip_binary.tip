@@ -1,0 +1,15 @@
+main() {
+    var x,y;
+    x = 5 % 2;
+    y = 5 / 2;
+    if (x != 1) error x;
+    if (y <= x) error y;
+    if (y < 2) error y;
+    if (1 >= y) error y;
+
+    x = -5 % 2;
+    y = -3 % -5;
+    if (x != -1) error x;
+    if (y != -3) error y;
+    return 0;
+}

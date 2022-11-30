@@ -38,9 +38,9 @@ nameDeclaration : IDENTIFIER ;
 expr : expr '(' (expr (',' expr)*)? ')' 	#funAppExpr
      | expr '.' IDENTIFIER 		#accessExpr
      | <assoc=right> '*' expr 				#deRefExpr
-     | SUB NUMBER				#negNumber
      | <assoc=right> '&' expr					#refExpr
      | NOT expr                 #unaryNegationExpr
+     | SUB NUMBER               #negNumber
      | <assoc=right> SUB expr                 #arithmeticNegation
      | expr op=(MUL | DIV | MOD) expr 	#multiplicativeExpr
      | expr op=(ADD | SUB) expr 		#additiveExpr

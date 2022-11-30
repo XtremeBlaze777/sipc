@@ -1,0 +1,15 @@
+main() {
+    var x, y, z;
+
+    x = true;
+    y = false;
+    if (x!=true) error 1;
+    if (y!=false) error 0;
+
+    x = true or false;
+    y = ((not true) and false) or (false and false);
+    if (x!=true) error 1;
+    if (y!=false) error 0;
+
+    return 0;
+}

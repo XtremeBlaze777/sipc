@@ -1,0 +1,8 @@
+main() {
+    var i;
+    for (i : 0 .. 5) {}
+    if (i != 5) error i;
+    for (i : 0 .. 5 by 2) {}
+    if (i != 6) error i;
+    return 0;
+}
