@@ -6,7 +6,7 @@ For this assignment, we were expected to extend the code generation functions fo
 
 The biggest challenge with this assignment was understanding how to use the LLVM library to create the new SIP type codegen functions. This required us to read a lot of the previous TIP types to see how LLVM was used to create the bitcode necessary. A lot of errors would occur as we created the new function, and we would see the bugs in our bitcode by using the -do -asm commandline options to further debug issues.
 
-The ultimate challenge that came to us was all the SIP types that revolved around arrays, such as the comma constructor, array indexing, and the for each loop. Looking at previous code types such as ASTAllocExpr was foreign to us. Because a lot of these SIP extensions relied on arrays working, a lot of them were held up by obtaining an understanding of how to implement the arrays.
+The ultimate challenge that came to us was all the SIP types that revolved around arrays, such as the comma constructor, array indexing, and the for each loop. Looking at previous code types such as ASTAllocExpr was foreign to us. Because a lot of these SIP extensions relied on arrays working, a lot of them were held up by obtaining an understanding of how to implement the arrays. Unfortunately, we were unable to come up with a working solution for these functions. However, the others work, but we were not able to fix it in time in testing for the runtest suite to work properly. We included possible implementations of arrays and other functions in the codegen file just in case.
 
 # Testing Approach
 
