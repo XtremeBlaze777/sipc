@@ -1076,9 +1076,9 @@ llvm::Value* ASTBoolExpr::codegen() {
   LOG_S(1) << "Generating code for " << *this;
 
   if (getValue() == "true") 
-    return ConstantInt::get(Type::getInt64Ty(TheContext), 0);
-  else if (getValue() == "false")
     return ConstantInt::get(Type::getInt64Ty(TheContext), 1);
+  else if (getValue() == "false")
+    return ConstantInt::get(Type::getInt64Ty(TheContext), 0);
   throw InternalError("failed to generate bitcode for boolean type");
 }
 
@@ -1118,6 +1118,8 @@ llvm::Value* ASTUnaryExpr::codegen() {
  *            nop        this is called the merge basic block
  */
 llvm::Value* ASTTernaryExpr::codegen() {
+  LOG_S(1) << "Generating code for " << *this;
+
   Value *CondV = getCond()->codegen();
   if (CondV == nullptr) {
     throw InternalError("failed to generate bitcode for the condition of the ternary operator");
@@ -1125,11 +1127,10 @@ llvm::Value* ASTTernaryExpr::codegen() {
 
   // Convert condition to a bool by comparing non-equal to 0.
   CondV = Builder.CreateICmpNE(CondV, ConstantInt::get(CondV->getType(), 0), "terncond");
-
   llvm::Function *TheFunction = Builder.GetInsertBlock()->getParent();
 
   /*
-   * Create blocks for the then and else cases.  The then block is first so
+   * Create blocks for the if and else cases.  The if block is first so
    * it is inserted in the function in the constructor. The rest of the blocks
    * need to be inserted explicitly into the functions basic block list
    * (via a push_back() call).
@@ -1139,24 +1140,27 @@ llvm::Value* ASTTernaryExpr::codegen() {
    * This can be optimized to fall through behavior by later passes.
    */
   labelNum++; // create unique labels for these BBs
+  auto *retVal = Builder.CreateAlloca(Type::getInt64Ty(TheContext), 0, "return");
   BasicBlock *IfBB = BasicBlock::Create(
-      TheContext, "then" + std::to_string(labelNum), TheFunction);
+      TheContext, "if" + std::to_string(labelNum));
   BasicBlock *ElseBB =
       BasicBlock::Create(TheContext, "else" + std::to_string(labelNum));
   BasicBlock *MergeBB =
-      BasicBlock::Create(TheContext, "ifmerge" + std::to_string(labelNum));
+      BasicBlock::Create(TheContext, "ternmerge" + std::to_string(labelNum));
 
   Builder.CreateCondBr(CondV, IfBB, ElseBB);
 
   // Emit if block.
   {
+    TheFunction->getBasicBlockList().push_back(IfBB);
     Builder.SetInsertPoint(IfBB);
 
     Value *IfV = getIf()->codegen();
     if (IfV == nullptr) {
-      throw InternalError("failed to generate bitcode for the ternary if block"); // LCOV_EXCL_LINE
+      throw InternalError("failed to generate bitcode for ternary if block"); // LCOV_EXCL_LINE
     }
 
+    Builder.CreateStore(IfV, retVal);
     Builder.CreateBr(MergeBB);
   }
 
@@ -1167,17 +1171,18 @@ llvm::Value* ASTTernaryExpr::codegen() {
 
     Value *ElseV = getElse()->codegen();
     if (ElseV == nullptr) {
-      throw InternalError("failed to generate bitcode for the ternary else block"); // LCOV_EXCL_LINE
+      throw InternalError("failed to generate bitcode for ternary else block"); // LCOV_EXCL_LINE
     }
 
+    Builder.CreateStore(ElseV, retVal);
     Builder.CreateBr(MergeBB);
   }
 
   // Emit merge block.
   TheFunction->getBasicBlockList().push_back(MergeBB);
   Builder.SetInsertPoint(MergeBB);
-  return Builder.CreateCall(nop);
-}
+  return Builder.CreateLoad(retVal->getAllocatedType(), retVal);
+}  // LCOV_EXCL_LINE
 
 llvm::Value* ASTArrIndex::codegen() {
   LOG_S(1) << "Generating code for " << *this;
