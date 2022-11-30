@@ -213,3 +213,69 @@ TEST_CASE("CodegenFunction: ASTForStmt throws InternalError on do codegen nullpt
   );
   REQUIRE_THROWS_AS(For.codegen(), InternalError);
 }
+
+TEST_CASE("CodegenFunction: ASTForEachStmt throws InternalError on elem codegen nullptr", "[CodegenFunctions]") {
+  ASTForEachStmt foreach(
+    std::make_unique<nullcodegen::MockASTExpr>(),
+    std::make_unique<ASTVariableExpr>("A"),
+    std::make_unique<ASTOutputStmt>( std::make_unique<ASTVariableExpr>("A") )
+  );
+  REQUIRE_THROWS_AS(foreach.codegen(), InternalError);
+}
+
+TEST_CASE("CodegenFunction: ASTForEachStmt throws InternalError on arr codegen nullptr", "[CodegenFunctions]") {
+  ASTForEachStmt foreach(
+    std::make_unique<ASTVariableExpr>("A"),
+    std::make_unique<nullcodegen::MockASTExpr>(),
+    std::make_unique<ASTOutputStmt>( std::make_unique<ASTVariableExpr>("A") )
+  );
+  REQUIRE_THROWS_AS(foreach.codegen(), InternalError);
+}
+
+TEST_CASE("CodegenFunction: ASTForEachStmt throws InternalError on do codegen nullptr", "[CodegenFunctions]") {
+  ASTForEachStmt foreach(
+    std::make_unique<ASTVariableExpr>("A"),
+    std::make_unique<ASTVariableExpr>("A"),
+    std::make_unique<nullcodegen::MockASTStmt>()
+  );
+  REQUIRE_THROWS_AS(foreach.codegen(), InternalError);
+}
+
+// TEST_CASE("CodegenFunction: ASTMainArray throws InternalError on elements codegen nullptr", "[CodegenFunctions]") {
+//   std::vector<std::unique_ptr<ASTExpr>> vec;
+//   vec.push_back(std::make_unique<nullcodegen::MockASTExpr>());
+//   ASTMainArray comma(vec);
+//   REQUIRE_THROWS_AS(comma.codegen(), InternalError);
+// }
+
+TEST_CASE("CodegenFunction: ASTAlternateArray throws InternalError on start codegen nullptr", "[CodegenFunctions]") {
+  ASTAlternateArray range(
+    std::make_unique<nullcodegen::MockASTExpr>(),
+    std::make_unique<ASTVariableExpr>("A")
+  );
+  REQUIRE_THROWS_AS(range.codegen(), InternalError);
+}
+
+TEST_CASE("CodegenFunction: ASTAlternateArray throws InternalError on end codegen nullptr", "[CodegenFunctions]") {
+  ASTAlternateArray range(
+    std::make_unique<ASTVariableExpr>("A"),
+    std::make_unique<nullcodegen::MockASTExpr>()
+  );
+  REQUIRE_THROWS_AS(range.codegen(), InternalError);
+}
+
+TEST_CASE("CodegenFunction: ASTArrIndex throws InternalError on idx codegen nullptr", "[CodegenFunctions]") {
+  ASTArrIndex idx(
+    std::make_unique<nullcodegen::MockASTExpr>(),
+    std::make_unique<ASTVariableExpr>("A")
+  );
+  REQUIRE_THROWS_AS(idx.codegen(), InternalError);
+}
+
+TEST_CASE("CodegenFunction: ASTArrIndex throws InternalError on arr codegen nullptr", "[CodegenFunctions]") {
+  ASTArrIndex idx(
+    std::make_unique<ASTVariableExpr>("A"),
+    std::make_unique<nullcodegen::MockASTExpr>()
+  );
+  REQUIRE_THROWS_AS(idx.codegen(), InternalError);
+}
