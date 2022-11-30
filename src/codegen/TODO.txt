@@ -3,17 +3,17 @@ Code Generation TODO List
 Update Previous TIP Types
 ----------------------------------
 [x] Update ASTBinaryExpr
-[] Update If/While statements
+[x] Update If/While statements
 
 
 Including New TIP Types
 ----------------------------------
-[] ASTBoolExpr
-[] ASTUnaryExpr
-[] ASTTernaryExpr
+[x] ASTBoolExpr
+[-] ASTUnaryExpr
+[x] ASTTernaryExpr
 [] ASTMainArray
 [] ASTAlternateArray
 [] ASTArrIndex
-[] ASTForStmt
+[x] ASTForStmt
 [] ASTForEachStmt
-[] ASTIncDecStmt
+[x] ASTIncDecStmt

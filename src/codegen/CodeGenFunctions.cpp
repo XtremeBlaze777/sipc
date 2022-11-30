@@ -1191,7 +1191,26 @@ llvm::Value* ASTArrIndex::codegen() {
 
 llvm::Value* ASTMainArray::codegen() {
   LOG_S(1) << "Generating code for " << *this;
-  return nullptr;
+
+  allocFlag = true;
+  Value *argVal = getInitializer()->codegen();
+  allocFlag = false;
+  if (argVal == nullptr) {
+    throw InternalError("failed to generate bitcode for the initializer of the alloc expression");
+  }
+  
+  //Allocate an int pointer with calloc
+  std::vector<Value *> twoArg;
+  twoArg.push_back(ConstantInt::get(Type::getInt64Ty(TheContext), 1));
+  twoArg.push_back(ConstantInt::get(Type::getInt64Ty(TheContext), 8));
+  auto *allocInst = Builder.CreateCall(callocFun, twoArg, "allocPtr");
+  auto *castPtr = Builder.CreatePointerCast(
+      allocInst, Type::getInt64PtrTy(TheContext), "castPtr");
+  // Initialize with argument
+  auto *initializingStore = Builder.CreateStore(argVal, castPtr);
+
+  return Builder.CreatePtrToInt(castPtr, Type::getInt64Ty(TheContext),
+                                "allocIntVal");
 }
 
 llvm::Value* ASTAlternateArray::codegen() {
