@@ -1,14 +1,23 @@
 main() {
     var x, y, z;
+
     x = true;
     y = false;
+    if (x!=true) error 1;
+    if (y!=false) error 0;
+
     x = true or false;
-    x = not true and false or false and false;
-    x = x != x;
+    y = ( (not true) and false) or (false and false);
+    if (x!=true) error 1;
+    if (y!=false) error 0;
+
+    x = (x != x);
     if (x == true) {
         z = 5;
     } else {
         z = 4;
     }
-    return z;
+    if (z!=4) error z;
+    
+    return 0;
 }

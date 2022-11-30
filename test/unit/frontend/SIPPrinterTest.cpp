@@ -26,7 +26,6 @@ TEST_CASE("ASTPrinterTest: all unary expressions (excluding arr)", "[ASTNodePrin
       "x = #y;",
       "return x;"
     };
-    std::cout << "Building AST" << std::endl;
     auto ast = ASTHelper::build_ast(stream);
 
     auto f = ast->findFunctionByName("fun");
@@ -34,7 +33,6 @@ TEST_CASE("ASTPrinterTest: all unary expressions (excluding arr)", "[ASTNodePrin
     int i = 0;
     int numStmts = f->getStmts().size() - 1;  // skip the return
     // HELPER FUNCTION 
-    std::cout << "Checking each stmt" << std::endl;
     for (auto s : f->getStmts()) {
       //auto a = dynamic_cast<ASTAssignStmt*>(s);
       stream = std::stringstream();
