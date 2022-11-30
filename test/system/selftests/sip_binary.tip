@@ -9,7 +9,7 @@ main() {
 
     x = -5 % 2;
     y = -3 % -5;
-    if (x != -2) error x;
-    if (y != 3) error y;
+    if (x != -1) error x;
+    if (y != -3) error y;
     return 0;
 }
