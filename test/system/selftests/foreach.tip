@@ -1,0 +1,9 @@
+main() {
+    var i, a, sum;
+    a = [3 of 3];
+    for (i : a) {
+        sum = sum + i;
+    }
+    if (sum != 9) error sum;
+    return 0;
+}

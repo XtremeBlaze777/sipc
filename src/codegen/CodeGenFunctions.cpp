@@ -1076,9 +1076,9 @@ llvm::Value* ASTBoolExpr::codegen() {
   LOG_S(1) << "Generating code for " << *this;
 
   if (getValue() == "true") 
-    return ConstantInt::get(Type::getInt64Ty(TheContext), 0);
+    return zeroV;
   else if (getValue() == "false")
-    return ConstantInt::get(Type::getInt64Ty(TheContext), 1);
+    return oneV;
   throw InternalError("failed to generate bitcode for boolean type");
 }
 
@@ -1251,11 +1251,9 @@ llvm::Value* ASTForStmt::codegen() {
   if (EndV == nullptr) {
     throw InternalError("failed to generate bitcode for end position");
   }
-  Value *StepV;
-  if (getStep() != nullptr) {
-     StepV = getStep()->codegen();
-  } else {
-    StepV = ConstantInt::get(Type::getInt64Ty(TheContext), 1);
+  Value *StepV = getStep->codegen();
+  if (StepV == nullptr) {
+    StepV = oneV;
   }
 
   Builder.CreateBr(HeaderBB);
@@ -1313,9 +1311,9 @@ llvm::Value* ASTIncDecStmt::codegen() {
   Value *Expr = getExpr()->codegen();
   Value *tmp;
   if (getOp() == "++") {
-      tmp = Builder.CreateAdd(Expr, ConstantInt::get(Type::getInt64Ty(TheContext), 1));
+      tmp = Builder.CreateAdd(Expr, oneV);
   } else if (getOp() == "--") {
-      tmp = Builder.CreateSub(Expr, ConstantInt::get(Type::getInt64Ty(TheContext), 1));
+      tmp = Builder.CreateSub(Expr, oneV);
   } else {
       throw InternalError("failed to generate bitcode for incdec stmt"); // LCOV_EXCL_LINE
   }
