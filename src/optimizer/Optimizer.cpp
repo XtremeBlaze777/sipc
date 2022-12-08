@@ -15,32 +15,39 @@
 
 using namespace llvm;
 
-void Optimizer::optimize(Module* theModule) {
+void Optimizer::optimize(Module* theModule, DisoptPass pass) {
   LOG_S(1) << "Optimizing program " << theModule->getName().str();
 
   // Create a pass manager to simplify generated module
-  auto TheFPM = std::make_unique<legacy::FunctionPassManager>(theModule);
+  if (Optimizer::DisoptPass::all == pass) { 
+    auto TheFPM = std::make_unique<legacy::FunctionPassManager>(theModule);
 
-  // Promote allocas to registers.
-  TheFPM->add(createPromoteMemoryToRegisterPass());
+    // Promote allocas to registers.
+    if (Optimizer::DisoptPass::pmr == pass)
+      TheFPM->add(createPromoteMemoryToRegisterPass());
 
-  // Do simple "peephole" optimizations
-  TheFPM->add(createInstructionCombiningPass());
+    // Do simple "peephole" optimizations
+    if (Optimizer::DisoptPass::ic == pass)
+      TheFPM->add(createInstructionCombiningPass());
 
-  // Reassociate expressions.
-  TheFPM->add(createReassociatePass());
+    // Reassociate expressions.
+    if (Optimizer::DisoptPass::re == pass)
+      TheFPM->add(createReassociatePass());
 
-  // Eliminate Common SubExpressions.
-  TheFPM->add(createGVNPass());
+    // Eliminate Common SubExpressions.
+    if (Optimizer::DisoptPass::gvn == pass) 
+      TheFPM->add(createGVNPass());
 
-  // Simplify the control flow graph (deleting unreachable blocks, etc).
-  TheFPM->add(createCFGSimplificationPass());
+    // Simplify the control flow graph (deleting unreachable blocks, etc).
+    if (Optimizer::DisoptPass::cfgs == pass)
+      TheFPM->add(createCFGSimplificationPass());
 
-  // initialize and run simplification pass on each function
-  TheFPM->doInitialization();
-  for (auto &fun : theModule->getFunctionList()) {
-    LOG_S(1) << "Optimizing function " << fun.getName().str();
+    // initialize and run simplification pass on each function
+    TheFPM->doInitialization();
+    for (auto &fun : theModule->getFunctionList()) {
+      LOG_S(1) << "Optimizing function " << fun.getName().str();
 
-    TheFPM->run(fun);
+      TheFPM->run(fun);
+    }
   }
 }

@@ -12,16 +12,27 @@
 
 using namespace llvm;
 using namespace std;
+using namespace Optimizer;
 
 static cl::OptionCategory TIPcat("tipc Options","Options for controlling the TIP compilation process.");
 static cl::opt<bool> ppretty("pp", cl::desc("pretty print"), cl::cat(TIPcat));
 static cl::opt<bool> psym("ps", cl::desc("print symbols"), cl::cat(TIPcat));
 static cl::opt<bool> ptypes("pt", cl::desc("print symbols with types (supercedes --ps)"), cl::cat(TIPcat));
-static cl::opt<bool> disopt("do", cl::desc("disable bitcode optimization"), cl::cat(TIPcat));
-static cl::opt<int> debug("verbose", cl::desc("enable log messages (Levels 1-3) \n Level 1 - Basic logging for every phase.\n Level 2 - Level 1 and type constraints being unified.\n Level 3 - Level 2 and union-find solving steps."), cl::cat(TIPcat));
+static cl::opt<int> debug("verbose", cl::desc("enable log messages (Levels 1-3) \n Level 1 - Symbols being added to the symbol table, type constraints being generated for the type solvers, and control flow constraints being generated.\n Level 2 - Level 1 and type constraints being unified.\n Level 3 - Level 2 and type constraints being added and searched for in the type graph."), cl::cat(TIPcat));
 static cl::opt<bool> emitHrAsm("asm",
                            cl::desc("emit human-readable LLVM assembly language"),
                            cl::cat(TIPcat));
+static cl::opt<Optimizer::DisoptPass> disopt(cl::desc("Disable all or one optimization"), 
+                                  cl::values(
+                                    clEnumVal(all, cmdLine[all]),
+                                    clEnumVal(pmr, cmdLine[pmr]),
+                                    clEnumVal(ic, cmdLine[ic]),
+                                    clEnumVal(re, cmdLine[re]),
+                                    clEnumVal(gvn, cmdLine[gvn]),
+                                    clEnumVal(cfgs, cmdLine[cfgs]),
+                                    clEnumVal(tce, cmdLine[tce])),
+                                  cl::cat(TIPcat));
+
 static cl::opt<std::string> cgFile("pcg", 
                          cl::value_desc("call graph output file"),
                          cl::desc("print call graph to a file in dot syntax"), 
@@ -114,9 +125,7 @@ int main(int argc, char *argv[]) {
 
       auto llvmModule = CodeGenerator::generate(ast.get(), analysisResults.get(), sourceFile);
 
-      if (!disopt) {
-        Optimizer::optimize(llvmModule.get());
-      }
+      Optimizer::optimize(llvmModule.get(), disopt);
 
       if(emitHrAsm) {
         CodeGenerator::emitHumanReadableAssembly(llvmModule.get(), outputfile);
