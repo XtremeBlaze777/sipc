@@ -9,17 +9,19 @@
 namespace Optimizer {
 
   //! \brief keys for optimization passes that can be disabled
-  enum DisoptPass { all, pmr, ic, re, gvn, cfgs, tce, NumPasses };
+  enum DisoptPass {all, no, pmr, ic, re, gvn, cfgs, dce, lun, NumPasses };
 
   //! \brief strings for optimization pass keys
   static const constexpr char* const cmdLine[NumPasses] = {
     "disable all optimizations",
+    "disable no optimizations",
     "disable promote memory to register",
     "disable instruction combining",
     "disable reassociation",
     "disable global value numbering",
     "disable CFG simplification",
-    "disable tail call elimination"
+    "disable dead code elimination",
+    "disable loop unrolling"
   };
 
   /*! \brief optimize LLVM module. 

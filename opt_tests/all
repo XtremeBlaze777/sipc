@@ -1,0 +1,63 @@
+; ModuleID = 'dce.tip'
+source_filename = "dce.tip"
+target triple = "x86_64-apple-darwin21.3.0"
+
+@_tip_ftable = internal constant [1 x i64 ()*] [i64 ()* @_tip_main]
+@_tip_num_inputs = constant i64 0
+@_tip_input_array = common global [0 x i64] zeroinitializer
+
+; Function Attrs: nofree nosync nounwind readnone willreturn
+declare void @llvm.donothing() #0
+
+define i64 @_tip_main() {
+entry:
+  %y = alloca i64, align 8
+  %x = alloca i64, align 8
+  store i64 0, i64* %x, align 4
+  store i64 0, i64* %y, align 4
+  store i64 4, i64* %x, align 4
+  store i64 0, i64* %y, align 4
+  br label %header1
+
+header1:                                          ; preds = %ifmerge2, %entry
+  %x1 = load i64, i64* %x, align 4
+  %gttmp = icmp sgt i64 %x1, 0
+  %loopcond = icmp ne i1 %gttmp, false
+  br i1 %loopcond, label %body1, label %exit1
+
+body1:                                            ; preds = %header1
+  br i1 false, label %then2, label %else2
+
+then2:                                            ; preds = %body1
+  %y2 = load i64, i64* %y, align 4
+  %addtmp = add i64 %y2, 1
+  store i64 %addtmp, i64* %y, align 4
+  %x3 = load i64, i64* %x, align 4
+  %subtmp = sub i64 %x3, 1
+  store i64 %subtmp, i64* %x, align 4
+  br label %ifmerge2
+
+else2:                                            ; preds = %body1
+  %y4 = load i64, i64* %y, align 4
+  %addtmp5 = add i64 %y4, 2
+  store i64 %addtmp5, i64* %y, align 4
+  %x6 = load i64, i64* %x, align 4
+  %subtmp7 = sub i64 %x6, 1
+  store i64 %subtmp7, i64* %x, align 4
+  br label %ifmerge2
+
+ifmerge2:                                         ; preds = %else2, %then2
+  call void @llvm.donothing()
+  br label %header1
+
+exit1:                                            ; preds = %header1
+  call void @llvm.donothing()
+  %y8 = load i64, i64* %y, align 4
+  ret i64 %y8
+}
+
+; Function Attrs: nounwind
+declare noalias i8* @calloc(i64, i64) #1
+
+attributes #0 = { nofree nosync nounwind readnone willreturn }
+attributes #1 = { nounwind }
