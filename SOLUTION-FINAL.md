@@ -31,9 +31,12 @@ We also focused on optimizing function calls and function storage space. For the
 
 Another optimization that we added was the global dead code elimination pass. Unlike the dead code elimination pass, we had to pass this through the overall pass manager, which allowed us to determine whether some functions would be used or not in our code. In the gdce.tip file, it completely removed the unused function that we had defined since it was not called in any shape or form.
 
+Our final optimization was the function inlining pass, which would inline functions that we created into the main body if possible. In our file fi.tip, we show that it wil reduce the LOCs by 3 by removing the redundant function code. Instead, all of the function code is just done in the body. 
+
 # Failed Optimizations on our End
 
 We tested various optimizations such as dead code elimination, loop invariant, loop flattening, and dead loops. For each of these passes, we found that the current optimizations that we had already handled most of the cases that these passes would also handle. One of these passes was the GVN Pass, which we found handled most scalar optimizations. There could be possible edge cases where these optimizations would have a benefit, but through our testing we were unable to find a reason to include these into our final Optimizer.
+
 
 # Big Bang Test
 

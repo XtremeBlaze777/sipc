@@ -88,6 +88,12 @@ void Optimizer::optimize(Module* theModule, DisoptPass pass) {
         std::cout << "Running Loop Deletion Pass" << std::endl;
       }
 
+      // Inlines functions
+      if (Optimizer::DisoptPass::fi != pass) {
+        InterFPM->add(createFunctionInliningPass());
+        std::cout << "Running Inlining Pass" << std::endl;
+      }
+
       // Merges identical functions
       if (Optimizer::DisoptPass::merf != pass) {
         InterFPM->add(createMergeFunctionsPass());
@@ -100,17 +106,11 @@ void Optimizer::optimize(Module* theModule, DisoptPass pass) {
         std::cout << "Running Global DCE Pass" << std::endl;
       }
 
-      // Inlines functions
-      /*if (Optimizer::DisoptPass::fi != pass) {
-        InterFPM->add(createFunctionInliningPass());
-        std::cout << "Running Inlining Pass" << std::endl;
-      }*/
-
     }
 
 
     // initialize and run simplification pass on each function
-    InterFPM->run(*theModule);
+    //InterFPM->run(*theModule);
 
     IntraFPM->doInitialization();
     for (auto &fun : theModule->getFunctionList()) {
@@ -118,5 +118,9 @@ void Optimizer::optimize(Module* theModule, DisoptPass pass) {
       IntraFPM->run(fun);
     }
     IntraFPM->doFinalization();
+
+
+    // initialize and run simplification pass on each function
+    InterFPM->run(*theModule);
   }
 }
