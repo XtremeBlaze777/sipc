@@ -37,7 +37,8 @@ static cl::opt<Optimizer::DisoptPass> disopt(cl::desc("Disable all or one optimi
                                     clEnumVal(lfl, cmdLine[lfl]),
                                     clEnumVal(del, cmdLine[del]),
                                     clEnumVal(merf, cmdLine[merf]),
-                                    clEnumVal(fi, cmdLine[fi])
+                                    clEnumVal(fi, cmdLine[fi]),
+                                    clEnumVal(gdce, cmdLine[gdce])
                                   ),
                                   cl::cat(TIPcat));
 

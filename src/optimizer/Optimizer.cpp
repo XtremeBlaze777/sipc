@@ -94,11 +94,17 @@ void Optimizer::optimize(Module* theModule, DisoptPass pass) {
         std::cout << "Running Function Merge Pass" << std::endl;
       }
 
+      // Global Dead Code Elimination on all functions
+      if (Optimizer::DisoptPass::gdce != pass) {
+        InterFPM->add(createGlobalDCEPass());
+        std::cout << "Running Global DCE Pass" << std::endl;
+      }
+
       // Inlines functions
-      if (Optimizer::DisoptPass::fi != pass) {
+      /*if (Optimizer::DisoptPass::fi != pass) {
         InterFPM->add(createFunctionInliningPass());
         std::cout << "Running Inlining Pass" << std::endl;
-      }
+      }*/
 
     }
 

@@ -9,7 +9,7 @@
 namespace Optimizer {
 
   //! \brief keys for optimization passes that can be disabled
-  enum DisoptPass {all, no, pm, ic, re, gvn, cfgs, dce, licm, lun, lfl, del, merf, fi, NumPasses };
+  enum DisoptPass {all, no, pm, ic, re, gvn, cfgs, dce, licm, lun, lfl, del, merf, fi, gdce, NumPasses };
 
   //! \brief strings for optimization pass keys
   static const constexpr char* const cmdLine[NumPasses] = {
@@ -27,6 +27,7 @@ namespace Optimizer {
     "disable dead loop elimination",
     "disable function merging",
     "disable function inlining",
+    "disable global dead code elimination"
   };
 
   /*! \brief optimize LLVM module. 
