@@ -1,4 +1,6 @@
 #!/bin/bash
-../bin/cleancov.sh
-../bin/build.sh --asm --$1 $2.tip
-code $2.tip.ll
+if [ -f run ]; then
+    ../bin/cleancov.sh
+    ../bin/build.sh --asm --$1 $2.tip
+    code $2.tip.ll
+fi
