@@ -16,22 +16,17 @@ cfgs.tip dropped from 10 lines to 4 lines.
 # Loop Unrolling Optimization
 lun.tip unrolled 29 lines into 113 lines. This will reduce the number of loops that the program will have to go through, thus reducing the total lines that the code will run through and improving the performance. The downside for such an optimization is that it will increase the size of the file since there are more lines of code that have been unrolled.
 
-
-
-# To test on a Mac
-merf.tip (MergeFunctions with identical AST)
-fi.tip (Function Inlining)
-
 # Optimizations We Added and Why
 There was no need to add scalar optimizations as GVN seemed to cover all of those in our testing, thus we focused on other items.
 
 We decided to focus on improving the while loop performance in tip. Once notable optimization that we previously knew from Computer Architecture was loop unrolling, which had diminishing benefits for each unroll, but would reduce the lines of code that the program would need to go through overall. We noticed that the loop unrolling pass would unroll the code from 29 lines to 113 lines, but from doing the math on how many lines of code would run, it would run x lines instead of y lines inside of the loop code.
 
+We also focused on optimizing function calls and function storage space. For the latter, we used a `MergeFunctionPass` that recognized when two functions had similar ASTs. Our file, *merf.tip*, contained two functions, foo and bar, that both had identical code to compute the factorial of the input. Both of the functions were then called and summed in main. Without the MergeFunctionPass, both foo() and bar() had identical definitions (save for the names of registers) in the emitted llvm assembly. Runnng the pass, changed the definition of foo() to instead simply call bar(), which reduced the line number from 16 to 2.
+
 # Failed Optimizations on our End
 
-One of the optimization passes we decided to test was the MergeFunctionsPass, but for some reason when adding this optimization it would not work as intended. We changed the order that it was placed in the pass manager, but it would still result in a segmentation fault. Thus, we could not have conclusive testing on whether or not it would benefit our optimizer. We did include a file merf.tip that was intended to see whether or not the pass would benefit our optimizer.
+Furthermore, we also had the same results when we were testing out FunctionInlining.
 
-Furthermore, we also had the same results when we were testing out FunctionInlining. There 
 # Big Bang Test
 
 # Conclusion
