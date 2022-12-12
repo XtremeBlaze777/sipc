@@ -40,7 +40,7 @@ We tested various optimizations such as dead code elimination, loop invariant, l
 
 # Big Bang Test
 
-Our big bang test was called bigbang.tip and is included in our opt\_tests folder. This combined each of the programs that we had used for testing so far into one big program to demonstrate how much faster and smaller the program would be compared to no optimizer. We wrote the test such that disabling anyone of the confirmed optimizations would hinder the emitted llvm asssembly of the program. Specifically, we incorporated (Global)DeadCodeElimination, loop unrolling, global value numbering, function merging, function inlining, and simpligying the control flow graph.
+Our big bang test was called bigbang.tip and is included in our opt\_tests folder. This combined each of the programs that we had used for testing so far into one big program to demonstrate how much faster and smaller the program would be compared to no optimizer. We wrote the test such that disabling anyone of the confirmed optimizations would hinder the emitted llvm asssembly of the program. Specifically, we incorporated (Global)DeadCodeElimination, loop unrolling, global value numbering, function merging, function inlining, and simpligying the control flow graph. Without optimizations, the program's bitcode weas around 180 LOC. With our optimizations, it went to 46 LOC, about a 4X decrease in the lines of code!
 
 # Conclusion
 There were some curious issues with developing on Windows (WSL) vs. a Mac: many of the create pass calls would not be included when running on WSL which made it harder to test optimizations ( notably createMergeFunction() and createFunctionInlining() ).
