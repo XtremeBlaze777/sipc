@@ -1,0 +1,9 @@
+main() {
+  var v, w, x, y, z;
+  w = 1;
+  x = 1;
+  y = w + x;
+  z = x + w;
+  v = y * z;
+  return v;
+}

@@ -15,7 +15,9 @@ The CreateFlowGraphSimplification optimization was more straightforward, as we w
 
 Same with the Reassociation Pass, we were able to look at the documentation and see how the pass actually reorganized the LLVM bitcode. It would modify where the math would be done for operations such as addition and subtraction to reduce the number of instructions needed. We made another example program re.tip that emphasized the abilities of the reassociation pass, reducing the number of lines by 2 in our small program.
 
-Unfortunately for the InstructionCombining Pass, we were unable to design a program in tip that would show the benefits of InstructionCombining. 
+For the Global Value Numbering Pass, we noted that it took advantage of removing redundant loads and stores. We were able to reduce the number of lines a lot by creating a sample program gvn.tip, which took advantage of using redundant values so that the pass would reduce the LLVM bitcode.
+
+Unfortunately for the InstructionCombining Pass, we were unable to design a program in tip that would show the benefits of InstructionCombining. We were unable to find enough information about InstructionCombining to take full advantage of its design.
 
 # Loop Unrolling Optimization
 lun.tip unrolled 29 lines into 113 lines. This will reduce the number of loops that the program will have to go through, thus reducing the total lines that the code will run through and improving the performance. The downside for such an optimization is that it will increase the size of the file since there are more lines of code that have been unrolled.
