@@ -58,8 +58,10 @@ void Optimizer::optimize(Module* theModule, DisoptPass pass) {
         std::cout << "Running CFGS Pass" << std::endl;
       }
 
+      // Was unable to find any benefits for each of these passes
+      //
       // Remove any dead code that is not being used (Dead Code Elimination)
-      if (Optimizer::DisoptPass::dce != pass && Optimizer::DisoptPass::ic != pass) {
+      /*if (Optimizer::DisoptPass::dce != pass && Optimizer::DisoptPass::ic != pass) {
         IntraFPM->add(createDeadCodeEliminationPass());
         std::cout << "Running DCE Pass" << std::endl;
       }
@@ -74,18 +76,18 @@ void Optimizer::optimize(Module* theModule, DisoptPass pass) {
       if (Optimizer::DisoptPass::lfl != pass && Optimizer::DisoptPass::licm != pass) {
         IntraFPM->add(createLoopFlattenPass());
         std::cout << "Running Loop Flatten Pass" << std::endl;
+      
+      // Deletes dead loops
+      if (Optimizer::DisoptPass::del != pass) {
+        IntraFPM->add(createLoopDeletionPass());
+        std::cout << "Running Loop Deletion Pass" << std::endl;
       }
+      }*/
 
       // Unrolls loops in while loop code to improve LOC performance
       if (Optimizer::DisoptPass::lun != pass) {
         IntraFPM->add(createLoopUnrollPass());
         std::cout << "Running Loop Unroll Pass" << std::endl;
-      }
-
-      // Deletes dead loops
-      if (Optimizer::DisoptPass::del != pass) {
-        IntraFPM->add(createLoopDeletionPass());
-        std::cout << "Running Loop Deletion Pass" << std::endl;
       }
 
       // Inlines functions
@@ -108,9 +110,6 @@ void Optimizer::optimize(Module* theModule, DisoptPass pass) {
 
     }
 
-
-    // initialize and run simplification pass on each function
-    //InterFPM->run(*theModule);
 
     IntraFPM->doInitialization();
     for (auto &fun : theModule->getFunctionList()) {
