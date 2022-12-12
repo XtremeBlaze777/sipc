@@ -1,0 +1,9 @@
+main() {
+    var x, y;
+    x = input;
+    if (x==5) {
+        x = 5;
+        y = x + 2;
+    }
+    return x;
+}

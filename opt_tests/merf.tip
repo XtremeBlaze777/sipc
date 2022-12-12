@@ -1,0 +1,26 @@
+foo(a) {
+    var i, cur;
+    cur = a;
+    while (cur > 1) {
+        a = a * (cur-1);
+        cur = cur-1;
+    }
+    return a;
+}
+
+bar(a) {
+    var i, cur;
+    cur = a;
+    while (cur > 1) {
+        a = a * (cur-1);
+        cur = cur-1;
+    }
+    return a;
+}
+
+main() {
+    var f, b;
+    f = foo(input);
+    b = bar(input);
+    return f+b;
+}

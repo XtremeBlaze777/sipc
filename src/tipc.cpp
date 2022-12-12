@@ -26,13 +26,19 @@ static cl::opt<Optimizer::DisoptPass> disopt(cl::desc("Disable all or one optimi
                                   cl::values(
                                     clEnumVal(no, cmdLine[no]),
                                     clEnumVal(all, cmdLine[all]),
-                                    clEnumVal(pmr, cmdLine[pmr]),
+                                    clEnumVal(pm, cmdLine[pm]),
                                     clEnumVal(ic, cmdLine[ic]),
                                     clEnumVal(re, cmdLine[re]),
                                     clEnumVal(gvn, cmdLine[gvn]),
                                     clEnumVal(cfgs, cmdLine[cfgs]),
                                     clEnumVal(dce, cmdLine[dce]),
-                                    clEnumVal(lun, cmdLine[lun])),
+                                    clEnumVal(licm, cmdLine[licm]),
+                                    clEnumVal(lun, cmdLine[lun]),
+                                    clEnumVal(lfl, cmdLine[lfl]),
+                                    clEnumVal(del, cmdLine[del]),
+                                    clEnumVal(merf, cmdLine[merf]),
+                                    clEnumVal(fi, cmdLine[fi])
+                                  ),
                                   cl::cat(TIPcat));
 
 static cl::opt<std::string> cgFile("pcg", 

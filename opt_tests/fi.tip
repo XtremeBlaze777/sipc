@@ -1,0 +1,9 @@
+foo(a) {
+    return a+5;
+}
+
+main() {
+    var x, y;
+    x = foo(y);
+    return foo(x);
+}

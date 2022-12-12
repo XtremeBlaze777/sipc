@@ -1,0 +1,10 @@
+main() {
+    var x, rec, i, sum;
+    x = 5;
+    rec = 6+x;
+    while (5 > i) {
+        sum = sum + rec + x;
+        i = i+1;
+    }
+    return 0;
+}

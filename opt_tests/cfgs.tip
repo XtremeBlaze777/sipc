@@ -1,0 +1,7 @@
+main() {
+    var i;
+    while (64 > i) {
+        output 5;
+    }
+    return 0;
+}

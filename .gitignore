@@ -53,3 +53,4 @@ test/unit/frontend/SIPNodeTest-flawed.cpp
 test.tipc
 test.cpp
 bin/test.tip
+opt_tests/error_msg.txt

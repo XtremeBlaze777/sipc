@@ -1,0 +1,10 @@
+main() {
+    var x,y,z,w,a,b;
+    x = 5;
+    y = x;
+    z = y+5;
+    w = z+y;
+    a = w+y;
+    b = a+w;
+    return b;
+}
