@@ -8,6 +8,8 @@ For our testing, we decided to create a folder in the top of the directory calle
 
 Some optimizations, such as loop unrolling, would not benefit from a lines of code metric since it's goal is to increase the number of lines to reduceloop usage. We decided to use our prior knowledge in computer architecture to explain why loop unrolling would be beneficial to the optimizer.
 
+We also ran each optimization multiple times as some either depended on others, or could have increased benefits after other optimizations had been made. Such dependencies include DeadCodeElimination relying on InstructionCombining, and LoopFlattening relying in LoopInvariantCM.
+
 # Testing existing tip optimizations
 The PromoteMemoryToRegister optimization was one that was difficult to test on the current optimizer, so we decided to test it standalone compared to no optimizer. We found that with the PMR pass, it would remove all the alloca, stores, and loads done for simple operations such as addition and subtraction. It reduced the line of codes tremendously, from 40 LOC in the block to 5 LOC. Furthermore, it does not use heavy operations such as load and store, which further shows why PMR pass is a solid choice for the optimizer. We tested this on pmr.tip with only the PMR optimization.
 
@@ -43,15 +45,8 @@ We tested various optimizations such as dead code elimination, loop invariant, l
 Our big bang test was called bigbang.tip and is included in our opt\_tests folder. This combined each of the programs that we had used for testing so far into one big program to demonstrate how much faster and smaller the program would be compared to no optimizer. We wrote the test such that disabling anyone of the confirmed optimizations would hinder the emitted llvm asssembly of the program. Specifically, we incorporated (Global)DeadCodeElimination, loop unrolling, global value numbering, function merging, function inlining, and simpligying the control flow graph. Without optimizations, the program's bitcode weas around 180 LOC. With our optimizations, it went to 46 LOC, about a 4X decrease in the lines of code!
 
 # Conclusion
-There were some curious issues with developing on Windows (WSL) vs. a Mac: many of the create pass calls would not be included when running on WSL which made it harder to test optimizations ( notably createMergeFunction() and createFunctionInlining() ).
-The aggresiveness of GVN made it very hard to confirm the usefulness of any scalar optimization. particularly the ones that were already present in base tipc. In essence, GVN acted as an "uber" optimization in the sense that it performed all the optimizations that the others would have performed.
+The aggresiveness of GVN made it very hard to confirm the usefulness of any scalar optimization. particularly the ones that were already present in base tipc. In essence, GVN acted as an "uber" optimization in the sense that it performed all the optimizations that the others would have performed. Thus, we focused on other aspects of programs such as loops and functions. We
 
 # Notes
 DeadCodeElimination needs InstructionCombine to run
 LoopFLattening needs LoopInvariantCM to run
-
-# Failed tests
-dce.tip (dead code elimination)
-licm.tip (loop invariant)
-lfl.tip (loop flattening)
-del.tip (dead loops)
