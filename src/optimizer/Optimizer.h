@@ -9,7 +9,7 @@
 namespace Optimizer {
 
   //! \brief keys for optimization passes that can be disabled
-  enum DisoptPass {all, no, pm, ic, re, gvn, cfgs, dce, licm, lun, lfl, del, merf, fi, gdce, NumPasses };
+  enum DisoptPass {all, no, pm, ic, re, gvn, cfgs, lun, merf, fi, gdce, NumPasses };
 
   //! \brief strings for optimization pass keys
   static const constexpr char* const cmdLine[NumPasses] = {
@@ -20,11 +20,7 @@ namespace Optimizer {
     "disable reassociation",
     "disable global value numbering",
     "disable CFG simplification",
-    "disable dead code elimination",
-    "disable loop invariant hoisting",
     "disable loop unrolling",
-    "disable loop flattening",
-    "disable dead loop elimination",
     "disable function merging",
     "disable function inlining",
     "disable global dead code elimination"

@@ -31,11 +31,7 @@ static cl::opt<Optimizer::DisoptPass> disopt(cl::desc("Disable all or one optimi
                                     clEnumVal(re, cmdLine[re]),
                                     clEnumVal(gvn, cmdLine[gvn]),
                                     clEnumVal(cfgs, cmdLine[cfgs]),
-                                    clEnumVal(dce, cmdLine[dce]),
-                                    clEnumVal(licm, cmdLine[licm]),
                                     clEnumVal(lun, cmdLine[lun]),
-                                    clEnumVal(lfl, cmdLine[lfl]),
-                                    clEnumVal(del, cmdLine[del]),
                                     clEnumVal(merf, cmdLine[merf]),
                                     clEnumVal(fi, cmdLine[fi]),
                                     clEnumVal(gdce, cmdLine[gdce])
