@@ -10,7 +10,7 @@ a.out
 *.interp
 
 # build directory
-build
+build/
 
 # LLVM
 *.bc
@@ -33,3 +33,23 @@ xml/
 
 # reports
 coverage.out/
+
+# Post-build files
+corretto.key
+llvm.sh
+kitware-archive.sh
+
+# VSCode
+.vscode/
+tipg4/.antlr/       #antlr extension
+src/frontend/.antlr #antlr extension
+
+# Testing
+tipg4/hellosip.tip
+tipg4/test.sip
+tipg4/prog.sip
+ASTNodeTest.cpp
+test/unit/frontend/SIPNodeTest-flawed.cpp
+test.tipc
+test.cpp
+bin/test.tip
