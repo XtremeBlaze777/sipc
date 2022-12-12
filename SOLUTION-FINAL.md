@@ -27,11 +27,11 @@ There was no need to add scalar optimizations as GVN seemed to cover all of thos
 
 We decided to focus on improving the while loop performance in tip. Once notable optimization that we previously knew from Computer Architecture was loop unrolling, which had diminishing benefits for each unroll, but would reduce the lines of code that the program would need to go through overall. We noticed that the loop unrolling pass would unroll the code from 29 lines to 113 lines, but from doing the math on how many lines of code would run, it would run x lines instead of y lines inside of the loop code.
 
-We also focused on optimizing function calls and function storage space. For the latter, we used a `MergeFunctionPass` that recognized when two functions had similar ASTs. Our file, *merf.tip*, contained two functions, foo and bar, that both had identical code to compute the factorial of the input. Both of the functions were then called and summed in main. Without the MergeFunctionPass, both foo() and bar() had identical definitions (save for the names of registers) in the emitted llvm assembly. Runnng the pass, changed the definition of foo() to instead simply call bar(), which reduced the line number from 16 to 2.
+We also focused on optimizing function calls. For repeated function code, we used a `MergeFunctionPass` that recognized when two functions had similar ASTs. Our file, *merf.tip*, contained two functions, foo and bar, that both had identical code to compute the factorial of the input. Both of the functions were then called and summed in main. Without the MergeFunctionPass, both foo() and bar() had identical definitions (save for the names of registers) in the emitted llvm assembly. Runnng the pass, changed the definition of foo() to instead simply call bar(), which reduced the line number from 16 to 2.
 
-Another optimization that we added was the global dead code elimination pass. Unlike the dead code elimination pass, we had to pass this through the overall pass manager, which allowed us to determine whether some functions would be used or not in our code. In the gdce.tip file, it completely removed the unused function that we had defined since it was not called in any shape or form.
+Another funtion call optimization was the function inlining pass, which would inline functions that we created into the main body if possible. In our file fi.tip, we show that it wil reduce the LOCs by 3 by removing the redundant function code. Instead, all of the function code is just done in the body. 
 
-Our final optimization was the function inlining pass, which would inline functions that we created into the main body if possible. In our file fi.tip, we show that it wil reduce the LOCs by 3 by removing the redundant function code. Instead, all of the function code is just done in the body. 
+Our final optimization that we added was the global dead code elimination pass. Unlike the dead code elimination pass, we had to pass this through the overall pass manager, which allowed us to determine whether some functions would be used or not in our code. In the gdce.tip file, it completely removed the unused function that we had defined since it was not called in any shape or form.
 
 # Failed Optimizations on our End
 
@@ -40,7 +40,7 @@ We tested various optimizations such as dead code elimination, loop invariant, l
 
 # Big Bang Test
 
-Our big bang test was called bigbang.tip and is included in our opt\_tests folder. This combined each of the programs that we had used for testing so far into one big program to demonstrate how much faster and smaller the program would be compared to no optimizer.
+Our big bang test was called bigbang.tip and is included in our opt\_tests folder. This combined each of the programs that we had used for testing so far into one big program to demonstrate how much faster and smaller the program would be compared to no optimizer. We wrote the test such that disabling anyone of the confirmed optimizations would hinder the emitted llvm asssembly of the program. Specifically, we incorporated (Global)DeadCodeElimination, loop unrolling, global value numbering, function merging, function inlining, and simpligying the control flow graph.
 
 # Conclusion
 There were some curious issues with developing on Windows (WSL) vs. a Mac: many of the create pass calls would not be included when running on WSL which made it harder to test optimizations ( notably createMergeFunction() and createFunctionInlining() ).
