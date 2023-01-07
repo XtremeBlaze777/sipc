@@ -7,6 +7,11 @@ tipc
 A compiler from TIP to llvm bitcode
 
 
+## Developers
+The extensions to tipc, converting it into sipc, were performed by **Neil Phan and Ratik Mathur**. The compiler has now been extended to compile SIP, a superset of TIP, to llvm bitcode. Further information about TIP, SIP, and tipc is provided below, courtesy of **Matthew Dwyer** (developer of tipc).
+### A note on the structure of this repo
+In addition to extending this compiler, optimizations for the intermediate code emitted (llvm bitcode) were performed on the base tipc compiler. As such, these optimizations are located in the `optimizations-tipc` branch, while the `main` branch contains the sipc compiler with only the basic optimizations that were included with base tipc.
+
 ## TIP Language, Interpreter, and Analyzers
 
 TIP is a "Tiny Imperative Programming" language developed by Anders M&#248;ller and Michael I. Schwartzbach for the [Static Program Analysis](https://cs.au.dk/~amoeller/spa/ "Static Program Analysis") lecture notes that they developed for graduate instruction at Aarhus University.
